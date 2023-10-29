@@ -11,6 +11,9 @@
 [![PyPI](https://img.shields.io/pypi/v/libcom)](https://pypi.org/project/libcom)
 [![GitHub](https://img.shields.io/github/license/bcmi/libcom)](https://github.com/bcmi/libcom/blob/main/LICENSE)
 ![GitHub Repo stars](https://img.shields.io/github/stars/bcmi/libcom)
+![GitHub forks](https://img.shields.io/github/forks/bcmi/libcom)
+[![Static Badge](https://img.shields.io/badge/Image%20Composition%20Demo-Green)](https://bcmi.sjtu.edu.cn/home/niuli/demo_image_composition/)
+[![Static Badge](https://img.shields.io/badge/Survey-Arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
 
 
 ## Introduction
