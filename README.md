@@ -1,4 +1,4 @@
-<!-- <div align="center">
+<div align="center">
 </br>
 <img src="resources/LOGO.png" width="200" />
 
@@ -6,7 +6,7 @@
 
 <h1 align="center">libcom: everything about image composition.</h1>
 
-</br> -->
+</br>
 
 
 ## Introduction
