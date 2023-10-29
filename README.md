@@ -4,9 +4,13 @@
 
 </div>
 
-<h1 align="center">libcom: everything about image composition.</h1>
+<h1 align="center">libcom: everything about image composition</h1>
 
 </br>
+
+[![PyPI](https://img.shields.io/pypi/v/libcom)](https://pypi.org/project/libcom)
+[![GitHub](https://img.shields.io/github/license/bcmi/libcom)](https://github.com/bcmi/libcom/blob/main/LICENSE)
+![GitHub Repo stars](https://img.shields.io/github/stars/bcmi/libcom)
 
 
 ## Introduction
