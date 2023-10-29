@@ -1,0 +1,2 @@
+from libcom.painterly_image_harmonization.source.ldm.modules.image_degradation.bsrgan import degradation_bsrgan_variant as degradation_fn_bsr
+from libcom.painterly_image_harmonization.source.ldm.modules.image_degradation.bsrgan_light import degradation_bsrgan_variant as degradation_fn_bsr_light

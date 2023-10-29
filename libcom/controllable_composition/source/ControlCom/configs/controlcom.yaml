@@ -1,0 +1,119 @@
+model:
+  base_learning_rate: 1.0e-05
+  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    linear_start: 0.00085
+    linear_end: 0.012
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    first_stage_key: composition
+    cond_stage_key: image
+    image_size: 64
+    channels: 4
+    cond_stage_trainable: false
+    finetune_full_unet: true
+    augment_config:
+      augment_types:
+      - - 0
+        - 0
+      - - 1
+        - 0
+      - - 0
+        - 1
+      - - 1
+        - 1
+      sample_prob:
+      - 0.15
+      - 0.15
+      - 0.35
+      - 0.35
+      sample_mode: random
+      augment_box: false
+      augment_background: true
+      replace_background_prob: 1
+      use_inpaint_background: false
+    conditioning_key: crossattn
+    monitor: val/loss_simple_ema
+    u_cond_percent: 0.2
+    scale_factor: 0.18215
+    use_ema: true
+    use_guidance: true
+    local_uncond: same
+    scheduler_config:
+      target: ldm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps:
+        - 1000
+        cycle_lengths:
+        - 10000000000000
+        f_start:
+        - 1.0e-06
+        f_max:
+        - 1.0
+        f_min:
+        - 1.0
+    unet_config:
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 32
+        in_channels: 11
+        out_channels: 4
+        model_channels: 320
+        attention_resolutions:
+        - 4
+        - 2
+        - 1
+        num_res_blocks: 2
+        channel_mult:
+        - 1
+        - 2
+        - 4
+        - 4
+        num_heads: 8
+        use_spatial_transformer: true
+        transformer_depth: 1
+        context_dim: 768
+        use_checkpoint: true
+        legacy: false
+        add_conv_in_front_of_unet: false
+        local_encoder_config:
+          conditioning_key: ldm.modules.local_module.LocalRefineBlock
+          add_position_emb: false
+          roi_size: 16
+          context_dim: 1024
+          resolutions:
+          - 1
+          - 2
+          add_in_encoder: true
+          add_in_decoder: true
+          add_before_crossattn: false
+    first_stage_config:
+      target: ldm.models.autoencoder.AutoencoderKL
+      params:
+        embed_dim: 4
+        monitor: val/rec_loss
+        ddconfig:
+          double_z: true
+          z_channels: 4
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+          - 1
+          - 2
+          - 4
+          - 4
+          num_res_blocks: 2
+          attn_resolutions: []
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.FrozenCLIPImageEmbedder
+      params:
+        version: openai-clip-vit-large-patch14
+        local_hidden_index: 12
+        use_foreground_mask: false
+        patchtoken_for_global: false
