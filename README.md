@@ -17,7 +17,8 @@
 [![GitHub](https://img.shields.io/github/license/bcmi/libcom)](https://github.com/bcmi/libcom/blob/main/LICENSE)
 
 ## Introduction
-**_libcom_** is an image composition toolbox covering various related tasks, including naive image composition, image blending, color transfer, image harmonization, painterly harmonization, object placement, *etc*. Detailed technical details and api descriptions can be found in the official [[documents]](xxxx). 
+**_libcom_** is an image composition toolbox covering various related tasks, including naive image composition, image blending, color transfer, image harmonization, painterly harmonization, object placement, *etc*. 
+<!-- Detailed technical details and api descriptions can be found in the official [[documents]](xxxx). -->
 
 ## Usage
 
