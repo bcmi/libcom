@@ -100,7 +100,7 @@ def get_ext_modules():
     else:
         return CppExtension('trilinear',  
                             ['trilinear.cpp'], 
-                            include_dirs='libcom/image_harmonization/source/trilinear_cpp/src'
+                            include_dirs=['libcom/image_harmonization/source/trilinear_cpp/src']
                             )
 
 if __name__ == '__main__':
