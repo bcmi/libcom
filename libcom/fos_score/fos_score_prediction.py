@@ -17,12 +17,37 @@ cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_set = ['FOS_D', 'FOS_E'] 
 
 class FOSScoreModel:
+    """
+    Foreground object search score prediction model.
+
+    Args:
+        device (str | torch.device): gpu id
+        model_type (str): predefined model type
+        kwargs (dict): other parameters for building model
+    
+    Examples:
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> from libcom import FOSScoreModel
+        >>> import cv2
+        >>> MODEL_TYPE = 'FOS_D' # choose from 'FOS_D', 'FOS_E'
+        >>> background = '../tests/source/background/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> fg_bbox    = [175, 82, 309, 310] # x1,y1,x2,y2
+        >>> foreground = '../tests/source/foreground/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> foreground_mask = '../tests/source/foreground_mask/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> net        = FOSScoreModel(device=0, model_type=MODEL_TYPE)
+        >>> score      = net(background_image, foreground_image, bounding_box, foreground_mask=foreground_mask)
+        >>> grid_img   = make_image_grid([background_image, foreground_image, composite_image], text_list=[f'fos_score:{score:.2f}'])
+        >>> cv2.imshow('fos_score_demo', grid_img)
+
+    Expected result:
+
+    .. image:: _static/image/fos_score_result1.jpg
+        :scale: 50 %
+
+            
+    """
     def __init__(self, device=0, model_type='FOS_D', **kwargs):
-        '''
-        device: gpu id, type=str/torch.device
-        model_type: predefined model type, type=str
-        kwargs: other parameters for building model, type=dict
-        '''
+        
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
@@ -37,6 +62,9 @@ class FOSScoreModel:
         self.build_data_transformer()
 
     def build_pretrained_model(self, weight_path):
+        """
+        Build pretrained model from path of weight.
+        """
         if self.model_type == "FOS_E":
             model = StudentModel(self.cfg)
             model.load_state_dict(torch.load(weight_path, map_location='cpu'), strict=True)
@@ -139,6 +167,19 @@ class FOSScoreModel:
             bounding_box,
             foreground_mask=None
             ):
+        """
+        Predicting the compatibility score between the given background and the given foreground. Called in __call__ function.
+
+        Args:
+            background_image (str | numpy.ndarray): The path to background image or the background image in ndarray form.
+            foreground_image (str | numpy.ndarray): The path to foreground image or the background image in ndarray form.
+            bounding_box (list): The bounding box which indicates the foreground's location in the background. [x1, y1, x2, y2].
+            foreground_mask (str | numpy.ndarray): Mask of foreground image which indicates the foreground object region in the foreground image. default: None.
+        
+        Returns:
+            fos_score (float): Predicted compatibility score between the given background image and the given foreground image.
+
+        """
         if self.model_type == 'FOS_E':
             background_image, foreground_image = self.inputs_preprocess(background_image, foreground_image, foreground_mask, bounding_box)
             sample = self.prepare_input_encoders(background_image, foreground_image, bounding_box)

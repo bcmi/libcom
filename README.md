@@ -18,7 +18,7 @@
 
 ## Introduction
 **_libcom_** is an image composition toolbox covering various related tasks, including naive image composition, image blending, color transfer, image harmonization, painterly harmonization, object placement, *etc*. 
-<!-- Detailed technical details and api descriptions can be found in the official [[documents]](xxxx). -->
+<!-- For more detailed user guides and method introduction, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/). -->
 
 ## Usage
 

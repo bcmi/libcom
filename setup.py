@@ -99,7 +99,7 @@ def get_ext_modules():
                              )
     else:
         return CppExtension('trilinear',  
-                            ['trilinear.cpp'], 
+                            ['libcom/image_harmonization/source/trilinear_cpp/src/trilinear.cpp'], 
                             include_dirs=['libcom/image_harmonization/source/trilinear_cpp/src']
                             )
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     setup(
         name='libcom',
-        version='0.0.1.post1',
+        version='0.0.1.post2',
         description='Image Composition Toolbox',
         long_description=readme(),
         long_description_content_type='text/markdown',

@@ -14,7 +14,7 @@ if __name__ == '__main__':
         shutil.rmtree(result_dir)
     os.makedirs(result_dir, exist_ok=True)
     print(f'begin testing {task_name}...')
-    net = OPAScoreModel(device=0, model_type='simopa')
+    net = OPAScoreModel(device=0, model_type='SimOPA')
     for pair in test_set:
         comp_img, comp_mask = pair['composite'], pair['composite_mask']
         score = net(comp_img, comp_mask)

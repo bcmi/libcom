@@ -33,12 +33,36 @@ model_set = ['ControlCom']
 task_set  = ['blending', 'harmonization'] # 'viewsynthesis', 'composition'
 
 class ControlComModel:
+    """
+    Foreground object search score prediction model.
+
+    Args:
+        device (str | torch.device): gpu id
+        model_type (str): predefined model type
+        kwargs (dict): sampler='ddim' (default) or 'plms', other parameters for building model
+    
+    Examples:
+        >>> from libcom import ControlComModel
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> import cv2
+        >>> bg_img   = '../tests/source/background/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> fg_bbox  = [175, 82, 309, 310] # x1,y1,x2,y2
+        >>> fg_img   = '../tests/source/foreground/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> fg_mask  = '../tests/source/foreground_mask/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> net      = ControlComModel(device=0, model_type='ControlCom')
+        >>> comp_img = net(bg_img, fg_img, fg_bbox, fg_mask, task=['blending', 'harmonization'])
+        >>> grid_img = make_image_grid([bg_img, fg_img, comp_img[0], comp_img[1]])
+        >>> cv2.imwrite('../docs/_static/image/controlcom_result1.jpg', grid_img)
+
+    Expected result:
+
+    .. image:: _static/image/controlcom_result1.jpg
+        :scale: 50 %
+
+            
+    """
+
     def __init__(self, device=0, model_type='ControlCom', **kwargs):
-        '''
-        device: gpu id, type=str/torch.device
-        model_type: predefined model type, type=str
-        kwargs: other parameters for building model, type=dict
-        '''
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
@@ -157,12 +181,24 @@ class ControlComModel:
     def __call__(self, background_image, foreground_image, bbox, 
                  foreground_mask=None, task='blending', 
                  num_samples=1, sample_steps=50, guidance_scale=5, seed=321):
-        '''
-        background_image, foreground_image: type=str or numpy array or PIL.Image
-        bbox: [x1, y1, x2, y2]
-        task: str or list of str
-        num_samples: int
-        '''
+        """
+        Controllable image composition based on diffusion model. Called in __call__ function.
+
+        Args:
+            background_image (str | numpy.ndarray): The path to background image or the background image in ndarray form.
+            foreground_image (str | numpy.ndarray): The path to foreground image or the background image in ndarray form.
+            bbox (list): The bounding box which indicates the foreground's location in the background. [x1, y1, x2, y2].
+            foreground_mask (None | str | numpy.ndarray): Mask of foreground image which indicates the foreground object region in the foreground image. default: None.
+            task (str | list of str): 'blending', 'harmonization', ['blending', 'harmonization']: Task types, including image blending, image harmonization. default: 'blending'.
+            num_samples (int): Number of images to be generated for each task. default: 1.
+            sample_steps (int): Number of denoising steps. The recommended setting is 25 for PLMS sampler and 50 for DDIM sampler. default: 50.
+            guidance_scale (int): Scale in classifier-free guidance (minimum: 1; maximum: 20). default: 5.
+            seed (int): Random Seed is used to reproduce results and same seed will lead to same results. 
+
+        Returns:
+            composite_images (numpy.ndarray): Generated images with a shape of 512x512x3 or Nx512x512x3, where N indicates the number of generated images. 
+        """
+        
         seed_everything(seed)
         indicator = self.task_to_indicator(task)
         test_kwargs, c, uc = self.inputs_preprocess(background_image, foreground_image, bbox, 

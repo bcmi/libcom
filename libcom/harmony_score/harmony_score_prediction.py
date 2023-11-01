@@ -13,12 +13,33 @@ cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_set = ['BargainNet'] 
 
 class HarmonyScoreModel:
+    """
+    Foreground object search score prediction model.
+
+    Args:
+        device (str | torch.device): gpu id
+        model_type (str): predefined model type.
+        kwargs (dict): other parameters for building model
+    
+    Examples:
+        >>> from libcom import HarmonyScoreModel
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> import cv2
+        >>> net = HarmonyScoreModel(device=0, model_type='BargainNet')
+        >>> comp_img  = '../tests/source/composite/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
+        >>> comp_mask = '../tests/source/composite_mask/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
+        >>> score     = net(comp_img, comp_mask)
+        >>> grid_img  = make_image_grid([comp_img, comp_mask], text_list=[f'harmony_score:{score:.2f}', 'composite-mask'])
+        >>> cv2.imwrite('../docs/_static/image/harmonyscore_result1.jpg', grid_img)
+
+    Expected result:
+
+    .. image:: _static/image/harmonyscore_result1.jpg
+        :scale: 50 %
+
+            
+    """
     def __init__(self, device=0, model_type='BargainNet', **kwargs):
-        '''
-        device: gpu id, type=str/torch.device
-        model_type: predefined model type, type=str
-        kwargs: other parameters for building model, type=dict
-        '''
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
@@ -75,9 +96,17 @@ class HarmonyScoreModel:
     
     @torch.no_grad()
     def __call__(self, composite_image, composite_mask):
-        '''
-        composite_image, composite_mask: type=str or numpy array or PIL.Image
-        '''
+        """
+        Predicting the compatibility score between background and foreground in the given composite image. Called in __call__ function.
+
+        Args:
+            composite_image (str | numpy.ndarray): The path to composite image or the compposite image in ndarray form.
+            composite_mask (str | numpy.ndarray): Mask of composite image which indicates the foreground object region in the composite image.
+        
+        Returns:
+            harmony_score (float): Predicted harmony score within [0,1] between background region and foreground region of the given composite image. Larger harmony score implies more harmonious composite image.
+
+        """
         im, bg_mask, fg_mask = self.inputs_preprocess(composite_image, composite_mask)
         bg_style = self.model(im, bg_mask)
         fg_style = self.model(im, fg_mask)

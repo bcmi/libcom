@@ -5,11 +5,46 @@ from libcom.utils.process_image import *
 
 
 def get_composite_image(foreground_image, foreground_mask, background_image, bbox, option="none"):
-    '''
-    foreground_image, foreground_mask, background_img: image_path/numpy array/PIL.Image
-    bbox: [x1,y1,x2,y2]
-    option: one of ['none', 'gaussian', 'poisson']
-    '''
+    """
+    Generate composite image through copy-and-paste.
+
+    Args:
+        foreground_image (str | numpy.ndarray): The path to foreground image or the background image in ndarray form.
+        foreground_mask (str | numpy.ndarray): Mask of foreground image which indicates the foreground object region in the foreground image.
+        background_image (str | numpy.ndarray): The path to background image or the background image in ndarray form. 
+        bbox (list): The bounding box which indicates the foreground's location in the background. [x1, y1, x2, y2]. 
+        option (str): 'none', 'gaussian', or 'poisson'. Image blending method. default: None.
+
+    Returns:
+        composite_image (numpy.ndarray): Generated composite image with the same resolution as input background image.
+        composite_mask (numpy.ndarray): Generated composite mask with the same resolution as composite image.
+    
+    Examples:
+        >>> from libcom import get_composite_image
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> import cv2
+        >>> 
+        >>> bg_img  = '../tests/source/background/8351494f79f6bf8f_m03k3r_73176af9_08.png'
+        >>> bbox = [223, 104, 431, 481] # x1,y1,x2,y2
+        >>> fg_img  = '../tests/source/foreground/8351494f79f6bf8f_m03k3r_73176af9_08.png'
+        >>> fg_mask = '../tests/source/foreground_mask/8351494f79f6bf8f_m03k3r_73176af9_08.png'
+        >>> # generate composite images by naive methods
+        >>> img_list = [bg_img, fg_img]
+        >>> comp_img1, comp_mask1 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'none')
+        >>> comp_img2, comp_mask2 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'gaussian')
+        >>> comp_img3, comp_mask3 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'poisson')
+        >>> img_list += [comp_img1, comp_mask1, comp_img2, comp_mask2, comp_img3, comp_mask3]
+        >>> # visualization results
+        >>> grid_img  = make_image_grid(img_list, cols=4)
+        >>> cv2.imwrite('../docs/_static/image/generatecomposite_result1.jpg', grid_img)
+    
+    Expected result:
+
+    .. image:: _static/image/generatecomposite_result1.jpg
+        :scale: 50 %
+
+            
+    """
     choices = ['none', 'gaussian', 'poisson']
     assert option in choices, f'{option} must be one of {choices}'
     fg_img   = read_image_opencv(foreground_image)

@@ -30,3 +30,4 @@ if __name__ == '__main__':
         cv2.imwrite(res_path, grid_img)
         print('save result to ', res_path)
     print(f'end testing {task_name}!\n')
+    

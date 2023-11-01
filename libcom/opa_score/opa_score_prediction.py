@@ -9,12 +9,38 @@ import os
 import torchvision.transforms as transforms
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
-model_set = ['simopa'] 
+model_set = ['SimOPA'] 
 
 
 class OPAScoreModel:
-    def __init__(self, device=0, model_type='simopa', **kwargs):
-        assert model_type in ['simopa'], f'Not implementation for {model_type}'
+    """
+    Foreground object search score prediction model.
+
+    Args:
+        device (str | torch.device): gpu id
+        model_type (str): predefined model type.
+        kwargs (dict): other parameters for building model
+    
+    Examples:
+        >>> from libcom import OPAScoreModel
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> import cv2
+        >>> net = OPAScoreModel(device=0, model_type='SimOPA')
+        >>> comp_img  = '../tests/source/composite/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
+        >>> comp_mask = '../tests/source/composite_mask/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
+        >>> score = net(comp_img, comp_mask)
+        >>> grid_img  = make_image_grid([comp_img, comp_mask], text_list=[f'opa_score:{score:.2f}', 'composite-mask'])
+        >>> cv2.imwrite('../docs/_static/image/opascore_result1.jpg', grid_img)
+
+    Expected result:
+
+    .. image:: _static/image/opascore_result1.jpg
+        :scale: 50 %
+
+            
+    """
+    def __init__(self, device=0, model_type='SimOPA', **kwargs):
+        assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
         weight_path = os.path.join(cur_dir, 'pretrained_models', 'SimOPA.pth')
@@ -50,6 +76,17 @@ class OPAScoreModel:
     
     @torch.no_grad()
     def __call__(self, composite_image, composite_mask):
+        """
+        Predicting the object placement assessment (opa) score for the given composite image, which evaluates the rationality of foreground object placement. Called in __call__ function.
+
+        Args:
+            composite_image (str | numpy.ndarray): The path to composite image or the compposite image in ndarray form.
+            composite_mask (str | numpy.ndarray): Mask of composite image which indicates the foreground object region in the composite image.
+        
+        Returns:
+            opa_score (float): Predicted opa score ranges from 0 to 1, where a larger score indicates more reasonable placement.
+
+        """
         inputs    = self.inputs_preprocess(composite_image, composite_mask)
         outputs   = self.model(inputs)
         preds     = self.outputs_postprocess(outputs)

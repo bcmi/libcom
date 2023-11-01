@@ -4,6 +4,34 @@ import cv2
 from libcom.utils.process_image import *
 
 def color_transfer(composite_image, composite_mask):
+    """
+    Generate composite image through copy-and-paste.
+
+    Args:
+        composite_image (str | numpy.ndarray): The path to composite image or the compposite image in ndarray form.
+        composite_mask (str | numpy.ndarray): Mask of composite image which indicates the foreground object region in the composite image.
+
+    Returns:
+        transfered image (numpy.ndarray): Transfered image with the same resolution as input image.
+    
+    Examples:
+        >>> from libcom import color_transfer
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> import cv2
+        >>> comp_img  = '../tests/source/composite/5b9e0751ca458cad_m0gjkl_40736b77_04.png'
+        >>> comp_mask = '../tests/source/composite_mask/5b9e0751ca458cad_m0gjkl_40736b77_04.png'
+        >>> trans_img = color_transfer(comp_img, comp_mask)
+        >>> # visualization results
+        >>> grid_img  = make_image_grid([comp_img, comp_mask, trans_img])
+        >>> cv2.imwrite('../docs/_static/image/colortransfer_result1.jpg', grid_img)
+
+    Expected result:
+
+    .. image:: _static/image/colortransfer_result1.jpg
+        :scale: 50 %
+
+            
+    """
     comp_img  = read_image_opencv(composite_image)
     comp_mask = read_mask_opencv(composite_mask)
     if comp_mask.shape[:2] != comp_img.shape[:2]:
