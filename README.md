@@ -63,7 +63,7 @@ Alternatively, you can download these files from [[Modelscope]](https://modelsco
 - Project Initiator & Team Manager: [Li Niu](https://www.ustcnewly.com/index.html). 
 - Architect & Lead Developer: [Bo Zhang](https://bo-zhang-cs.github.io/).   
 - Documentation Manager: [Jiacheng Sui](https://github.com/charlessjc).
-- Module Developers: [Jiacheng Sui](https://github.com/charlessjc).
+- Module Developers: [Jiacheng Sui](https://github.com/charlessjc), [Binjie Gao](https://github.com/WhynotHAHA), [Lingxiao Lu](https://github.com/pokaaa), Xinhao Tao, Junyan Cao. 
 
 ## Bibtex
 
