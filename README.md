@@ -10,7 +10,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/libcom)](https://pypi.org/project/libcom)
 [![Downloads](https://static.pepy.tech/badge/libcom)](https://pepy.tech/project/libcom)
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fbcmi%2Flibcom&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=views&edge_flat=false)](https://hits.seeyoufarm.com)
+[![Hits](https://hits.sh/github.com/bcmi/libcom.svg?label=views&extraCount=239)](https://hits.sh/github.com/bcmi/libcom/)
 ![GitHub Repo stars](https://img.shields.io/github/stars/bcmi/libcom)
 [![Static Badge](https://img.shields.io/badge/Image%20Composition%20Demo-Green)](https://bcmi.sjtu.edu.cn/home/niuli/demo_image_composition/)
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
