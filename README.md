@@ -59,10 +59,11 @@ During using the toolbox, the pretrained models and related files will be automa
 Alternatively, you can download these files from [[Modelscope]](https://modelscope.cn/models/bcmizb/Libcom_pretrained_models/files) or [[Huggingface]](https://huggingface.co/BCMIZB/Libcom_pretrained_models/tree/main) in advance, and move them to the installation directory.
 
 ## Contributors
-
-<a href="https://github.com/bcmi/libcom/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=bcmi/libcom" />
-</a>
+- Institution: [Brain-like Computing and Machine Intelligence (BCMI) Lab](https://bcmi.sjtu.edu.cn/).
+- Project Initiator & Team Manager: [Li Niu](https://www.ustcnewly.com/index.html). 
+- Architect & Lead Developer: [Bo Zhang](https://bo-zhang-cs.github.io/).   
+- Documentation Manager: [Jiacheng Sui](https://github.com/charlessjc).
+- Module Developers: [Jiacheng Sui](https://github.com/charlessjc).
 
 ## Bibtex
 
