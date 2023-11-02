@@ -58,6 +58,12 @@ During using the toolbox, the pretrained models and related files will be automa
 
 Alternatively, you can download these files from [[Modelscope]](https://modelscope.cn/models/bcmizb/Libcom_pretrained_models/files) or [[Huggingface]](https://huggingface.co/BCMIZB/Libcom_pretrained_models/tree/main) in advance, and move them to the installation directory.
 
+## Contributors
+
+<a href="https://github.com/bcmi/libcom/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=bcmi/libcom" />
+</a>
+
 ## Bibtex
 
 If you use our toolbox, please cite our survey paper using the following BibTeX  [[arxiv](https://arxiv.org/pdf/2106.14490.pdf)]:
