@@ -40,6 +40,10 @@ the illumination statistics of foreground to fit background.
 
 For more detailed user guidance and method description, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/). 
 
+## Requirements
+
+The main branch is built on the Linux system with **Python 3.8** and **PyTorch 1.10.1**. For other dependencies, please refer to [[conda_env]](requirements/libcom.yaml) and [[runtime_dependencies]](requirements/runtime.txt).
+
 ## Get Started
 
 ### Create runtime environment
