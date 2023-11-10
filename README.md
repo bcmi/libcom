@@ -45,39 +45,7 @@ For more detailed user guidance and method description, please refer to our [[do
 The main branch is built on the Linux system with **Python 3.8** and **PyTorch 1.10.1**. For other dependencies, please refer to [[conda_env]](requirements/libcom.yaml) and [[runtime_dependencies]](requirements/runtime.txt).
 
 ## Get Started
-
-### Create runtime environment
-
-```shell
-git clone https://github.com/bcmi/libcom.git
-cd libcom/requirements
-conda env create -f libcom.yaml
-conda activate Libcom
-pip install -r runtime.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
-# install a specific version of taming-transformers from source code
-cd ../libcom/controllable_composition/source/ControlCom/src/taming-transformers
-python setup.py install
-```
-
-### Installation
-```shell
-pip install libcom
-```
-or
-```shell
-python setup.py install
-```
-After that, you can verify the installation by running:
-```shell
-cd tests
-sh run_all_tests.sh
-```
-The visualization results can be found in `results` folder.
-
-### Download pretrained models
-During using the toolbox, the pretrained models and related files will be automatically downloaded to the installation directory. Note downloading the pretrained models may take some time when you first call some models, especially `ShadowGenerationModel`, `ControlComModel`, and `PainterlyHarmonizationModel`.
-
-Alternatively, you can download these files from [[Modelscope]](https://modelscope.cn/models/bcmizb/Libcom_pretrained_models/files) or [[Huggingface]](https://huggingface.co/BCMIZB/Libcom_pretrained_models/tree/main) in advance, and move them to the installation directory.
+Please refer to [[Installation]](docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guides.
 
 ## Contributors
 - Institution: [Brain-like Computing and Machine Intelligence (BCMI) Lab](https://bcmi.sjtu.edu.cn/).
