@@ -17,11 +17,17 @@
 [![GitHub](https://img.shields.io/github/license/bcmi/libcom)](https://github.com/bcmi/libcom/blob/main/LICENSE)
 
 ## Introduction
-**_libcom_** is an image composition toolbox. The goal of image composition is inserting one foreground into a background image to get a realistic composite image. Generally speaking, image composition could be used to combine the visual elements from different images.
+**_libcom_** is an image composition toolbox. The goal of image composition is inserting one foreground into a background image to get a realistic composite image, by addressing the inconsistencies (appearance, geometry, and semantic inconsistency) between foreground and background. Generally speaking, image composition could be used to combine the visual elements from different images.
+<div align="center">
+</br>
+<img src="resources/image_composition_task.gif" width="600" />
+</div>
 
 **_libcom_** covers various related tasks in the field of image composition, including image harmonization, painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
 
-### Main Parts
+The ultimate goal of this library is solving all the problems related to image composition by simply using `import libcom`. 
+
+### Main Functions
 
 - **get_composite_image** generates composite images using naive copy-and-paste followed by image blending.
 - **OPAScoreModel** is an object placement assessment model that evaluates the rationality of object placement by predicting a rationality scores.
