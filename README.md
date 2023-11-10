@@ -21,8 +21,7 @@
 
 **_libcom_** covers various related tasks in the field of image composition, including image harmonization, painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
 
-<details open>
-<summary>Main Parts</summary>
+### Main Parts
 
 - **get_composite_image** generates composite images using naive copy-and-paste followed by image blending.
 - **OPAScoreModel** is an object placement assessment model that evaluates the rationality of object placement by predicting a rationality scores.
@@ -36,7 +35,6 @@ the illumination statistics of foreground to fit background.
 - **FOSScoreModel** contains two foreground object search models, which can be used to evaluate the compatibility between foreground and background in terms of geometry and semantics.
 - **ControlComModel** is a controllable image composition model, which unifies image blending and image harmonization in one diffusion model. 
 - **ShadowGenerationModel** takes in deshadowed composite image and foreground object mask, and generates images with semantically plausible foreground shadows.
-</details>
 
 For more detailed user guidance and method description, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/). 
 
