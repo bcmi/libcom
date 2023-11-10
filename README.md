@@ -21,9 +21,26 @@
 
 **_libcom_** covers various related tasks in the field of image composition, including image harmonization, painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
 
+<details open>
+<summary>Main APIs</summary>
+
+- **get_composite_image** generates composite images using naive copy-and-paste followed by image blending.
+- **OPAScoreModel** is an object placement assessment model that evaluates the rationality of object placement by predicting a rationality scores.
+- **FOPAHeatMapModel** can predict the rationality scores for all locations with a pair of background and scaled foreground as input in a single forward pass.
+- **color_transfer** tranfers the color of foreground to fit background scene using reinhard algorithm.
+- **ImageHarmonizationModel** contains several pretrained models for image harmonization, which aims to adjust
+the illumination statistics of foreground to fit background.
+- **PainterlyHarmonizationModel** contains serveral pretrained models for painterly image harmonization, which aims to adjust the foreground style of the painterly composite image to make it compatible with the background.
+- **HarmonyScoreModel** predicts harmony score for a composite image, in which larger harmony score implies more harmonious composite image.
+- **InharmoniousLocalizationModel** supports the localization of the inharmonious region in a synthetic image.
+- **FOSScoreModel** contains two foreground object search models, which can be used to evaluate the compatibility between foreground and background in terms of geometry and semantics.
+- **ControlComModel** is a controllable image composition model, which unifies image blending and image harmonization in one diffusion model. 
+- **ShadowGenerationModel** takes in deshadowed composite image and foreground object mask, and generates images with semantically plausible foreground shadows.
+</details>
+
 For more detailed user guidance and method description, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/). 
 
-## Usage
+## Get Started
 
 ### Create runtime environment
 
