@@ -17,30 +17,29 @@
 [![GitHub](https://img.shields.io/github/license/bcmi/libcom)](https://github.com/bcmi/libcom/blob/main/LICENSE)
 
 ## Introduction
-**_libcom_** is an image composition toolbox. The goal of image composition is inserting one foreground into a background image to get a realistic composite image, by addressing the inconsistencies (appearance, geometry, and semantic inconsistency) between foreground and background. Generally speaking, image composition could be used to combine the visual elements from different images.
+**_libcom_ is an image composition toolbox.** The goal of image composition is inserting one foreground into a background image to get a realistic composite image, by addressing the inconsistencies (appearance, geometry, and semantic inconsistency) between foreground and background. Generally speaking, image composition could be used to combine the visual elements from different images.
 <div align="center">
 </br>
 <img src="resources/image_composition_task.gif" width="600" />
 </div>
 
-**_libcom_** covers various related tasks in the field of image composition, including image harmonization, painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
+**_libcom_ covers a diversity of related tasks in the field of image composition**, including image blending, standard/painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
 
-The ultimate goal of this library is solving all the problems related to image composition by simply using `import libcom`. 
+**The ultimate goal of this library is solving all the problems related to image composition with simple `import libcom`.**
 
 ### Main Functions
 
 - **get_composite_image** generates composite images using naive copy-and-paste followed by image blending.
-- **OPAScoreModel** is an object placement assessment model that evaluates the rationality of object placement by predicting a rationality scores.
-- **FOPAHeatMapModel** can predict the rationality scores for all locations with a pair of background and scaled foreground as input in a single forward pass.
-- **color_transfer** tranfers the color of foreground to fit background scene using reinhard algorithm.
-- **ImageHarmonizationModel** contains several pretrained models for image harmonization, which aims to adjust
-the illumination statistics of foreground to fit background.
-- **PainterlyHarmonizationModel** contains serveral pretrained models for painterly image harmonization, which aims to adjust the foreground style of the painterly composite image to make it compatible with the background.
-- **HarmonyScoreModel** predicts harmony score for a composite image, in which larger harmony score implies more harmonious composite image.
-- **InharmoniousLocalizationModel** supports the localization of the inharmonious region in a synthetic image.
-- **FOSScoreModel** contains two foreground object search models, which can be used to evaluate the compatibility between foreground and background in terms of geometry and semantics.
-- **ControlComModel** is a controllable image composition model, which unifies image blending and image harmonization in one diffusion model. 
-- **ShadowGenerationModel** takes in deshadowed composite image and foreground object mask, and generates images with semantically plausible foreground shadows.
+- **OPAScoreModel**  evaluates the rationality of foreground object placement in a composite image.
+- **FOPAHeatMapModel** can predict the rationality scores for all locations/scales given a background-foreground pair, and output the composite image with optimal location/scale.  
+- **color_transfer** adjusts the foreground color to match the background using traditional color transfer method.
+- **ImageHarmonizationModel** adjusts the foreground illumination to be compatible the background given photorealistic background and photorealistic foreground.
+- **PainterlyHarmonizationModel** adjusts the foreground style to be compatible with the background given artistic background and photorealistic foreground.
+- **HarmonyScoreModel** evaluates the harmony level between foreground and background in a composite image.
+- **InharmoniousLocalizationModel** localizes the inharmonious region in a synthetic image.
+- **FOSScoreModel** evaluates the compatibility between foreground and background in a composite image in terms of geometry and semantics.
+- **ControlComModel** is a generative image composition model, which unifies image blending and image harmonization in one diffusion model. 
+- **ShadowGenerationModel** generates plausible shadow for the inserted object in a composite image. 
 
 For more detailed user guidance and method description, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/). 
 
@@ -49,7 +48,7 @@ For more detailed user guidance and method description, please refer to our [[do
 The main branch is built on the Linux system with **Python 3.8** and **PyTorch 1.10.1**. For other dependencies, please refer to [[conda_env]](requirements/libcom.yaml) and [[runtime_dependencies]](requirements/runtime.txt).
 
 ## Get Started
-Please refer to [[Installation]](docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guides.
+Please refer to [[Installation]](docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guidance.
 
 ## Contributors
 - Institution: [Brain-like Computing and Machine Intelligence (BCMI) Lab](https://bcmi.sjtu.edu.cn/).
