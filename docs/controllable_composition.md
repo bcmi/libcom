@@ -1,17 +1,15 @@
 # Controllable Image Composition
 
-Controllable image composition unifies multiple image composition sub-tasks into one generateive model. Here we adopt the following method:
+Controllable image composition unifies multiple image composition sub-tasks (*i.e.*, image blending and image harmonization) into one generative model with a binary indicator variable to decide the sub-task, by using the following method. Image blending aims to insert the foreground object into the specified bounding box on the background seamlessly, while image harmonization further adjusts the foreground illumination to be compatible with the background. Given a foreground image containing foreground object, the foreground mask is optional, but providing foreground mask may improve the performance. Note that this model does not change the pose/viewpoint of foreground. This model works well in most cases and can maintain delicate details. 
 
-**ControlCom**:
-
-> **ControlCom: Controllable Image Composition using Diffusion Model**  [[arxiv]](https://arxiv.org/pdf/2308.10040.pdf) [[homepage]](https://github.com/bcmi/ControlCom-Image-Composition)<br>
+> **ControlCom: Controllable Image Composition using Diffusion Model**  [[arXiv]](https://arxiv.org/pdf/2308.10040.pdf) [[code]](https://github.com/bcmi/ControlCom-Image-Composition)<br>
 >
 > Bo Zhang, Yuxuan Duan, Jun Lan, Yan Hong, Huijia Zhu, Weiqiang Wang, Li Niu<br>
 
 ## Brief Method Summary
 
-<img src="../resources/controllable_composition.png" style="zoom:50%"/>
+![controllable_composition](../resources/controllable_composition.jpg)
+
 
 ### ControlCom
-
-Controllable Composition (ControlCom) unifies four tasks in one model using an 2-dim binary indicator vector, in which the first (resp., second) dimension represents whether adjusting the foreground illumination (resp., pose) to be compatible with background. 1 means making adjustment and 0 means remaining the same. Therefore, (0,0) corresponds to image blending, (1,0) corresponds to image harmonization, (0,1) corresponds to view synthesis, (1,1) corresponds to generative composition. **The current implementation only supports image blending and image harmonization.**
+Controllable Composition (ControlCom) is built on pretrained stable diffusion, which takes masked background and noisy latent image as input. A foreground encoder extracts foreground features, which are injected into stable diffusion. Moreover, ControlCom introduces a binary indicator variable to indicate whether the foreground illumination should be changed. 0 indicates that the foreground illumination is not changed, corresponding to image blending task. 1 indicates that the foreground illumination is changed to match the background, corresponding to image harmonization task. In this way, ControlCom unifies these two tasks in one model.

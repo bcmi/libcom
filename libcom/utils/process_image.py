@@ -95,3 +95,14 @@ def make_image_grid(img_list, text_list=None, resolution=(512,512), cols=None, b
             grid_img.append(ver_border)
     grid_img = np.concatenate(grid_img, axis=0)
     return grid_img
+
+def draw_bbox_on_image(input_img, bbox, color=(0,255,255), line_width=5):
+    img = read_image_opencv(input_img)
+    x1, y1, x2, y2 = bbox
+    h,w,_ = img.shape
+    x1 = max(x1, line_width)
+    y1 = max(y1, line_width)
+    x2 = min(x2, w-line_width)
+    y2 = min(y2, h-line_width)
+    img = cv2.rectangle(img, (x1,y1), (x2,y2), color, thickness=line_width)
+    return img

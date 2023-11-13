@@ -12,12 +12,51 @@ cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_set = ['PCTNet', 'CDTNet'] 
 
 class ImageHarmonizationModel:
+    """
+    Image harmonization model.
+
+    Args:
+        device (str | torch.device): gpu id
+        model_type (str): predefined model type, 'PCTNet' or 'CDTNet'
+        kwargs (dict): other parameters for building model
+
+    Examples:
+        >>> from libcom import ImageHarmonizationModel
+        >>> import cv2
+        >>> import os
+        >>> import numpy as np
+        >>> from PIL import Image
+
+        >>> #Use CDTNet
+        >>> CDTNet = ImageHarmonizationModel(device=0, model_type='CDTNet')
+        >>> comp_img1  = '../tests/source/composite/comp1_CDTNet.jpg'
+        >>> comp_mask1 = '../tests/source/composite_mask/mask1_CDTNet.png'
+        >>> CDT_result1 = CDTNet(comp_img1, comp_mask1)
+        >>> cv2.imwrite('../docs/_static/image/image_harmonization_CDT_result1.jpg', np.concatenate([cv2.imread(comp_img1), cv2.imread(comp_mask1), CDT_result1],axis=1))
+        >>> comp_img2  = '../tests/source/composite/comp2_CDTNet.jpg'
+        >>> comp_mask2 = '../tests/source/composite_mask/mask2_CDTNet.png'
+        >>> CDT_result2 = CDTNet(comp_img2, comp_mask2)
+        >>> cv2.imwrite('../docs/_static/image/image_harmonization_CDT_result2.jpg', np.concatenate([cv2.imread(comp_img2), cv2.imread(comp_mask2), CDT_result2],axis=1))
+        >>> #Use PCTNet
+        >>> PCTNet = ImageHarmonizationModel(device=0, model_type='PCTNet')
+        >>> comp_img1  = '../tests/source/composite/comp1_PCTNet.jpg'
+        >>> comp_mask1 = '../tests/source/composite_mask/mask1_PCTNet.png'
+        >>> PCT_result1 = PCTNet(comp_img1, comp_mask1)
+        >>> cv2.imwrite('../docs/_static/image/image_harmonization_PCT_result1.jpg', np.concatenate([cv2.imread(comp_img1), cv2.imread(comp_mask1), PCT_result1],axis=1))
+        >>> comp_img2  = '../tests/source/composite/comp2_PCTNet.jpg'
+        >>> comp_mask2 = '../tests/source/composite_mask/mask2_PCTNet.png'
+        >>> PCT_result2 = PCTNet(comp_img2, comp_mask2)
+        >>> cv2.imwrite('../docs/_static/image/image_harmonization_PCT_result2.jpg', np.concatenate([cv2.imread(comp_img2), cv2.imread(comp_mask2), PCT_result2],axis=1))
+
+    Expected result:
+
+    .. image:: _static/image/image_harmonization_CDT_result1.jpg
+    .. image:: _static/image/image_harmonization_CDT_result2.jpg
+    .. image:: _static/image/image_harmonization_PCT_result1.jpg
+    .. image:: _static/image/image_harmonization_PCT_result2.jpg
+
+    """
     def __init__(self, device=0, model_type='PCTNet', **kwargs):
-        '''
-        device: gpu id, type=str/torch.device
-        model_type: predefined model type, type=str
-        kwargs: other parameters for building model, type=dict
-        '''
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
@@ -68,10 +107,17 @@ class ImageHarmonizationModel:
     
     @torch.no_grad()
     def __call__(self, composite_image, composite_mask):
-        '''
-        composite_image, composite_mask: type=str or numpy array or PIL.Image
-        '''
-        # insert your code here: define inference pipeline
+        """
+        Given a composite image and a foreground mask, perform harmonization on the foreground.
+
+        Args:
+            composite_image (str | numpy.ndarray): The path to composite image or the compposite image in ndarray form.
+            composite_mask (str | numpy.ndarray): Mask of composite image which indicates the foreground object region in the composite image.
+
+        Returns:
+            harmonized_image (np.array): The harmonized result.
+        
+        """
         img, mask, img_lr, mask_lr = self.inputs_preprocess(composite_image, composite_mask)
         if self.model_type == "CDTNet":
             outputs = self.model(img, mask)

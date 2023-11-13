@@ -14,7 +14,7 @@ model_set = ['SimOPA']
 
 class OPAScoreModel:
     """
-    Foreground object search score prediction model.
+    OPA score prediction model.
 
     Args:
         device (str | torch.device): gpu id
@@ -23,19 +23,26 @@ class OPAScoreModel:
     
     Examples:
         >>> from libcom import OPAScoreModel
+        >>> from libcom import get_composite_image
         >>> from libcom.utils.process_image import make_image_grid
         >>> import cv2
         >>> net = OPAScoreModel(device=0, model_type='SimOPA')
-        >>> comp_img  = '../tests/source/composite/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
-        >>> comp_mask = '../tests/source/composite_mask/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
-        >>> score = net(comp_img, comp_mask)
-        >>> grid_img  = make_image_grid([comp_img, comp_mask], text_list=[f'opa_score:{score:.2f}', 'composite-mask'])
+        >>> test_dir  = './source'
+        >>> bg_img    = 'source/background/17.jpg'
+        >>> fg_img    = 'source/foreground/17.jpg'
+        >>> fg_mask   = 'source/foreground_mask/17.png'
+        >>> bbox_list = [[475, 697, 1275, 1401], [475, 300, 1275, 1004]]
+        >>> comp1, comp_mask1 = get_composite_image(fg_img, fg_mask, bg_img, bbox_list[0])
+        >>> comp2, comp_mask2 = get_composite_image(fg_img, fg_mask, bg_img, bbox_list[1])
+        >>> score1 = net(comp1, comp_mask1)
+        >>> score2 = net(comp2, comp_mask2)
+        >>> grid_img  = make_image_grid([comp1, comp_mask1, comp2, comp_mask2], text_list=[f'opa_score:{score1:.2f}', 'composite-mask', f'opa_score:{score2:.2f}', 'composite-mask'])
         >>> cv2.imwrite('../docs/_static/image/opascore_result1.jpg', grid_img)
 
     Expected result:
 
     .. image:: _static/image/opascore_result1.jpg
-        :scale: 50 %
+        :scale: 38 %
 
             
     """
@@ -77,7 +84,7 @@ class OPAScoreModel:
     @torch.no_grad()
     def __call__(self, composite_image, composite_mask):
         """
-        Predicting the object placement assessment (opa) score for the given composite image, which evaluates the rationality of foreground object placement. Called in __call__ function.
+        Predicting the object placement assessment (opa) score for the given composite image, which evaluates the rationality of foreground object placement.
 
         Args:
             composite_image (str | numpy.ndarray): The path to composite image or the compposite image in ndarray form.

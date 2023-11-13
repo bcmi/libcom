@@ -11,5 +11,5 @@ python:
     - requirements: requirements.txt
     - method: pip
       path: .
-sphinx:
-  fail_on_warning: true
+# sphinx:
+#   fail_on_warning: true

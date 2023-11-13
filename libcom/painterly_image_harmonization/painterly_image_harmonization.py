@@ -23,6 +23,34 @@ cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_set = ['PHDNet', 'PHDiffusion'] 
 
 class PainterlyHarmonizationModel:
+    """
+    Painterly image harmonization prediction model.
+
+    Args:
+        device (str | torch.device): gpu id
+        model_type (str): predefined model type
+        kwargs (dict): use_residual (bool): whether to use adapter with residual or not for PHDiffusion
+
+    Examples:
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> from libcom import PainterlyHarmonizationModel
+        >>> import cv2
+        >>> import torch
+        >>> task_name = 'painterly_image_harmonization'
+        >>> MODEL_TYPE = 'PHDNet' # choose from 'PHDNet', 'PHDiffusion'
+        >>> comp_img = '../tests/painterly_harmonization_source/composite/3.png'
+        >>> comp_mask = '../tests/painterly_harmonization_source/composite_mask/3.png'
+        >>> net = PainterlyHarmonizationModel(device=0, model_type=MODEL_TYPE)
+        >>> output_img = net(comp_img, comp_mask)
+        >>> grid_img = make_image_grid([comp_img, comp_mask, output_img])
+        >>> cv2.imshow('painterly_image_harmonization_demo', grid_img)
+
+    Expected result:
+
+    .. image:: _static/image/painterly_image_harmonization_result2.jpg
+    .. image:: _static/image/painterly_image_harmonization_result3.jpg
+        
+    """
     def __init__(self, device=0, model_type='PHDNet', **kwargs):
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
@@ -120,9 +148,6 @@ class PainterlyHarmonizationModel:
     
     @torch.no_grad()
     def PHDNet_inference(self, composite_image, composite_mask):
-        '''
-        composite_image, composite_mask: type=str or numpy array or PIL.Image
-        '''
         comp, mask = self.inputs_preprocess(composite_image, composite_mask)
         outputs    = self.model(comp, mask)
         preds      = self.outputs_postprocess(outputs)
@@ -130,6 +155,19 @@ class PainterlyHarmonizationModel:
     
     @torch.no_grad()
     def __call__(self, composite_image, composite_mask, sample_steps=50, strength=0.7, random_seed=None):
+        """
+        Generating the harmonized image for the given composite image and the corresponding composite mask.
+
+        Args:
+            composite_image (str | numpy.ndarray): The path to the composite image or the composite image in ndarray form.
+            composite_mask (str | numpy.ndarray): The path to the composite mask or the composite mask in ndarray form.
+            sample_steps (int): Default total step in the inference process of PHDiffusion.
+            strength (float): A hyper-parameter that decides the total step (strength * sample_steps) for PHDiffusion.
+
+        Returns:
+            preds (numpy.ndarray): Generated harmonized image for the given composite image and the corresponding composite mask, with BGR channel.
+
+        """
         if self.model_type == 'PHDNet':
             return self.PHDNet_inference(composite_image, composite_mask)
         if random_seed != None:

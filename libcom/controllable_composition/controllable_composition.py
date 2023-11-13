@@ -34,7 +34,7 @@ task_set  = ['blending', 'harmonization'] # 'viewsynthesis', 'composition'
 
 class ControlComModel:
     """
-    Foreground object search score prediction model.
+    Comtrollable composition model.
 
     Args:
         device (str | torch.device): gpu id
@@ -43,22 +43,28 @@ class ControlComModel:
     
     Examples:
         >>> from libcom import ControlComModel
-        >>> from libcom.utils.process_image import make_image_grid
+        >>> from libcom.utils.process_image import make_image_grid, draw_bbox_on_image
         >>> import cv2
-        >>> bg_img   = '../tests/source/background/f80eda2459853824_m09g1w_b2413ec8_11.png'
-        >>> fg_bbox  = [175, 82, 309, 310] # x1,y1,x2,y2
-        >>> fg_img   = '../tests/source/foreground/f80eda2459853824_m09g1w_b2413ec8_11.png'
-        >>> fg_mask  = '../tests/source/foreground_mask/f80eda2459853824_m09g1w_b2413ec8_11.png'
-        >>> net      = ControlComModel(device=0, model_type='ControlCom')
-        >>> comp_img = net(bg_img, fg_img, fg_bbox, fg_mask, task=['blending', 'harmonization'])
-        >>> grid_img = make_image_grid([bg_img, fg_img, comp_img[0], comp_img[1]])
-        >>> cv2.imwrite('../docs/_static/image/controlcom_result1.jpg', grid_img)
+        >>> img_names = ['6c5601278dcb5e6d_m09728_f5cd2891_17.png', '000000460450.png']
+        >>> bboxes    = [[130, 91, 392, 271], [134, 158, 399, 511]] # x1,y1,x2,y2
+        >>> test_dir  = '../tests/controllable_composition/'
+        >>> for i in range(len(img_names)):
+        >>>     bg_img  = test_dir + 'background/' + img_names[i]
+        >>>     fg_img  = test_dir + 'foreground/' + img_names[i]
+        >>>     bbox    = bboxes[i]
+        >>>     mask    = test_dir + 'foreground_mask/' + img_names[i]
+        >>>     net     = ControlComModel(device=0)
+        >>>     comp    = net(bg_img, fg_img, bbox, mask, task=['blending', 'harmonization'])
+        >>>     bg_img  = draw_bbox_on_image(bg_img, bbox)
+        >>>     grid_img = make_image_grid([bg_img, fg_img, comp[0], comp[1]])
+        >>>     cv2.imwrite('../docs/_static/image/controlcom_result{}.jpg'.format(i+1), grid_img)
 
     Expected result:
 
     .. image:: _static/image/controlcom_result1.jpg
-        :scale: 50 %
-
+        :scale: 38 %
+    .. image:: _static/image/controlcom_result2.jpg
+        :scale: 38 %
             
     """
 
@@ -182,7 +188,7 @@ class ControlComModel:
                  foreground_mask=None, task='blending', 
                  num_samples=1, sample_steps=50, guidance_scale=5, seed=321):
         """
-        Controllable image composition based on diffusion model. Called in __call__ function.
+        Controllable image composition based on diffusion model.
 
         Args:
             background_image (str | numpy.ndarray): The path to background image or the background image in ndarray form.

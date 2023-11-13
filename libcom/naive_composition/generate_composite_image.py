@@ -21,28 +21,32 @@ def get_composite_image(foreground_image, foreground_mask, background_image, bbo
     
     Examples:
         >>> from libcom import get_composite_image
-        >>> from libcom.utils.process_image import make_image_grid
+        >>> from libcom.utils.process_image import make_image_grid, draw_bbox_on_image
         >>> import cv2
-        >>> 
-        >>> bg_img  = '../tests/source/background/8351494f79f6bf8f_m03k3r_73176af9_08.png'
-        >>> bbox = [223, 104, 431, 481] # x1,y1,x2,y2
-        >>> fg_img  = '../tests/source/foreground/8351494f79f6bf8f_m03k3r_73176af9_08.png'
-        >>> fg_mask = '../tests/source/foreground_mask/8351494f79f6bf8f_m03k3r_73176af9_08.png'
-        >>> # generate composite images by naive methods
-        >>> img_list = [bg_img, fg_img]
-        >>> comp_img1, comp_mask1 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'none')
-        >>> comp_img2, comp_mask2 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'gaussian')
-        >>> comp_img3, comp_mask3 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'poisson')
-        >>> img_list += [comp_img1, comp_mask1, comp_img2, comp_mask2, comp_img3, comp_mask3]
-        >>> # visualization results
-        >>> grid_img  = make_image_grid(img_list, cols=4)
-        >>> cv2.imwrite('../docs/_static/image/generatecomposite_result1.jpg', grid_img)
+        >>> test_dir = 'source/'
+        >>> img_list = ['1.jpg', '8.jpg']
+        >>> bbox_list = [[1000, 895, 1480, 1355], [1170, 944, 2331, 3069]] 
+        >>> for i,img_name in enumerate(img_list):
+        >>>     bg_img  = test_dir + 'background/' + img_name
+        >>>     bbox    = bbox_list[i] # x1,y1,x2,y2
+        >>>     fg_img  = test_dir + 'foreground/' + img_name
+        >>>     fg_mask = test_dir + 'foreground_mask/' + img_name.replace('.jpg', '.png')
+        >>>     # generate composite images by naive methods
+        >>>     comp_img1, comp_mask1 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'none')
+        >>>     comp_img2, comp_mask2 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'gaussian')
+        >>>     comp_img3, comp_mask3 = get_composite_image(fg_img, fg_mask, bg_img, bbox, 'poisson')
+        >>>     vis_list = [bg_img, fg_img, comp_img1, comp_mask1, comp_img2, comp_mask2, comp_img3, comp_mask3]
+        >>>     # visualization results
+        >>>     grid_img  = make_image_grid(vis_list, cols=4)
+        >>>     cv2.imwrite(f'../docs/_static/image/generatecomposite_result{i+1}.jpg', grid_img)
     
     Expected result:
 
     .. image:: _static/image/generatecomposite_result1.jpg
-        :scale: 50 %
-
+        :scale: 38 %
+        
+    .. image:: _static/image/generatecomposite_result2.jpg
+        :scale: 38 %
             
     """
     choices = ['none', 'gaussian', 'poisson']

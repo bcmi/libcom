@@ -18,19 +18,22 @@ def color_transfer(composite_image, composite_mask):
         >>> from libcom import color_transfer
         >>> from libcom.utils.process_image import make_image_grid
         >>> import cv2
-        >>> comp_img  = '../tests/source/composite/5b9e0751ca458cad_m0gjkl_40736b77_04.png'
-        >>> comp_mask = '../tests/source/composite_mask/5b9e0751ca458cad_m0gjkl_40736b77_04.png'
-        >>> trans_img = color_transfer(comp_img, comp_mask)
+        >>> comp_img1  = '../tests/source/composite/1.jpg'
+        >>> comp_mask1 = '../tests/source/composite_mask/1.png'
+        >>> trans_img1 = color_transfer(comp_img1, comp_mask1)
+        >>> comp_img2  = '../tests/source/composite/8.jpg'
+        >>> comp_mask2 = '../tests/source/composite_mask/8.png'
+        >>> trans_img2 = color_transfer(comp_img2, comp_mask2)
         >>> # visualization results
-        >>> grid_img  = make_image_grid([comp_img, comp_mask, trans_img])
+        >>> grid_img  = make_image_grid([comp_img1, comp_mask1, trans_img1, 
+        >>>                             comp_img2, comp_mask2, trans_img2], cols=3)
         >>> cv2.imwrite('../docs/_static/image/colortransfer_result1.jpg', grid_img)
 
     Expected result:
 
     .. image:: _static/image/colortransfer_result1.jpg
         :scale: 50 %
-
-            
+        
     """
     comp_img  = read_image_opencv(composite_image)
     comp_mask = read_mask_opencv(composite_mask)

@@ -29,19 +29,24 @@ class FOSScoreModel:
         >>> from libcom.utils.process_image import make_image_grid
         >>> from libcom import FOSScoreModel
         >>> import cv2
+        >>> import torch
+        >>> task_name = 'fos_score_prediction'
         >>> MODEL_TYPE = 'FOS_D' # choose from 'FOS_D', 'FOS_E'
         >>> background = '../tests/source/background/f80eda2459853824_m09g1w_b2413ec8_11.png'
         >>> fg_bbox    = [175, 82, 309, 310] # x1,y1,x2,y2
         >>> foreground = '../tests/source/foreground/f80eda2459853824_m09g1w_b2413ec8_11.png'
         >>> foreground_mask = '../tests/source/foreground_mask/f80eda2459853824_m09g1w_b2413ec8_11.png'
-        >>> net        = FOSScoreModel(device=0, model_type=MODEL_TYPE)
-        >>> score      = net(background_image, foreground_image, bounding_box, foreground_mask=foreground_mask)
-        >>> grid_img   = make_image_grid([background_image, foreground_image, composite_image], text_list=[f'fos_score:{score:.2f}'])
+        >>> composite_image = '../tests/source/composite/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> net = FOSScoreModel(device=0, model_type=MODEL_TYPE)
+        >>> score = net(background, foreground, fg_bbox, foreground_mask=foreground_mask)
+        >>> grid_img  = make_image_grid([background, foreground, composite_image], text_list=[f'fos_score:{score:.2f}'])
         >>> cv2.imshow('fos_score_demo', grid_img)
 
     Expected result:
 
-    .. image:: _static/image/fos_score_result1.jpg
+    .. image:: _static/image/fos_score_result3.jpg
+        :scale: 50 %
+    .. image:: _static/image/fos_score_result2.jpg
         :scale: 50 %
 
             
@@ -168,7 +173,7 @@ class FOSScoreModel:
             foreground_mask=None
             ):
         """
-        Predicting the compatibility score between the given background and the given foreground. Called in __call__ function.
+        Predicting the compatibility score between the given background and the given foreground.
 
         Args:
             background_image (str | numpy.ndarray): The path to background image or the background image in ndarray form.

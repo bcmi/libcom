@@ -11,6 +11,7 @@ def download_pretrained_model(weight_path):
         assert os.path.isfile(weight_path), weight_path
         return weight_path
     else:
+        weight_path= os.path.abspath(weight_path)
         model_name = os.path.basename(weight_path)
         save_dir   = os.path.dirname(weight_path)
         download_file_from_network(model_name, save_dir)
@@ -23,6 +24,7 @@ def download_entire_folder(folder_path):
         assert len(os.listdir(folder_path)) > 1, f'{folder_path} is an empty folder'
         return folder_path
     else:
+        folder_path = os.path.abspath(folder_path) 
         folder_name = os.path.basename(folder_path)
         file_name   = folder_name + '.zip'
         save_dir    = os.path.dirname(folder_path)

@@ -19,20 +19,52 @@ from libcom.fopa_heat_map.source.data.all_transforms import Compose, JointResize
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 model_set = ['fopa'] 
 
+
 class FOPAHeatMapModel:
+    """
+    Generate a heatmap for a pair of scaled foreground and background.
+
+    Args:
+        device (str | torch.device): gpu id
+        model_type (str): predefined model type
+
+    Examples:
+        >>> test_set = get_test_list_fopa_heatmap()
+        >>> result_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', task_name)
+        >>> if os.path.exists(result_dir):
+        >>>     shutil.rmtree(result_dir)
+        >>> os.makedirs(result_dir, exist_ok=True)
+        >>> os.makedirs(os.path.join(result_dir, 'grid'), exist_ok=True)
+        >>> print(f'begin testing {task_name}...')
+        >>> net = FOPAHeatMapModel(device=0)
+        >>> for pair in test_set[:1]:
+        >>>     fg_img, fg_mask, bg_img = pair['foreground'], pair['foreground_mask'], pair['background']
+        >>>     bboxes, heatmaps = net(fg_img, fg_mask, bg_img, cache_dir=os.path.join(result_dir, 'cache'), heatmap_dir=os.path.join(result_dir, 'heatmap'))
+        >>>     img_name  = os.path.basename(bg_img).replace('.png', '.jpg')
+        >>>     grid_img  = make_image_grid([bg_img, fg_img, heatmaps[0]])
+        >>>     res_path  = os.path.join(result_dir, 'grid', img_name)
+        >>>     cv2.imwrite(res_path, grid_img)
+        >>>     print('save result to ', res_path)
+        >>> print(f'end testing {task_name}!') 
+
+    Expected result:
+
+    .. image:: _static/image/fopa_heatmap_FOPA_result1.png
+        :scale: 72 %
+
+    .. image:: _static/image/fopa_heatmap_FOPA_result3.png
+        :scale: 52 %
+        
+    """
     def __init__(self, device=0, model_type='fopa', **kwargs):
-        '''
-        device: gpu id, type=str/torch.device
-        model_type: predefined model type, str type
-        kwargs: other parameters for building model, type=dict
-        '''
+        
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
         self.device = check_gpu_device(device)
         fopa_weight = os.path.join(cur_dir, 'pretrained_models', 'FOPA.pth')
         download_pretrained_model(fopa_weight)
-        sopa_weight = os.path.join(cur_dir, 'pretrained_models', 'SOPA.pth')
+        sopa_weight = os.path.join(cur_dir, 'pretrained_models', 'SOPA.pth.tar')
         download_pretrained_model(sopa_weight)
         self.build_pretrained_model(sopa_weight, fopa_weight)
         self.build_data_transformer()
@@ -151,6 +183,24 @@ class FOPAHeatMapModel:
     @torch.no_grad()
     def __call__(self, foreground_image, foreground_mask, background_image, cache_dir, heatmap_dir,
                  fg_scale_num=16, composite_num_choose=1, composite_num=50):
+        """
+        Generate a heatmap for a pair of scaled foreground and background.
+        
+        Args:
+            foreground_image: foreground image path
+            foreground_mask: foreground mask path
+            background_image: background image path
+            cache_dir: folder path where scaled foreground images, scaled mask images and composite images are stored
+            heatmap_dir: folder path where heatmaps are stored
+            fg_scale_num: number of scales of scaled foreground images and mask images
+            composite_num_choose: the number of chosen composite images
+            composite_num: the number of composite images with the highest score
+
+        Returns:
+            box_list: the path of concatenated background image, foreground image and corresponding heatmap
+            heatmap_list: the path of heatmaps
+
+        """
         scaled_fg_dir, scaled_mask_dir, csv_file = prepare_multi_fg_scales(cache_dir, foreground_image, foreground_mask, background_image, fg_scale_num)
         heatmap_list = self.generate_heatmap(background_image, csv_file, 
                                              scaled_fg_dir, scaled_mask_dir, heatmap_dir)

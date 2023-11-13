@@ -1,29 +1,24 @@
 # Foreground Object Search (FOS) Score
 
-The FOS score is computed by these two methods:
+FOS score measures the compatibility between foreground and background in terms of geometry and semantics, which is computed by using the following method. FOS score is useful for foreground object search, that is, retrieving compatible foregrounds from a foreground library for a given background with bounding box. 
 
-**FOS-E**:
-
-> **Foreground Object Search by Distilling Composite Image Feature**  [[arXiv]](https://arxiv.org/pdf/2308.04990.pdf)[[code]](https://github.com/bcmi/Foreground-Object-Search-Dataset-FOSD)<br>
+> **Foreground Object Search by Distilling Composite Image Feature**  [[paper]](https://openaccess.thecvf.com/content/ICCV2023/papers/Zhang_Foreground_Object_Search_by_Distilling_Composite_Image_Feature_ICCV_2023_paper.pdf) [[code]](https://github.com/bcmi/Foreground-Object-Search-Dataset-FOSD)<br>
 >
 > Bo Zhang, Jiacheng Sui, Li Niu<br>
 > Accepted by **ICCV 2023**.
 
-**FOS-D**:
-
-> **Learning a Discriminative Model for the Perception of Realism in Composite Images**  [[arXiv]](https://arxiv.org/abs/1510.00477)[[code]](https://github.com/junyanz/RealismCNN)<br>
->
-> [Jun-Yan Zhu](https://www.cs.cmu.edu/~junyanz/), [Philipp Krähenbühl](https://www.philkr.net/), [Eli Shechtman](https://research.adobe.com/person/eli-shechtman/) and [Alexei A. Efros](https://people.eecs.berkeley.edu/~efros/)<br>
-> Accepted by **ICCV 2015**.
 
 ## Brief Method Summary
 
 ### FOS-E
 
-<img src="../resources/fos_score_FOS-E.png" style="zoom:80%;" />
+![fos_score_FOSE](../resources/fos_score_FOSE.jpg)
 
-A novel FOS method via distilling composite feature (DiscoFOS). Specifically, a pretrained discriminator serves as teacher network. The student network employs two encoders to extract foreground feature and background feature. Their interaction output is enforced to match the composite image feature from the teacher network.
+The foreground encoder extracts the foreground feature and the background encoder extracts the background feature. The interacted output feature is used to predict the compatibility score.
 
 ### FOS-D
 
-Training a discriminator to estimate the compatibility of composite images.
+![fos_score_FOSD](../resources/fos_score_FOSD.jpg)
+
+
+A discriminator is used to predict the compatibility score based on the cropped composite image.

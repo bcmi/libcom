@@ -26,24 +26,28 @@ class HarmonyScoreModel:
         >>> from libcom.utils.process_image import make_image_grid
         >>> import cv2
         >>> net = HarmonyScoreModel(device=0, model_type='BargainNet')
-        >>> comp_img  = '../tests/source/composite/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
-        >>> comp_mask = '../tests/source/composite_mask/1bb218825e370c51_m02p5f1q_4a9db762_30.png'
-        >>> score     = net(comp_img, comp_mask)
-        >>> grid_img  = make_image_grid([comp_img, comp_mask], text_list=[f'harmony_score:{score:.2f}', 'composite-mask'])
+        >>> test_dir   = '../tests/harmony_score_prediction/'
+        >>> img_names  = ['vaulted-cellar-247391_inharm.jpg', 'ameland-5651866_harm.jpg']
+        >>> vis_list,scores = [], []
+        >>> for img_name in img_names:
+        >>>     comp_img  = test_dir + 'composite/' + img_name
+        >>>     comp_mask = test_dir + 'composite_mask/' + img_name
+        >>>     score     = net(comp_img, comp_mask)
+        >>>     vis_list += [comp_img, comp_mask]
+        >>>     scores.append(score)
+        >>> grid_img  = make_image_grid(vis_list, text_list=[f'harmony_score:{scores[0]:.2f}', 'composite-mask', f'harmony_score:{scores[1]:.2f}', 'composite-mask'])
         >>> cv2.imwrite('../docs/_static/image/harmonyscore_result1.jpg', grid_img)
-
+ 
     Expected result:
 
     .. image:: _static/image/harmonyscore_result1.jpg
-        :scale: 50 %
+        :scale: 38 %
 
-            
     """
     def __init__(self, device=0, model_type='BargainNet', **kwargs):
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
-        # insert your code here: modify the model name
         weight_path = os.path.join(cur_dir, 'pretrained_models', 'BargainNet.pth')
         download_pretrained_model(weight_path)
         self.device = check_gpu_device(device)
@@ -97,7 +101,7 @@ class HarmonyScoreModel:
     @torch.no_grad()
     def __call__(self, composite_image, composite_mask):
         """
-        Predicting the compatibility score between background and foreground in the given composite image. Called in __call__ function.
+        Predicting the compatibility score between background and foreground in the given composite image.
 
         Args:
             composite_image (str | numpy.ndarray): The path to composite image or the compposite image in ndarray form.

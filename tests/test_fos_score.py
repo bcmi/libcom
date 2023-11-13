@@ -6,7 +6,7 @@ import shutil
 import torch
 
 task_name = 'fos_score_prediction'
-MODEL_TYPE = 'FOS_D' # choose from 'encoders', 'discriminator'
+MODEL_TYPE = 'FOS_D' # choose from 'FOS_D', 'FOS_E'
 
 if __name__ == '__main__':
     test_set = get_test_list()

@@ -8,11 +8,12 @@ from .painterly_image_harmonization import *
 from .fopa_heat_map import *
 from .fos_score import *
 from .controllable_composition import *
+from .shadow_generation import *
 
-# add your model class
 __all__ = [
     'color_transfer', 'get_composite_image', 'OPAScoreModel', 
     'HarmonyScoreModel', 'InharmoniousLocalizationModel',
     'ImageHarmonizationModel', 'PainterlyHarmonizationModel',
-    'FOPAHeatMapModel', 'FOSScoreModel', 'ControlComModel'
+    'FOPAHeatMapModel', 'FOSScoreModel', 'ControlComModel',
+    'ShadowGenerationModel'
 ]
