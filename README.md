@@ -55,7 +55,7 @@ Please refer to [[Installation]](docs/get_started.md) for installation instructi
 - Project Initiator & Team Manager: [Li Niu](https://www.ustcnewly.com/index.html). 
 - Architect & Lead Developer: [Bo Zhang](https://bo-zhang-cs.github.io/).   
 - Documentation Manager: [Jiacheng Sui](https://github.com/charlessjc).
-- Module Developers: [Jiacheng Sui](https://github.com/charlessjc), [Binjie Gao](https://github.com/WhynotHAHA), [Lingxiao Lu](https://github.com/pokaaa), [Xinhao Tao](https://github.com/taoxinhao13), [Junyan Cao](https://github.com/cjy-4).
+- Module Developers: [Jiacheng Sui](https://github.com/charlessjc), [Binjie Gao](https://github.com/WhynotHAHA), [Lingxiao Lu](https://github.com/pokaaa), [Xinhao Tao](https://github.com/taoxinhao13), [Junyan Cao](https://github.com/cjy-4), [Junqi You](https://github.com/dhmbb2).
 
 ## License
 
