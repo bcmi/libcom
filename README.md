@@ -16,6 +16,7 @@
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
 [![GitHub](https://img.shields.io/github/license/bcmi/libcom)](https://github.com/bcmi/libcom/blob/main/LICENSE)
 
+
 ## Introduction
 **_libcom_ is an image composition toolbox.** The goal of image composition is inserting one foreground into a background image to get a realistic composite image, by addressing the inconsistencies (appearance, geometry, and semantic inconsistency) between foreground and background. Generally speaking, image composition could be used to combine the visual elements from different images.
 <div align="center">
@@ -48,7 +49,7 @@ For more detailed user guidance and method description, please refer to our [[do
 The main branch is built on the Linux system with **Python 3.8** and **PyTorch 1.10.1**. For other dependencies, please refer to [[conda_env]](requirements/libcom.yaml) and [[runtime_dependencies]](requirements/runtime.txt).
 
 ## Get Started
-Please refer to [[Installation]](docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guidance.
+Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/main/docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guidance.
 
 ## Contributors
 - Institution: [Brain-like Computing and Machine Intelligence (BCMI) Lab](https://bcmi.sjtu.edu.cn/).
