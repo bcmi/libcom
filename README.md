@@ -1,6 +1,6 @@
 <div align="center">
 </br>
-<img src="resources/LOGO.png" width="200" />
+<img src="https://raw.githubusercontent.com/bcmi/libcom/main/resources/LOGO.png" width="200" />
 
 </div>
 
@@ -20,7 +20,7 @@
 **_libcom_ is an image composition toolbox.** The goal of image composition is inserting one foreground into a background image to get a realistic composite image, by addressing the inconsistencies (appearance, geometry, and semantic inconsistency) between foreground and background. Generally speaking, image composition could be used to combine the visual elements from different images.
 <div align="center">
 </br>
-<img src="resources/image_composition_task.gif" width="600" />
+<img src="https://raw.githubusercontent.com/bcmi/libcom/main/resources/image_composition_task.gif" width="600" />
 </div>
 
 **_libcom_ covers a diversity of related tasks in the field of image composition**, including image blending, standard/painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
@@ -45,7 +45,7 @@ For more detailed user guidance and method description, please refer to our [[do
 
 ## Requirements
 
-The main branch is built on the Linux system with **Python 3.8** and **PyTorch 1.10.1**. For other dependencies, please refer to [[conda_env]](requirements/libcom.yaml) and [[runtime_dependencies]](requirements/runtime.txt).
+The main branch is built on the Linux system with **Python 3.8** and **PyTorch 1.10.1**. For other dependencies, please refer to [[conda_env]](https://github.com/bcmi/libcom/blob/main/requirements/libcom.yaml) and [[runtime_dependencies]](https://github.com/bcmi/libcom/blob/main/requirements/runtime.txt).
 
 ## Get Started
 Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/main/docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guidance.
@@ -59,7 +59,7 @@ Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/main/docs/g
 
 ## License
 
-This project is released under the [Apache 2.0 license](LICENSE).
+This project is released under the [Apache 2.0 license](https://github.com/bcmi/libcom/blob/main/LICENSE).
 
 ## Bibtex
 
