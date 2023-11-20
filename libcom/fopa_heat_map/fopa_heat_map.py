@@ -64,7 +64,7 @@ class FOPAHeatMapModel:
         self.device = check_gpu_device(device)
         fopa_weight = os.path.join(cur_dir, 'pretrained_models', 'FOPA.pth')
         download_pretrained_model(fopa_weight)
-        sopa_weight = os.path.join(cur_dir, 'pretrained_models', 'SOPA.pth.tar')
+        sopa_weight = os.path.join(cur_dir, 'pretrained_models', 'SOPA.pth')
         download_pretrained_model(sopa_weight)
         self.build_pretrained_model(sopa_weight, fopa_weight)
         self.build_data_transformer()
