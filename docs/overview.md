@@ -29,8 +29,8 @@ This chapter introduces you to the **libcom** toolbox, and provides links to the
 
 ## How to Use this Guide
 
-Here is a detailed step-by-step guide to learn more about MMDetection:
+Here is a detailed step-by-step guide to learn more about libcom:
 
-1. For installation instructions, please see [get_started](get_started.md).
+1. For installation instructions, please see [get_started](https://libcom.readthedocs.io/en/latest/get_started.html).
 
-2. Learn the usage of libcom by refering to API Reference.
+2. Learn the usage of libcom by refering to [API Reference](https://libcom.readthedocs.io/en/latest/api.html).
