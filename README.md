@@ -41,7 +41,7 @@
 - **ControlComModel** is a generative image composition model, which unifies image blending and image harmonization in one diffusion model. 
 - **ShadowGenerationModel** generates plausible shadow for the inserted object in a composite image. 
 
-For more detailed user guidance and method description, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/). 
+**For the detailed method descriptions, code examples, visualization results, and performance comments, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/).**
 
 ## Requirements
 
