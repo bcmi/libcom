@@ -12,7 +12,7 @@ pip install -r runtime.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
 cd ../libcom/controllable_composition/source/ControlCom/src/taming-transformers
 python setup.py install
 ```
-**Tips**: We have validated the above process on Linux. You may encounter ResolvepackageNotFound during installation on Windows or other systems. To resolve this, you can try removing the packages under "ResolvepackageNotFound" from libcom.yaml, then create a conda environment. Subsequently, based on the runtime error messages, use pip to install the missing packages.
+**Tips**: We have validated the above process on Linux. You may encounter `ResolvepackageNotFound` error during installation on Windows or other systems. To resolve this, you can try removing the packages under "ResolvepackageNotFound" from libcom.yaml, then create a conda environment. Subsequently, based on the runtime error messages, use pip to install the missing packages.
 
 ## Installation
 ```shell
