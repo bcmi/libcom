@@ -12,6 +12,7 @@ pip install -r runtime.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
 cd ../libcom/controllable_composition/source/ControlCom/src/taming-transformers
 python setup.py install
 ```
+During installation, if you encounter any problem related to the **`trilinear`** library, please refer to its [official repository](https://github.com/HuiZeng/Image-Adaptive-3DLUT).
 
 ## Installation
 ```shell
