@@ -12,7 +12,7 @@ pip install -r runtime.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
 cd ../libcom/controllable_composition/source/ControlCom/src/taming-transformers
 python setup.py install
 ```
-During installation, if you encounter any problem related to the **`trilinear`** library, please refer to its [official repository](https://github.com/HuiZeng/Image-Adaptive-3DLUT).
+**Tips**: We have validated the above process on Linux. You may encounter ResolvepackageNotFound during installation on Windows or other systems. To resolve this, you can try removing the packages under "ResolvepackageNotFound" from libcom.yaml, then create a conda environment. Subsequently, based on the runtime error messages, use pip to install the missing packages.
 
 ## Installation
 ```shell
@@ -22,7 +22,9 @@ or
 ```shell
 python setup.py install
 ```
-After that, you can verify the installation by running:
+**Tips**: If you encounter any issues during installation related to the **`trilinear`** library, please refer to its [official repository](https://github.com/HuiZeng/Image-Adaptive-3DLUT) and check for relevant help in the [issues section](https://github.com/HuiZeng/Image-Adaptive-3DLUT/issues).
+
+After installation, you can verify the installation by running:
 ```shell
 cd tests
 sh run_all_tests.sh
