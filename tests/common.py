@@ -26,6 +26,8 @@ def get_test_list():
                 pair[k] = bbox
             else:
                 img_path = os.path.join(data_dir, k, img_name)
+                if not os.path.exists(img_path):
+                    img_path = os.path.join(data_dir, k, img_name.replace('.jpg', '.png'))
                 assert os.path.exists(img_path), img_path
                 pair[k]  = img_path
         samples.append(pair)
@@ -33,6 +35,18 @@ def get_test_list():
 
 def get_test_list_painterly_harmonization():
     data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'painterly_harmonization_source')
+    samples  = []
+    for img_name in os.listdir(os.path.join(data_dir, 'composite')):
+        pair = {}
+        for k in ['composite', 'composite_mask']:
+            img_path = os.path.join(data_dir, k, img_name)
+            assert os.path.exists(img_path), img_path
+            pair[k]  = img_path
+        samples.append(pair)
+    return samples
+
+def get_test_list_harmony_prediction():
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'harmony_score_prediction')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'composite')):
         pair = {}
@@ -54,6 +68,36 @@ def get_test_list_fopa_heatmap():
             pair[k]  = img_path
         samples.append(pair)
     return samples
+
+def get_controlcom_test_list():
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'controllable_composition')
+    samples  = []
+    for img_name in os.listdir(os.path.join(data_dir, 'background')):
+        pair = {}
+        for k in ['background', 'foreground', 'foreground_mask', 'bbox']:
+            if k == 'bbox':
+                txt_path = os.path.join(data_dir, 'bbox', img_name.split('.')[0] + '.txt')
+                bbox = load_bbox_from_txt(txt_path)
+                pair[k] = bbox
+            else:
+                img_path = os.path.join(data_dir, k, img_name)
+                if not os.path.exists(img_path):
+                    img_path = os.path.join(data_dir, k, img_name.replace('.jpg', '.png'))
+                assert os.path.exists(img_path), img_path
+                pair[k]  = img_path
+        samples.append(pair)
+    return samples
+
+def draw_bbox_on_image(input_img, bbox, color=(0,255,255), line_width=5):
+    img = read_image_opencv(input_img)
+    x1, y1, x2, y2 = bbox
+    h,w,_ = img.shape
+    x1 = max(x1, line_width)
+    y1 = max(y1, line_width)
+    x2 = min(x2, w-line_width)
+    y2 = min(y2, h-line_width)
+    img = cv2.rectangle(img, (x1,y1), (x2,y2), color, thickness=line_width)
+    return img
 
 def make_image_grid(img_list, text_list=None, resolution=(512,512), cols=None, border_color=255, border_width=5):
     if cols == None:
