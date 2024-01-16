@@ -1,7 +1,8 @@
 #ifndef _TRILINEAR_KERNEL
 #define _TRILINEAR_KERNEL
 
-#include <THC/THC.h>
+#include <ATen/cuda/CUDAContext.h>
+#include <ATen/cuda/CUDAEvent.h>
 
 __global__ void TriLinearForward(const int nthreads, const float* lut, const float* image, float* output, const int dim, const int shift, const float binsize, const int width, const int height, const int batch);
 
@@ -11,6 +12,4 @@ __global__ void TriLinearBackward(const int nthreads, const float* image, const 
 
 int TriLinearBackwardLaucher(const float* image, const float* image_grad, float* lut_grad, const int lut_dim, const int shift, const float binsize, const int width, const int height, const int batch, cudaStream_t stream);
 
-
 #endif
-
