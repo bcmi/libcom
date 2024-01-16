@@ -23,6 +23,7 @@ except:
     pass
 from torch import device
 import torchvision
+from transformers.utils import cached_file
 from .source.ControlCom.ldm.util import instantiate_from_config
 from .source.ControlCom.ldm.models.diffusion.ddim import DDIMSampler
 from .source.ControlCom.ldm.models.diffusion.plms import PLMSSampler
@@ -73,19 +74,21 @@ class ControlComModel:
         self.model_type = model_type
         self.option = kwargs
         
-        weight_path = os.path.join(cur_dir, 'pretrained_models', 'ControlCom.pth')
-        download_pretrained_model(weight_path)
+        #weight_path = os.path.join(cur_dir, 'pretrained_models', 'ControlCom.pth')
+        #download_pretrained_model(weight_path)
         
         self.device = check_gpu_device(device)
         self.build_pretrained_model(weight_path)
         self.build_data_transformer()
 
     def build_pretrained_model(self, weight_path):
-        pl_sd  = torch.load(weight_path, map_location="cpu")
+        #pl_sd  = torch.load(weight_path, map_location="cpu")
+        pl_sd = torch.load(cached_file("BCMIZB/Libcom_pretrained_models", "ControlCom.pth"))
         sd     = pl_sd["state_dict"]
         config = OmegaConf.load(os.path.join(cur_dir, 'source/ControlCom/configs/controlcom.yaml'))
-        clip_path = os.path.join(cur_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
-        download_entire_folder(clip_path)
+        #clip_path = os.path.join(cur_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
+        #download_entire_folder(clip_path)
+        clip_path = "openai/clip-vit-large-patch14"
         config.model.params.cond_stage_config.params.version = clip_path
         model  = instantiate_from_config(config.model)
         model.load_state_dict(sd, strict=False)
