@@ -18,8 +18,13 @@ if __name__ == '__main__':
     os.makedirs(result_dir, exist_ok=True)
     print(f'begin testing {task_name}...')
     phd_net = PainterlyHarmonizationModel(device=0, model_type='PHDNet')
-    phdiff  = PainterlyHarmonizationModel(device=0, model_type='PHDiffusion', use_residual=False)
-    phdiffres = PainterlyHarmonizationModel(device=0, model_type='PHDiffusion')
+    gpu_num = torch.cuda.device_count()
+    if gpu_num > 2:
+        phdiff_gpu, phdiffres_gpu = 1, 2
+    elif gpu_num > 1:
+        phdiff_gpu, phdiffres_gpu = 0, 1
+    phdiff  = PainterlyHarmonizationModel(device=phdiff_gpu, model_type='PHDiffusion', use_residual=False)
+    phdiffres = PainterlyHarmonizationModel(device=phdiffres_gpu, model_type='PHDiffusion')
     for pair in test_set:
         comp_img, comp_mask = pair['composite'], pair['composite_mask']
         phdnet_img = phd_net(comp_img, comp_mask)

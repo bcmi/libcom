@@ -92,6 +92,7 @@ def parse_requirements(fname='requirements.txt', with_version=True):
     return packages
 
 def get_ext_modules():
+    # if encounter compilation issues, please refer to https://github.com/HuiZeng/Image-Adaptive-3DLUT?tab=readme-ov-file#build.
     if torch.cuda.is_available():
         return CUDAExtension('trilinear', 
                              ['libcom/image_harmonization/source/trilinear_cpp/src/trilinear_cuda.cpp', 
@@ -107,7 +108,7 @@ if __name__ == '__main__':
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     setup(
         name='libcom',
-        version='0.0.1.post8',
+        version='0.0.1.post9',
         description='Image Composition Toolbox',
         long_description=readme(),
         long_description_content_type='text/markdown',

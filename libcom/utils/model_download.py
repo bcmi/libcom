@@ -37,7 +37,7 @@ def download_entire_folder(folder_path):
     
 def download_file_from_network(file_name, save_dir):
     if not os.path.exists(save_dir):
-         os.mkdir(save_dir)
+        os.mkdir(save_dir)
     print('Try to download {} to {}'.format(file_name, save_dir))
     try:
         from huggingface_hub import hf_hub_download
@@ -51,8 +51,10 @@ def download_file_from_network(file_name, save_dir):
                                         cache_dir=save_dir, 
                                         revision='master')
     assert os.path.exists(file_path), 'Download {} failed, please try again'.format(file)
-    shutil.move(file_path, os.path.join(save_dir, file_name))
-    
+    save_path = os.path.abspath(os.path.join(save_dir, file_name))
+    shutil.copyfile(os.path.abspath(file_path), save_path, follow_symlinks=True)
+    assert os.path.exists(save_path), 'Move file to {} failed, please try again'.format(save_path)
+    os.remove(os.path.realpath(file_path)) # delete the cache
         
 if __name__ == '__main__':
     file_list   = ['BargainNet.pth', 'SOPA.pth']
@@ -64,8 +66,3 @@ if __name__ == '__main__':
     for folder in folder_list:
         folder_path = './pretrained_models/' + folder
         download_entire_folder(folder_path)
-
-
-
-    
-        
