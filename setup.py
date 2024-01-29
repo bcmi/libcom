@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 import torch
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
 import os
+from os.path import join
 
 
 def readme():
@@ -91,17 +92,17 @@ def parse_requirements(fname='requirements.txt', with_version=True):
     packages = list(gen_packages_items())
     return packages
 
-def get_ext_modules():
+def get_ext_modules(cur_dir):
     # if encounter compilation issues, please refer to https://github.com/HuiZeng/Image-Adaptive-3DLUT?tab=readme-ov-file#build.
     if torch.cuda.is_available():
         return CUDAExtension('trilinear', 
-                             ['libcom/image_harmonization/source/trilinear_cpp/src/trilinear_cuda.cpp', 
-                              'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_kernel.cu'],
+                             [join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_cuda.cpp'), 
+                              join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_kernel.cu')],
                              )
     else:
         return CppExtension('trilinear',  
-                            ['libcom/image_harmonization/source/trilinear_cpp/src/trilinear.cpp'], 
-                            include_dirs=['libcom/image_harmonization/source/trilinear_cpp/src']
+                            [join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear.cpp')], 
+                            include_dirs=[join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src')]
                             )
 
 if __name__ == '__main__':
@@ -128,7 +129,7 @@ if __name__ == '__main__':
         setup_requires=parse_requirements('requirements/build.txt'),
         tests_require=parse_requirements('requirements/tests.txt'),
         install_requires=parse_requirements('requirements/requirements.txt'),
-        ext_modules=[get_ext_modules()],
+        ext_modules=[get_ext_modules(cur_dir)],
         cmdclass={'build_ext': BuildExtension},
         extras_require={
             'all': parse_requirements('requirements.txt'),
