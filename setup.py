@@ -95,15 +95,13 @@ def parse_requirements(fname='requirements.txt', with_version=True):
 def get_ext_modules(cur_dir):
     # if encounter compilation issues, please refer to https://github.com/HuiZeng/Image-Adaptive-3DLUT?tab=readme-ov-file#build.
     if torch.cuda.is_available():
-        return CUDAExtension('trilinear', 
-                             [join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_cuda.cpp'), 
-                              join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_kernel.cu')],
-                             )
+        trilinear_cuba_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_cuda.cpp')
+        trilinear_kernel_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_kernel.cu')
+        return CUDAExtension('trilinear', [trilinear_cuba_abs_path, trilinear_kernel_abs_path])
     else:
-        return CppExtension('trilinear',  
-                            [join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear.cpp')], 
-                            include_dirs=[join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src')]
-                            )
+        trilinear_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear.cpp')
+        src_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src')
+        return CppExtension('trilinear', [trilinear_abs_path], include_dirs=[src_abs_path]) 
 
 if __name__ == '__main__':
     cur_dir = os.path.dirname(os.path.abspath(__file__))
