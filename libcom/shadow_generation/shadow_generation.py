@@ -17,6 +17,7 @@ from .source.PostProcessModel import PostProcess
 from .source.cldm.model import load_state_dict
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['ShadowGeneration'] 
 
 class ShadowGenerationModel:
@@ -56,8 +57,8 @@ class ShadowGenerationModel:
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
-        cldm_weight_path = os.path.join(cur_dir, 'pretrained_models', 'Shadow_cldm.pth')
-        ppp_weight_path  = os.path.join(cur_dir, 'pretrained_models', 'Shadow_ppp.pth')
+        cldm_weight_path = os.path.join(model_dir, 'pretrained_models', 'Shadow_cldm.pth')
+        ppp_weight_path  = os.path.join(model_dir, 'pretrained_models', 'Shadow_ppp.pth')
         download_pretrained_model(ppp_weight_path)
         download_pretrained_model(cldm_weight_path)
         self.device = check_gpu_device(device)
@@ -67,7 +68,7 @@ class ShadowGenerationModel:
     def build_pretrained_model(self, ppp_weight_path, cldm_weight_path):
         config_path = os.path.join(cur_dir, 'source', 'cldm_v15.yaml')
         config      = OmegaConf.load(config_path)
-        clip_path   = os.path.join(cur_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
+        clip_path   = os.path.join(model_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
         download_entire_folder(clip_path)
         config.model.params.cond_stage_config.params.version = clip_path
         model = PostProcess(

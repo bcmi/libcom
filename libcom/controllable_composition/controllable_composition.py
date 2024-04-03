@@ -29,6 +29,7 @@ from .source.ControlCom.ldm.models.diffusion.plms import PLMSSampler
 from .source.ControlCom.ldm.data.open_images_control import get_tensor, get_tensor_clip, get_bbox_tensor, bbox2mask, tensor2numpy
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['ControlCom'] 
 task_set  = ['blending', 'harmonization'] # 'viewsynthesis', 'composition'
 
@@ -73,7 +74,7 @@ class ControlComModel:
         self.model_type = model_type
         self.option = kwargs
         
-        weight_path = os.path.join(cur_dir, 'pretrained_models', 'ControlCom.pth')
+        weight_path = os.path.join(model_dir, 'pretrained_models', 'ControlCom.pth')
         download_pretrained_model(weight_path)
         
         self.device = check_gpu_device(device)
@@ -84,7 +85,7 @@ class ControlComModel:
         pl_sd  = torch.load(weight_path, map_location="cpu")
         sd     = pl_sd["state_dict"]
         config = OmegaConf.load(os.path.join(cur_dir, 'source/ControlCom/configs/controlcom.yaml'))
-        clip_path = os.path.join(cur_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
+        clip_path = os.path.join(model_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
         download_entire_folder(clip_path)
         config.model.params.cond_stage_config.params.version = clip_path
         model  = instantiate_from_config(config.model)

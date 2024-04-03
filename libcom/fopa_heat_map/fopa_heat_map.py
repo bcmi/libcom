@@ -17,6 +17,7 @@ from libcom.fopa_heat_map.source.prepare_multi_fg_scales import prepare_multi_fg
 from libcom.fopa_heat_map.source.data.all_transforms import Compose, JointResize
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['fopa'] 
 
 
@@ -62,9 +63,9 @@ class FOPAHeatMapModel:
         self.model_type = model_type
         self.option = kwargs
         self.device = check_gpu_device(device)
-        fopa_weight = os.path.join(cur_dir, 'pretrained_models', 'FOPA.pth')
+        fopa_weight = os.path.join(model_dir, 'pretrained_models', 'FOPA.pth')
         download_pretrained_model(fopa_weight)
-        sopa_weight = os.path.join(cur_dir, 'pretrained_models', 'SOPA.pth')
+        sopa_weight = os.path.join(model_dir, 'pretrained_models', 'SOPA.pth')
         download_pretrained_model(sopa_weight)
         self.build_pretrained_model(sopa_weight, fopa_weight)
         self.build_data_transformer()

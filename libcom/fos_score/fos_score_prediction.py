@@ -13,7 +13,7 @@ import torchvision.transforms as transforms
 from torchvision.utils import save_image
 from einops import rearrange
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
-
+model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['FOS_D', 'FOS_E'] 
 
 class FOSScoreModel:
@@ -60,7 +60,7 @@ class FOSScoreModel:
         self.IMAGE_NET_STD  = [0.5, 0.5, 0.5]
         config_file = os.path.join(cur_dir, 'source/config/config_rfosd.yaml')
         self.cfg    = Config(config_file)
-        weight_path = os.path.join(cur_dir, 'pretrained_models', '{}.pth'.format(self.model_type))
+        weight_path = os.path.join(model_dir, 'pretrained_models', '{}.pth'.format(self.model_type))
         download_pretrained_model(weight_path)
         self.device = check_gpu_device(device)
         self.build_pretrained_model(weight_path)
