@@ -9,6 +9,7 @@ from .source.pct_net import *
 from .source.cdt_net import *
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['PCTNet', 'CDTNet'] 
 
 class ImageHarmonizationModel:
@@ -61,11 +62,11 @@ class ImageHarmonizationModel:
         self.model_type = model_type
         self.option = kwargs
         if self.model_type == 'CDTNet':
-            weight_path = os.path.join(cur_dir, 'pretrained_models', 'CDTNet.pth')
+            weight_path = os.path.join(model_dir, 'pretrained_models', 'CDTNet.pth')
         else:
-            weight_path = os.path.join(cur_dir, 'pretrained_models', 'PCTNet.pth')
+            weight_path = os.path.join(model_dir, 'pretrained_models', 'PCTNet.pth')
         download_pretrained_model(weight_path)
-        lut_path = os.path.join(cur_dir, 'pretrained_models', 'IdentityLUT33.txt')
+        lut_path = os.path.join(model_dir, 'pretrained_models', 'IdentityLUT33.txt')
         download_pretrained_model(lut_path)
         self.device = check_gpu_device(device)
         self.build_pretrained_model(weight_path)

@@ -8,6 +8,7 @@ import torchvision.transforms as transforms
 from .source.madis_net import *
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['IHDRNet'] 
 
 class InharmoniousLocalizationModel:
@@ -40,9 +41,9 @@ class InharmoniousLocalizationModel:
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
-        weight_path_g = os.path.join(cur_dir, 'pretrained_models', 'Inharmonious_G.pth')
+        weight_path_g = os.path.join(model_dir, 'pretrained_models', 'Inharmonious_G.pth')
         download_pretrained_model(weight_path_g)
-        weight_path_ihdrnet = os.path.join(cur_dir, 'pretrained_models', 'IHDRNet.pth')
+        weight_path_ihdrnet = os.path.join(model_dir, 'pretrained_models', 'IHDRNet.pth')
         download_pretrained_model(weight_path_ihdrnet)
         self.device = check_gpu_device(device)
         self.build_pretrained_model(weight_path_g, weight_path_ihdrnet)

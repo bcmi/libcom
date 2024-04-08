@@ -20,6 +20,7 @@ import logging
 logging.getLogger('transformers').setLevel(logging.ERROR) # disable transformer lib warning 
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['PHDNet', 'PHDiffusion'] 
 
 class PainterlyHarmonizationModel:
@@ -57,17 +58,17 @@ class PainterlyHarmonizationModel:
         self.option = kwargs
         
         if model_type == 'PHDNet':
-            weight_path = os.path.join(cur_dir, 'pretrained_models', model_type + '.pth')
+            weight_path = os.path.join(model_dir, 'pretrained_models', model_type + '.pth')
             self.device = check_gpu_device(device)
             download_pretrained_model(weight_path)
             self.build_pretrained_model(weight_path)
         elif model_type == 'PHDiffusion':
             self.use_residual = self.option.get('use_residual', True)
             if self.use_residual:
-                phdiff_weight_path = os.path.join(cur_dir, 'pretrained_models', model_type+'WithRes.pth')
+                phdiff_weight_path = os.path.join(model_dir, 'pretrained_models', model_type+'WithRes.pth')
             else:
-                phdiff_weight_path = os.path.join(cur_dir, 'pretrained_models', model_type+'.pth')
-            sd_weight_path = os.path.join(cur_dir, '../shared_pretrained_models', 'sd-v1-4.ckpt')
+                phdiff_weight_path = os.path.join(model_dir, 'pretrained_models', model_type+'.pth')
+            sd_weight_path = os.path.join(model_dir, '../shared_pretrained_models', 'sd-v1-4.ckpt')
             download_pretrained_model(sd_weight_path)
             download_pretrained_model(phdiff_weight_path)
             self.device = check_gpu_device(device)
@@ -87,7 +88,7 @@ class PainterlyHarmonizationModel:
             sd_weight_path, phdiff_weight_path = weight_path
             assert self.model_type == 'PHDiffusion', self.model_type
             self.config= OmegaConf.load(cur_dir+'/source/PHDiffusion/stable_diffusion.yaml')
-            clip_path = os.path.join(cur_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
+            clip_path = os.path.join(model_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
             download_entire_folder(clip_path)
             self.config.model.params.cond_stage_config.params.model_path = clip_path
             pl_sd = torch.load(sd_weight_path, map_location="cpu")

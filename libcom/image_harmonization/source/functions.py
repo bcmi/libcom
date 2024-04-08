@@ -356,6 +356,7 @@ class Generator3DLUT_identity(nn.Module):
     def __init__(self, dim=33):
         super(Generator3DLUT_identity, self).__init__()
         filepath = '/'.join(os.path.realpath(__file__).split("/")[0:-2])
+        filepath = os.environ.get('LIBCOM_MODEL_DIR',filepath)
         if dim == 33:
             file = open(filepath + "/pretrained_models/IdentityLUT33.txt", 'r')
         lines = file.readlines()
