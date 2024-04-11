@@ -90,8 +90,6 @@ def get_obj_from_str(string, reload=False):
     if reload:
         module_imp = importlib.import_module(module)
         importlib.reload(module_imp)
-    if 'ldm' in module:
-        module = '.source.ControlCom.' + module
     return getattr(importlib.import_module(module, package='libcom.controllable_composition'), cls)
 
 

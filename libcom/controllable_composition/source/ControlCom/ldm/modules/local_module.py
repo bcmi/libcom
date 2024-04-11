@@ -6,8 +6,8 @@ import torch.nn.functional as F
 from torch import nn, einsum
 from einops import rearrange, repeat
 import os, sys
-from ldm.modules.diffusionmodules.util import checkpoint
-from ldm.modules.attention import CrossAttention, zero_module, Normalize
+from libcom.controllable_composition.source.ControlCom.ldm.modules.diffusionmodules.util import checkpoint
+from libcom.controllable_composition.source.ControlCom.ldm.modules.attention import CrossAttention, zero_module, Normalize
 from torchvision.ops import roi_align
 
 class FDN(nn.Module):

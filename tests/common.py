@@ -88,6 +88,25 @@ def get_controlcom_test_list():
         samples.append(pair)
     return samples
 
+def get_objectstitch_test_list():
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'objectstitch')
+    samples  = []
+    for img_name in os.listdir(os.path.join(data_dir, 'background')):
+        pair = {}
+        for k in ['background', 'foreground', 'foreground_mask', 'bbox']:
+            if k == 'bbox':
+                txt_path = os.path.join(data_dir, 'bbox', img_name.split('.')[0] + '.txt')
+                bbox = load_bbox_from_txt(txt_path)
+                pair[k] = bbox
+            else:
+                img_path = os.path.join(data_dir, k, img_name)
+                if not os.path.exists(img_path):
+                    img_path = os.path.join(data_dir, k, img_name.replace('.jpg', '.png'))
+                assert os.path.exists(img_path), img_path
+                pair[k]  = img_path
+        samples.append(pair)
+    return samples
+
 def draw_bbox_on_image(input_img, bbox, color=(0,255,255), line_width=5):
     img = read_image_opencv(input_img)
     x1, y1, x2, y2 = bbox

@@ -27,7 +27,7 @@ if __name__ == '__main__':
     os.makedirs(result_dir, exist_ok=True)
 
     print(f'begin testing {task_name}...')
-    net = ShadowGenerationModel(device=2, model_type='ShadowGeneration')
+    net = ShadowGenerationModel(device=0, model_type='ShadowGeneration')
     for pair in test_set:
         comp_img, comp_mask = pair['composite'], pair['composite_mask']
         preds = net(comp_img, comp_mask, number=5)

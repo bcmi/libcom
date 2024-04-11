@@ -9,11 +9,12 @@ from .fopa_heat_map import *
 from .fos_score import *
 from .controllable_composition import *
 from .shadow_generation import *
+from .objectstitch import *
 
 __all__ = [
     'color_transfer', 'get_composite_image', 'OPAScoreModel', 
     'HarmonyScoreModel', 'InharmoniousLocalizationModel',
     'ImageHarmonizationModel', 'PainterlyHarmonizationModel',
     'FOPAHeatMapModel', 'FOSScoreModel', 'ControlComModel',
-    'ShadowGenerationModel'
+    'ShadowGenerationModel', 'ObjectStitchModel'
 ]

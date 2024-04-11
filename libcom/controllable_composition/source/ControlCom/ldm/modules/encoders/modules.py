@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
 from functools import partial
-from einops import rearrange, repeat
-from transformers import CLIPTokenizer, CLIPTextModel,CLIPVisionModel,CLIPModel,CLIPVisionModelWithProjection
+from transformers import CLIPVisionModel
 import os,sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-from ldm.modules.x_transformer import Encoder, TransformerWrapper  # TODO: can we directly rely on lucidrains code and simply add this as a reuirement? --> test
-from ldm.modules.encoders.xf import LayerNorm, Transformer
+from libcom.controllable_composition.source.ControlCom.ldm.modules.x_transformer import Encoder, TransformerWrapper  # TODO: can we directly rely on lucidrains code and simply add this as a reuirement? --> test
+from libcom.controllable_composition.source.ControlCom.ldm.modules.encoders.xf import LayerNorm, Transformer
 import math
 import torch.nn.functional as F
 
@@ -217,7 +216,7 @@ class FrozenCLIPImageEmbedder(AbstractEncoder):
 
 
 if __name__ == "__main__":
-    from ldm.util import count_params
+    from libcom.controllable_composition.source.ControlCom.ldm.util import count_params
     device = torch.device("cuda:0")
     model = FrozenCLIPImageEmbedder().to(device)
     count_params(model, verbose=True)

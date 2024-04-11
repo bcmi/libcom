@@ -88,11 +88,7 @@ def get_obj_from_str(string, reload=False):
     if reload:
         module_imp = importlib.import_module(module)
         importlib.reload(module_imp)
-    if 'ldm' in module:
-        module = '.' + module # relative import
-        return getattr(importlib.import_module(module, package='libcom.painterly_image_harmonization.source'), cls)
-    else:
-        return getattr(importlib.import_module(module, package=None), cls)
+    return getattr(importlib.import_module(module, package=None), cls)
 
 
 checkpoint_dict_replacements = {

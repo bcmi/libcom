@@ -8,7 +8,7 @@ from einops import rearrange, repeat
 import os, sys
 proj_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, proj_dir)
-from ldm.modules.diffusionmodules.util import checkpoint
+from libcom.controllable_composition.source.ControlCom.ldm.modules.diffusionmodules.util import checkpoint
 from torchvision.ops import roi_align
 
 def exists(val):

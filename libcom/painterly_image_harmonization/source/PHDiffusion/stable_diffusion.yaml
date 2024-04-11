@@ -1,7 +1,7 @@
 name: test
 model:
   base_learning_rate: 1.0e-04
-  target: PHDiffusion.ldm.models.diffusion.ddpm.LatentDiffusion
+  target: libcom.painterly_image_harmonization.source.PHDiffusion.ldm.models.diffusion.ddpm.LatentDiffusion
   params:
     linear_start: 0.00085
     linear_end: 0.0120
@@ -19,7 +19,7 @@ model:
     use_ema: False
 
     scheduler_config: # 10000 warmup steps
-      target: PHDiffusion.ldm.lr_scheduler.LambdaLinearScheduler
+      target: libcom.painterly_image_harmonization.source.PHDiffusion.ldm.lr_scheduler.LambdaLinearScheduler
       params:
         warm_up_steps: [ 10000 ]
         cycle_lengths: [ 10000000000000 ] # incredibly large number to prevent corner cases
@@ -28,7 +28,7 @@ model:
         f_min: [ 1. ]
 
     unet_config:
-      target: PHDiffusion.ldm.modules.diffusionmodules.openaimodel.UNetModel
+      target: libcom.painterly_image_harmonization.source.PHDiffusion.ldm.modules.diffusionmodules.openaimodel.UNetModel
       params:
         image_size: 32 # unused
         in_channels: 4
@@ -45,7 +45,7 @@ model:
         legacy: False
 
     first_stage_config:
-      target: PHDiffusion.ldm.models.autoencoder.AutoencoderKL
+      target: libcom.painterly_image_harmonization.source.PHDiffusion.ldm.models.autoencoder.AutoencoderKL
       params:
         embed_dim: 4
         monitor: val/rec_loss
@@ -68,7 +68,7 @@ model:
           target: torch.nn.Identity
 
     cond_stage_config: #__is_unconditional__
-      target: PHDiffusion.ldm.modules.encoders.modules.FrozenCLIPEmbedder
+      target: libcom.painterly_image_harmonization.source.PHDiffusion.ldm.modules.encoders.modules.FrozenCLIPEmbedder
       params:
         model_path: openai-clip-vit-large-patch14
 

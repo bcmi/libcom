@@ -11,7 +11,7 @@ import torch.nn.functional as F
 import os, sys
 proj_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, proj_dir)
-from ldm.modules.diffusionmodules.util import (
+from libcom.controllable_composition.source.ControlCom.ldm.modules.diffusionmodules.util import (
     checkpoint,
     conv_nd,
     linear,
@@ -1141,7 +1141,7 @@ if __name__ == '__main__':
     import torch
     device = torch.device("cuda:0")
     from omegaconf import OmegaConf
-    from ldm.util import instantiate_from_config
+    from libcom.controllable_composition.source.ControlCom.ldm.util import instantiate_from_config
     cfg_path = os.path.join(proj_dir, 'configs/finetune_paint.yaml')
     configs  = OmegaConf.load(cfg_path).model.params
     model  = instantiate_from_config(configs.unet_config).to(device)

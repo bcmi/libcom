@@ -1,6 +1,6 @@
 model:
   base_learning_rate: 1.0e-05
-  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  target: libcom.controllable_composition.source.ControlCom.ldm.models.diffusion.ddpm.LatentDiffusion
   params:
     linear_start: 0.00085
     linear_end: 0.012
@@ -41,7 +41,7 @@ model:
     use_guidance: true
     local_uncond: same
     scheduler_config:
-      target: ldm.lr_scheduler.LambdaLinearScheduler
+      target: libcom.controllable_composition.source.ControlCom.ldm.lr_scheduler.LambdaLinearScheduler
       params:
         warm_up_steps:
         - 1000
@@ -54,7 +54,7 @@ model:
         f_min:
         - 1.0
     unet_config:
-      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      target: libcom.controllable_composition.source.ControlCom.ldm.modules.diffusionmodules.openaimodel.UNetModel
       params:
         image_size: 32
         in_channels: 11
@@ -78,7 +78,7 @@ model:
         legacy: false
         add_conv_in_front_of_unet: false
         local_encoder_config:
-          conditioning_key: ldm.modules.local_module.LocalRefineBlock
+          conditioning_key: libcom.controllable_composition.source.ControlCom.ldm.modules.local_module.LocalRefineBlock
           add_position_emb: false
           roi_size: 16
           context_dim: 1024
@@ -89,7 +89,7 @@ model:
           add_in_decoder: true
           add_before_crossattn: false
     first_stage_config:
-      target: ldm.models.autoencoder.AutoencoderKL
+      target: libcom.controllable_composition.source.ControlCom.ldm.models.autoencoder.AutoencoderKL
       params:
         embed_dim: 4
         monitor: val/rec_loss
@@ -111,7 +111,7 @@ model:
         lossconfig:
           target: torch.nn.Identity
     cond_stage_config:
-      target: ldm.modules.encoders.modules.FrozenCLIPImageEmbedder
+      target: libcom.controllable_composition.source.ControlCom.ldm.modules.encoders.modules.FrozenCLIPImageEmbedder
       params:
         version: openai-clip-vit-large-patch14
         local_hidden_index: 12
