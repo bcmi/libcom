@@ -23,8 +23,9 @@ This chapter introduces you to the **libcom** toolbox, and provides links to the
 - **HarmonyScoreModel** evaluates the harmony level between foreground and background in a composite image.
 - **InharmoniousLocalizationModel** localizes the inharmonious region in a synthetic image.
 - **FOSScoreModel** evaluates the compatibility between foreground and background in a composite image in terms of geometry and semantics.
-- **ControlComModel** is a generative image composition model, which unifies image blending and image harmonization in one diffusion model. 
-- **ShadowGenerationModel** generates plausible shadow for the inserted object in a composite image. 
+- **ControlComModel** is a generative image composition model, which unifies image blending, image harmonization, view synthesis, and generative composition within a diffusion model. 
+- **ObjectStitchModel** is another generative image composition model that aims to generate a composite image from a pair of background and foreground, with non-object pixels filled with black.
+- **ShadowGenerationModel** generates plausible shadow for the inserted object in a composite image.
 
 
 ## How to Use this Guide
