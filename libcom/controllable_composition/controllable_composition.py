@@ -200,7 +200,7 @@ class ControlComModel:
             foreground_image (str | numpy.ndarray): The path to foreground image or the background image in ndarray form.
             bbox (list): The bounding box which indicates the foreground's location in the background. [x1, y1, x2, y2].
             foreground_mask (None | str | numpy.ndarray): Mask of foreground image which indicates the foreground object region in the foreground image. default: None.
-            task (str | list of str): 'blending', 'harmonization', ['blending', 'harmonization']: Task types, including image blending, image harmonization. default: 'blending'.
+            task (str | list of str): 'blending', 'harmonization', 'viewsynthesis', 'composition' | ['blending', 'harmonization']: Task types, including image blending, image harmonization, view synthesis, generative composition. default: 'blending'.
             num_samples (int): Number of images to be generated for each task. default: 1.
             sample_steps (int): Number of denoising steps. The recommended setting is 25 for PLMS sampler and 50 for DDIM sampler. default: 50.
             guidance_scale (int): Scale in classifier-free guidance (minimum: 1; maximum: 20). default: 5.
