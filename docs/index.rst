@@ -29,6 +29,7 @@ Welcome to Libcom's documentation!
    painterly_image_harmonization.md
    fopa_heat_map.md
    shadow_generation.md
+   object_stitch.md
 
 Indices and tables
 ==================

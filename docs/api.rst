@@ -61,3 +61,9 @@ libcom.shadow_generation
 .. automodule:: libcom.shadow_generation
     :members:
     :special-members: __call__
+
+libcom.objectstitch
+----------------------------------------
+.. automodule:: libcom.objectstitch
+    :members:
+    :special-members: __call__
