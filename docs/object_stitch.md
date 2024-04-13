@@ -10,7 +10,7 @@ Object Stitch is another generative image composition model which can adjust the
 
 ## Brief Method Summary
 
-### <img src="C:\Users\16638\AppData\Roaming\Typora\typora-user-images\image-20240413155341137.png" alt="image-20240413155341137" />
+### ![fos_score_FOSE](../resources/objectstitch.jpg)
 
 The framework of Object Stitch consists of a content adaptor and a generator (a pretrained text-to-image diffusion model). The input subject is fed into a ViT and the adaptor which produces a descriptive embedding. At the same time the background image is taken as input by the diffusion model. At each iteration during the denoising stage, we apply the mask on the generated image, so that the generator only denoises the masked area.
 
