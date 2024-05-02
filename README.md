@@ -12,6 +12,7 @@
 [![Downloads](https://static.pepy.tech/badge/libcom)](https://pepy.tech/project/libcom)
 [![Hits](https://hits.sh/github.com/bcmi/libcom.svg?label=views)](https://hits.sh/github.com/bcmi/libcom/)
 [![Static Badge](https://img.shields.io/badge/Image%20Composition%20Demo-Green)](https://bcmi.sjtu.edu.cn/home/niuli/demo_image_composition/)
+[![Static Badge](https://img.shields.io/badge/Resources-Awesome-green?style=flat&label=Resources)](https://github.com/bcmi/Awesome-Image-Composition)
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
 [![GitHub](https://img.shields.io/github/license/bcmi/libcom)](https://github.com/bcmi/libcom/blob/main/LICENSE)
 
