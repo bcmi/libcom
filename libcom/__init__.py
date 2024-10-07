@@ -16,5 +16,5 @@ __all__ = [
     'HarmonyScoreModel', 'InharmoniousLocalizationModel',
     'ImageHarmonizationModel', 'PainterlyHarmonizationModel',
     'FOPAHeatMapModel', 'FOSScoreModel', 'ControlComModel',
-    'ShadowGenerationModel', 'ObjectStitchModel'
+    'ShadowGenerationModel', 'Mure_ObjectStitchModel'
 ]
