@@ -1,19 +1,15 @@
-# from share import *
-
 from torch import nn
-from .cldm.cldm import ControlLDM
 import torch
-from .cldm.model import create_model, load_state_dict
-from torch.utils.data import DataLoader
-from .cldm.logger import PostProcessLogger
 import pytorch_lightning as pl
 import os
-import cv2
 import numpy as np
 from PIL import Image
-from libcom.shadow_generation.source.ldm.modules.diffusionmodules.openaimodel import (ResBlock, TimestepEmbedSequential, AttentionBlock, 
+
+from .cldm.cldm import ControlLDM
+from .cldm.model import create_model, load_state_dict
+from .ldm.modules.diffusionmodules.openaimodel import (ResBlock, TimestepEmbedSequential, AttentionBlock, 
                                                       Upsample, SpatialTransformer, Downsample)
-from libcom.shadow_generation.source.ldm.modules.diffusionmodules.util import (
+from .ldm.modules.diffusionmodules.util import (
     checkpoint,
     conv_nd,
     linear,
@@ -22,7 +18,7 @@ from libcom.shadow_generation.source.ldm.modules.diffusionmodules.util import (
     normalization,
     timestep_embedding,
 )
-from libcom.shadow_generation.source.ldm.util import exists
+from .ldm.util import exists
 
 class Post_Process_Net(nn.Module):
     def __init__(
@@ -380,7 +376,7 @@ class Post_Process_Net(nn.Module):
 class PostProcess(pl.LightningModule):
     def __init__(self, model_path, control_net_path, infe_steps=50, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.post_process_net = Post_Process_Net(image_size=512, 
+        self.post_process_net = Post_Process_Net(image_size=256, 
                                                  in_channels=7, 
                                                  out_channels=4, 
                                                  model_channels=96,
@@ -395,12 +391,10 @@ class PostProcess(pl.LightningModule):
                                                  legacy=False,
                                                  use_checkpoint=True)
         self.model = create_model(model_path).cpu()
-        control_net_weight = load_state_dict(control_net_path, location='cpu')
-        self.model.load_state_dict(control_net_weight, strict=False)
-        self.model.sd_lock = True
-        self.model.only_mid_control = False
+        self.model.load_state_dict(load_state_dict(control_net_path, location='cuda'), strict=False)
         self.learning_rate = 1e-5
         self.infe_steps = infe_steps
+        # self.generated_image_path = "/data/youjunqi/Foreground-Reconstruction/output"
 
     def training_step(self, batch, batch_idx):
         self.post_process_net.train()
@@ -446,14 +440,6 @@ class PostProcess(pl.LightningModule):
         
         loss1 = nn.functional.l1_loss(pred_mask, gt_mask_scaled * 2 - 1) 
         loss2 = nn.functional.l1_loss(adjusted_img, gt_img_scaled, reduction='none')
-        # ratio = torch.sum(torch.greater_equal(gt_mask, 0.6), dim=(1,2)) / (gt_mask.shape[1] * gt_mask.shape[2])
-        # scale = torch.clamp((1/ratio).type(torch.int32), 4, 199)
-        #scale=4
-        # mask = gt_mask * scale[:, None, None] + 1
-        # mask = gt_mask * 4 + 1
-        #mask = mask[:, :, :, None]
-        #loss2 *= mask
-        
         loss = loss1 + loss2.mean()
 
         return loss

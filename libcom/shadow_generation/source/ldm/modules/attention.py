@@ -6,7 +6,7 @@ from torch import nn, einsum
 from einops import rearrange, repeat
 from typing import Optional, Any
 
-from libcom.shadow_generation.source.ldm.modules.diffusionmodules.util import checkpoint
+from ...ldm.modules.diffusionmodules.util import checkpoint
 
 
 try:

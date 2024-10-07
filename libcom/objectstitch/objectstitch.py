@@ -28,43 +28,46 @@ from .source.ObjectStitch.ldm.models.diffusion.ddim import DDIMSampler
 from .source.ObjectStitch.ldm.models.diffusion.plms import PLMSSampler
 from .source.ObjectStitch.ldm.data.open_images import get_tensor, get_tensor_clip, get_bbox_tensor, bbox2mask, mask2bbox, tensor2numpy
 
+import copy
+
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['ObjectStitch'] 
 
-class ObjectStitchModel:
+class Mure_ObjectStitchModel:
     """
     Unofficial implementation of the paper "ObjectStitch: Object Compositing with Diffusion Model", CVPR 2023.
-
+    Building upon ObjectStitch, we have made improvements to support input of multiple foreground images.
+    
     Args:
         device (str | torch.device): gpu id
         model_type (str): predefined model type.
         kwargs (dict): sampler='ddim' (default) or 'plms', other parameters for building model
     
     Examples:
-        >>> from libcom import ObjectStitchModel
+        >>> from libcom import MureObjectStitchModel
         >>> from libcom.utils.process_image import make_image_grid, draw_bbox_on_image
         >>> import cv2
-        >>> net    = ObjectStitchModel(device=0, sampler='plms')
+        >>> net    = MureObjectStitchModel(device=0, sampler='plms')
         >>> sample_list = ['000000003658', '000000165136']
-        >>> sample_dir  = '../tests/objectstitch/'
+        >>> sample_dir  = '../tests/mureobjectstitch/'
         >>> bbox_list   = [[0, 253, 186, 509], [217, 177, 499, 410]]
         
         >>> for i, sample in enumerate(sample_list):
-        >>>     bg_img = sample_dir + f'background/{sample}.png'
-        >>>     fg_img = sample_dir + f'foreground/{sample}.png'
-        >>>     fg_mask= sample_dir + f'foreground_mask/{sample}.png'
+        >>>     bg_img = sample_dir + f'{sample}/background/{sample}.png'
+        >>>     fg_img = sample_dir + f'{sample}/foreground/'
+        >>>     fg_mask= sample_dir + f'{sample}/foreground_mask/'
         >>>     bbox   = bbox_list[i]
         >>>     comp   = net(bg_img, fg_img, fg_mask, bbox, sample_steps=25, num_samples=3)
         >>>     bg_img   = draw_bbox_on_image(bg_img, bbox)
         >>>     grid_img = make_image_grid([bg_img, fg_img] + [comp[i] for i in range(len(comp))])
-        >>>     cv2.imwrite(f'../docs/_static/image/objectstitch_result{i+1}.jpg', grid_img)
+        >>>     cv2.imwrite(f'../docs/_static/image/mureobjectstitch_result{i+1}.jpg', grid_img)
 
     Expected result:
 
-    .. image:: _static/image/objectstitch_result1.jpg
+    .. image:: _static/image/mureobjectstitch_result1.jpg
         :scale: 38 %
-    .. image:: _static/image/objectstitch_result2.jpg
+    .. image:: _static/image/mureobjectstitch_result2.jpg
         :scale: 38 %
             
     """
@@ -102,29 +105,146 @@ class ObjectStitchModel:
         self.sd_transform   = get_tensor(image_size=self.image_size)
         self.mask_transform = get_tensor(normalize=False, image_size=self.image_size)
         self.latent_shape   = [4, self.image_size[0] // 8, self.image_size[1] // 8]
+
+    def constant_pad_bbox(self, bbox, width, height, value=10):
+        # Get reference image
+        bbox_pad = copy.deepcopy(bbox)
+        left_space = bbox[0]
+        up_space = bbox[1]
+        right_space = width - bbox[2]
+        down_space = height - bbox[3]
+
+        bbox_pad[0] = bbox[0]-min(value, left_space)
+        bbox_pad[1] = bbox[1]-min(value, up_space)
+        bbox_pad[2] = bbox[2]+min(value, right_space)
+        bbox_pad[3] = bbox[3]+min(value, down_space)
+        return bbox_pad
+
+    def crop_foreground_by_bbox(self, img, mask, bbox, pad_bbox=10):
+        width, height = img.shape[1], img.shape[0]
+        bbox_pad = self.constant_pad_bbox(
+            bbox, width, height, pad_bbox) if pad_bbox > 0 else bbox
+        img = img[bbox_pad[1]:bbox_pad[3], bbox_pad[0]:bbox_pad[2]]
+        if mask is not None:
+            mask = mask[bbox_pad[1]:bbox_pad[3], bbox_pad[0]:bbox_pad[2]]
+        return img, mask, bbox_pad
+
+    def draw_compose_fg_img(self, fg_img_compose):
+        final_img = Image.new('RGB', (512, 512), (255, 255, 255))
+        fg_img_nums = len(fg_img_compose)
+
+        if fg_img_nums == 1:
+            size = (512, 512)
+            positions = [(0, 0)]
+        elif fg_img_nums == 2:
+            size = (256, 512)
+            positions = [(0, 0), (256, 0)]
+        elif fg_img_nums == 3:
+            size = (256, 512)
+            positions = [(0, 0), (256, 0), (0, 256)]
+        elif fg_img_nums == 4:
+            positions = [(0, 0), (256, 0), (0, 256), (256, 256)]
+            size = (256, 256)
+        else :
+            positions = [(0, 0), (256, 0), (0, 256), (256, 256), (128, 128)]
+            size = (256, 256)
+
+        if fg_img_nums>5:
+            fg_img_compose = fg_img_compose[:5]
         
-    def generate_image_batch(self, bg_path, fg_path, fg_mask_path, bbox):
+        for idx, img in enumerate(fg_img_compose):
+            fg_img = img.resize(size)
+            final_img.paste(fg_img, positions[idx])
+        
+        return final_img
+
+    def rescale_image_with_bbox(self, image, bbox=None, long_size=1024):
+        src_width, src_height = image.size
+        if max(src_width, src_height) <= long_size:
+            dst_img = image
+            dst_width, dst_height = dst_img.size
+        else:
+            scale = float(long_size) / max(src_width, src_height)
+            dst_width, dst_height = int(scale * src_width), int(scale * src_height)
+            dst_img = image.resize((dst_width, dst_height))
+        if bbox == None:
+            return dst_img
+        bbox[0] = int(float(bbox[0]) / src_width * dst_width)
+        bbox[1] = int(float(bbox[1]) / src_height * dst_height)
+        bbox[2] = int(float(bbox[2]) / src_width * dst_width)
+        bbox[3] = int(float(bbox[3]) / src_height * dst_height)
+        return dst_img, bbox
+
+    def mask_bboxregion_coordinate(self, mask):
+        valid_index = np.argwhere(mask == 255)  # [length,2]
+        if np.shape(valid_index)[0] < 1:
+            x_left = 0
+            x_right = 0
+            y_bottom = 0
+            y_top = 0
+        else:
+            x_left = np.min(valid_index[:, 1])
+            x_right = np.max(valid_index[:, 1])
+            y_bottom = np.max(valid_index[:, 0])
+            y_top = np.min(valid_index[:, 0])
+        return x_left, x_right, y_bottom, y_top
+
+    def generate_multifg(self, fg_list_path, fgmask_list_path):
+        fg_list, fg_mask_list, fg_img_list, fg_img_compose = [], [], [], []
+
+        assert len(fg_list_path) < 11, "too many foreground images"
+        for fg_img_path in fg_list_path:
+            fg_img = Image.open(fg_img_path).convert('RGB')
+            fg_list.append(fg_img)
+        for fg_mask_name in fgmask_list_path:
+            fg_mask = Image.open(fg_mask_name).convert('RGB')
+            fg_mask_list.append(fg_mask)
+        
+        for idx, fg_mask in enumerate(fg_mask_list):
+            fg_mask = fg_mask.convert('L')
+            mask = np.asarray(fg_mask)
+            m = np.array(mask > 0).astype(np.uint8)
+            fg_mask = Image.fromarray(m * 255)
+            x_left, x_right, y_bottom, y_top = self.mask_bboxregion_coordinate(np.array(fg_mask))
+            H, W = (np.array(fg_mask)).shape[:2]
+            x_right=min(x_right, W-1)
+            y_bottom=min(y_bottom, H-1)
+            fg_bbox = [x_left, y_top, x_right, y_bottom]
+            fg_img, fg_bbox = self.rescale_image_with_bbox(fg_list[idx], fg_bbox)
+            fg_img = np.array(fg_img)
+            fg_mask = fg_mask.resize((fg_img.shape[1], fg_img.shape[0]))
+            fg_mask = np.array(fg_mask)
+            fg_img, fg_mask, fg_bbox = self.crop_foreground_by_bbox(fg_img, fg_mask, fg_bbox)
+            fg_mask = np.array(Image.fromarray(fg_mask).convert('RGB'))
+            black = np.zeros_like(fg_mask)
+            fg_img = np.where(fg_mask > 127, fg_img, black)
+            fg_img = Image.fromarray(fg_img)
+            fg_img_compose.append(fg_img)
+            fg_t = self.clip_transform(fg_img)
+            fg_img_list.append(fg_t.unsqueeze(0))
+        fg_img = self.draw_compose_fg_img(fg_img_compose)
+
+        return fg_img_list, fg_img
+
+    def generate_image_batch(self, bg_path, fg_list_path, fgmask_list_path, bbox):
+
         bg_img     = Image.open(bg_path).convert('RGB')
         bg_w, bg_h = bg_img.size
         bg_t       = self.sd_transform(bg_img)
-        fg_img     = Image.open(fg_path).convert('RGB')
-        # fill the non-object region of the foreground image with black pixel
-        fg_mask= Image.open(fg_mask_path).convert('RGB')
-        fg_mask= fg_mask.resize((fg_img.width, fg_img.height))
-        black  = np.zeros_like(fg_mask)
-        fg_mask= np.asarray(fg_mask)
-        fg_img = np.asarray(fg_img)
-        fg_img = np.where(fg_mask > 127, fg_img, black)
-        fg_img = Image.fromarray(fg_img)
-        fg_t       = self.clip_transform(fg_img)
+
+        ## jiaxuan
+        fg_img_list, fg_img = self.generate_multifg(fg_list_path, fgmask_list_path)
+
         mask       = Image.fromarray(bbox2mask(bbox, bg_w, bg_h))
         mask_t     = self.mask_transform(mask)
         mask_t     = torch.where(mask_t > 0.5, 1, 0).float()
         inpaint_t  = bg_t * (1 - mask_t)
         bbox_t     = get_bbox_tensor(bbox, bg_w, bg_h)
+
         return {"bg_img":  inpaint_t.unsqueeze(0),
                 "bg_mask": mask_t.unsqueeze(0),
-                "fg_img":  fg_t.unsqueeze(0),
+                "fg_img":  fg_img,
+                "fg_img_list": fg_img_list,
                 "bbox":    bbox_t.unsqueeze(0)}
     
     def prepare_input(self, batch, shape, num_samples):
@@ -132,6 +252,7 @@ class ObjectStitchModel:
             for k in batch.keys():
                 if isinstance(batch[k], torch.Tensor):
                     batch[k] = torch.cat([batch[k]] * num_samples, dim=0)
+
         test_model_kwargs={}
         bg_img    = batch['bg_img'].to(self.device)
         bg_latent = self.model.encode_first_stage(bg_img)
@@ -141,17 +262,25 @@ class ObjectStitchModel:
         rs_mask = torch.where(rs_mask > 0.5, 1.0, 0.0)
         test_model_kwargs['bg_mask']  = rs_mask
         test_model_kwargs['bbox']  = batch['bbox'].to(self.device)
-        fg_tensor = batch['fg_img'].to(self.device)
-        
-        c = self.model.get_learned_conditioning(fg_tensor)
-        c = self.model.proj_out(c)
-        uc = self.model.learnable_vector.repeat(c.shape[0], c.shape[1], 1) # 1,1,768
+
+        condition_list = []
+        for fg_img in batch['fg_img_list']:
+            fg_img = fg_img.to(self.device)
+            condition = self.model.get_learned_conditioning(fg_img)
+            condition = self.model.proj_out(condition)
+            condition_list.append(condition)
+        c = torch.cat(condition_list, dim=1)
+        c = torch.cat([c] * num_samples, dim=0)
+        uc = self.model.learnable_vector.repeat(c.shape[0], c.shape[1], 1)  # 1,1,768
         return test_model_kwargs, c, uc
     
-    def inputs_preprocess(self, background_image, foreground_image, foreground_mask, bbox, num_samples):
-        batch = self.generate_image_batch(background_image, foreground_image, foreground_mask, bbox)
+    def inputs_preprocess(self, background_image, fg_list_path, fgmask_list_path, bbox, num_samples):
+
+        batch = self.generate_image_batch(background_image, fg_list_path, fgmask_list_path, bbox)
         test_kwargs, c, uc = self.prepare_input(batch, self.latent_shape, num_samples)
-        return test_kwargs, c, uc 
+        show_fg_img = batch["fg_img"]
+
+        return test_kwargs, c, uc, show_fg_img
     
     
     def outputs_postprocess(self, outputs):
@@ -169,7 +298,7 @@ class ObjectStitchModel:
 
         Args:
             background_image (str | numpy.ndarray): The path to background image or the background image in ndarray form.
-            foreground_image (str | numpy.ndarray): The path to foreground image or the background image in ndarray form.
+            foreground_image (str | numpy.ndarray): The path to the list of foreground images or the foreground images in ndarray form.
             foreground_mask (None | str | numpy.ndarray): Mask of foreground image which indicates the foreground object region in the foreground image.
             bbox (list): The bounding box which indicates the foreground's location in the background. [x1, y1, x2, y2].
             
@@ -183,8 +312,16 @@ class ObjectStitchModel:
         """
         
         seed_everything(seed)
-        test_kwargs, c, uc = self.inputs_preprocess(background_image, foreground_image, 
+
+        ## c, uc: torch.Size([3, 257, 768])
+        ## test_kewargs: dict_keys(['bg_latent', 'bg_mask', 'bbox'])
+        # torch.Size([3, 4, 64, 64])
+        # torch.Size([3, 1, 64, 64])
+        # torch.Size([3, 4])
+
+        test_kwargs, c, uc, show_fg_img = self.inputs_preprocess(background_image, foreground_image, 
                                                     foreground_mask, bbox, num_samples)
+
         start_code = torch.randn([num_samples]+self.latent_shape, device=self.device)
         outputs, _ = self.sampler.sample(S=sample_steps,
                                     conditioning=c,
@@ -197,4 +334,4 @@ class ObjectStitchModel:
                                     unconditional_conditioning=uc,
                                     test_model_kwargs=test_kwargs)
         comp_img   = self.outputs_postprocess(outputs)
-        return comp_img
+        return comp_img, show_fg_img

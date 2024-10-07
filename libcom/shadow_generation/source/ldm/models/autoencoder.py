@@ -3,11 +3,11 @@ import pytorch_lightning as pl
 import torch.nn.functional as F
 from contextlib import contextmanager
 
-from libcom.shadow_generation.source.ldm.modules.diffusionmodules.model import Encoder, Decoder
-from libcom.shadow_generation.source.ldm.modules.distributions.distributions import DiagonalGaussianDistribution
+from ...ldm.modules.diffusionmodules.model import Encoder, Decoder
+from ...ldm.modules.distributions.distributions import DiagonalGaussianDistribution
 
-from libcom.shadow_generation.source.ldm.util import instantiate_from_config
-from libcom.shadow_generation.source.ldm.modules.ema import LitEma
+from ...ldm.util import instantiate_from_config
+from ...ldm.modules.ema import LitEma
 
 
 class AutoencoderKL(pl.LightningModule):

@@ -1,13 +1,17 @@
 import torch
-import torchvision
 import torchvision.transforms as transforms
 from libcom.utils.model_download import download_pretrained_model, download_entire_folder
 from libcom.utils.process_image import *
 from libcom.utils.environment import *
-import torch
 import os
 from omegaconf import OmegaConf
 from pytorch_lightning import seed_everything
+import numpy as np
+import os
+import cv2
+from PIL import Image
+import numpy as np
+
 try:
     from lightning_fabric.utilities.seed import log
     log.propagate = False
@@ -18,7 +22,37 @@ from .source.cldm.model import load_state_dict
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
-model_set = ['ShadowGeneration'] 
+model_set = ['ShadowGeneration']
+
+def opencv_to_pil(input):
+    return Image.fromarray(cv2.cvtColor(input, cv2.COLOR_BGR2RGB))
+
+def read_image_pil(input):
+    if isinstance(input, str):
+        assert os.path.exists(input), input
+        input = Image.open(input).convert('RGB')
+    elif isinstance(input, np.ndarray):
+        input = opencv_to_pil(input)
+    return input   
+
+def read_mask_pil(input):
+    if isinstance(input, str):
+        assert os.path.exists(input), input
+        input = Image.open(input).convert('L')
+    elif isinstance(input, np.ndarray):
+        input = Image.fromarray(input).convert('L')
+    return input
+
+def check_gpu_device(device):
+    assert torch.cuda.is_available(), 'Only GPU are supported'
+    if isinstance(device, (int, str)):
+        device = int(device)
+        assert 0 <= device < torch.cuda.device_count(), f'invalid device id: {device}'
+        device = torch.device(f'cuda:{device}')
+    if isinstance(device, torch.device):
+        return device
+    else:
+        raise Exception('invalid device type: type({})={}'.format(device, type(device)))
 
 class ShadowGenerationModel:
     """
@@ -57,20 +91,28 @@ class ShadowGenerationModel:
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
         self.option = kwargs
-        cldm_weight_path = os.path.join(model_dir, 'pretrained_models', 'Shadow_cldm.pth')
-        ppp_weight_path  = os.path.join(model_dir, 'pretrained_models', 'Shadow_ppp.pth')
+        cldm_weight_path = os.path.join(model_dir, 'pretrained_models', 'Shadow_cldm.ckpt')
+        ppp_weight_path  = os.path.join(model_dir, 'pretrained_models', 'Shadow_ppp.ckpt')
+        cls_weight_path = os.path.join(model_dir, 'pretrained_models', 'Shadow_cls.pth')
+        reg_weight_path = os.path.join(model_dir, 'pretrained_models', 'Shadow_reg.pth')
+        cls_label_path = os.path.join(model_dir, 'pretrained_models', 'Shadow_cls_label.pkl')
         download_pretrained_model(ppp_weight_path)
         download_pretrained_model(cldm_weight_path)
+        download_pretrained_model(cls_weight_path)
+        download_pretrained_model(reg_weight_path)
         self.device = check_gpu_device(device)
-        self.build_pretrained_model(ppp_weight_path, cldm_weight_path)
+        self.build_pretrained_model(ppp_weight_path, cldm_weight_path, cls_weight_path, reg_weight_path, cls_label_path)
         self.build_data_transformer()
 
-    def build_pretrained_model(self, ppp_weight_path, cldm_weight_path):
+    def build_pretrained_model(self, ppp_weight_path, cldm_weight_path, cls_weight_path, reg_weight_path, cls_label_path):
         config_path = os.path.join(cur_dir, 'source', 'cldm_v15.yaml')
-        config      = OmegaConf.load(config_path)
+        config = OmegaConf.load(config_path)
+        config.model.params.cls_net_path = cls_weight_path
+        config.model.params.reg_net_path = reg_weight_path
+        config.model.params.cls_label = cls_label_path
         clip_path   = os.path.join(model_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
         download_entire_folder(clip_path)
-        config.model.params.cond_stage_config.params.version = clip_path
+        config.model.params.cond_stage_config.params.version = clip_path    
         model = PostProcess(
             model_path=config,
             control_net_path=cldm_weight_path,
@@ -87,18 +129,38 @@ class ShadowGenerationModel:
         ])
     
     def inputs_preprocess(self, composite_image, composite_mask):
-        img  = read_image_pil(composite_image)
-        img  = self.transformer(img).permute(1,2,0)
+        img = read_image_pil(composite_image)
+        img = self.transformer(img).permute(1, 2, 0)
+        target = img * 2 - 1
+
         mask = read_mask_pil(composite_mask)
-        mask = self.transformer(mask).permute(1,2,0)
-        img = img.unsqueeze(0)
-        mask = mask.unsqueeze(0)
+        mask_np = np.array(mask)
+        mask_np = cv2.resize(mask_np, (512, 512))
+        _, fg_instance_thresh = cv2.threshold(mask_np, 128, 255, cv2.THRESH_BINARY)
+        contours_instance, _ = cv2.findContours(fg_instance_thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+        merged_contour_points_instance = np.concatenate(contours_instance)
+        rect_instance = cv2.minAreaRect(merged_contour_points_instance)
+        (x, y), (w, h), theta = rect_instance
+        if w < h:
+            w, h = h, w
+            theta += 90
+        bbx_instance = np.array([x, y, w + 1, h + 1, theta]).astype(int)
+        bbx_instance = torch.tensor(bbx_instance).unsqueeze(0)
+
+        mask = self.transformer(mask).permute(1, 2, 0)
+        img, mask, target = img.unsqueeze(0), mask.unsqueeze(0), target.unsqueeze(0)
+
         cat_img = torch.cat([img, mask], dim=-1)
-        return img.to(self.device), mask.to(self.device), cat_img.to(self.device)
+        mask_embeddings = torch.zeros((1, 64, 2048), dtype=torch.float32)
+        bbx_region = torch.zeros((1, 512, 512), dtype=torch.float32)
+
+        return target.to(self.device), mask.to(self.device), cat_img.to(self.device), \
+               bbx_instance.to(self.device), mask_embeddings.to(self.device), bbx_region.to(self.device)
     
     def outputs_postprocess(self, outputs):
         img, output = outputs
-        img = img * 255
+        #img = img * 255
+        img = (img + 1) * 127.5
         pred_mask = torch.greater_equal(output[:, :, :, 3], 0).int()
         adjusted_img = output[:, :, :, :3]
         adjusted_img = torch.clamp(adjusted_img, -1., 1.)
@@ -112,19 +174,19 @@ class ShadowGenerationModel:
     
     @torch.no_grad()
     def inf_img(self, inputs):
-        img, mask, cat_img = inputs
-        batch = dict(jpg=img, txt=[''], hint=cat_img, mask=None, gt_mask=mask)
+        target, mask, cat_img, bbx_instance, mask_embeddings, bbx_region = inputs
+        batch = dict(jpg=target, cls=cat_img, fg=bbx_instance, bbx=bbx_region, embeddings=mask_embeddings, txt=[''], hint=cat_img)
+        # batch = dict(jpg=img, txt=[''], hint=cat_img, mask=None, gt_mask=mask)
         # get predicted image   
-        images = self.model.model.log_images(batch, mode='pndm', input=(img*2-1).permute(0,3,1,2), 
-                                             ddim_steps=50, add_noise_strength=1)
+        images = self.model.model.log_images(batch, use_x_T=True)
         image_scaled = images['samples_cfg_scale_9.00'].permute(0,2,3,1)
         # go through post process net
-        input = torch.concat([image_scaled, img * 2 - 1, mask], dim=-1)
+        input = torch.concat([image_scaled, target, mask], dim=-1)
         null_timeteps = torch.zeros(1, device=input.device)
         output = self.model.post_process_net(input.permute(0,3,1,2), timesteps=null_timeteps)
         output = output.permute(0,2,3,1)
 
-        return img, output
+        return target, output
     
 
     @torch.no_grad()
@@ -143,7 +205,7 @@ class ShadowGenerationModel:
 
         """
         seed_everything(seed)
-        inputs    = self.inputs_preprocess(composite_image, composite_mask)
+        inputs = self.inputs_preprocess(composite_image, composite_mask)
         preds = []
         for _ in range(number):
             outputs = self.inf_img(inputs)

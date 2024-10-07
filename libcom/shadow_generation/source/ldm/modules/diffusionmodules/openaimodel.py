@@ -6,7 +6,7 @@ import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
 
-from libcom.shadow_generation.source.ldm.modules.diffusionmodules.util import (
+from ....ldm.modules.diffusionmodules.util import (
     checkpoint,
     conv_nd,
     linear,
@@ -15,8 +15,8 @@ from libcom.shadow_generation.source.ldm.modules.diffusionmodules.util import (
     normalization,
     timestep_embedding,
 )
-from libcom.shadow_generation.source.ldm.modules.attention import SpatialTransformer
-from libcom.shadow_generation.source.ldm.util import exists
+from ....ldm.modules.attention import SpatialTransformer
+from ....ldm.util import exists
 
 
 # dummy replace
@@ -522,8 +522,6 @@ class UNetModel(nn.Module):
         self.num_head_channels = num_head_channels
         self.num_heads_upsample = num_heads_upsample
         self.predict_codebook_ids = n_embed is not None
-        self.down_blocks = nn.ModuleList([])
-        self.up_blocks = nn.ModuleList([])
 
         time_embed_dim = model_channels * 4
         self.time_embed = nn.Sequential(
@@ -599,25 +597,24 @@ class UNetModel(nn.Module):
                 input_block_chans.append(ch)
             if level != len(channel_mult) - 1:
                 out_ch = ch
-                if resblock_updown:
-                    stage_last_block = ResBlock(
-                                            ch,
-                                            time_embed_dim,
-                                            dropout,
-                                            out_channels=out_ch,
-                                            dims=dims,
-                                            use_checkpoint=use_checkpoint,
-                                            use_scale_shift_norm=use_scale_shift_norm,
-                                            down=True,
-                                        )
-                else:
-                    stage_last_block = Downsample(
-                                            ch, conv_resample, dims=dims, out_channels=out_ch
-                                        )
                 self.input_blocks.append(
-                    TimestepEmbedSequential(stage_last_block)
+                    TimestepEmbedSequential(
+                        ResBlock(
+                            ch,
+                            time_embed_dim,
+                            dropout,
+                            out_channels=out_ch,
+                            dims=dims,
+                            use_checkpoint=use_checkpoint,
+                            use_scale_shift_norm=use_scale_shift_norm,
+                            down=True,
+                        )
+                        if resblock_updown
+                        else Downsample(
+                            ch, conv_resample, dims=dims, out_channels=out_ch
+                        )
+                    )
                 )
-                self.down_blocks.append(stage_last_block)
                 ch = out_ch
                 input_block_chans.append(ch)
                 ds *= 2
@@ -708,24 +705,20 @@ class UNetModel(nn.Module):
                         )
                 if level and i == self.num_res_blocks[level]:
                     out_ch = ch
-                    if resblock_updown:
-                        stage_last_block = ResBlock(
-                                                ch,
-                                                time_embed_dim,
-                                                dropout,
-                                                out_channels=out_ch,
-                                                dims=dims,
-                                                use_checkpoint=use_checkpoint,
-                                                use_scale_shift_norm=use_scale_shift_norm,
-                                                up=True,
-                                            ) 
-                    else:
-                        stage_last_block = Upsample(
-                                                ch, conv_resample, dims=dims, out_channels=out_ch
-                                                )
-                    
-                    layers.append(stage_last_block)
-                    self.up_blocks.append(stage_last_block)
+                    layers.append(
+                        ResBlock(
+                            ch,
+                            time_embed_dim,
+                            dropout,
+                            out_channels=out_ch,
+                            dims=dims,
+                            use_checkpoint=use_checkpoint,
+                            use_scale_shift_norm=use_scale_shift_norm,
+                            up=True,
+                        )
+                        if resblock_updown
+                        else Upsample(ch, conv_resample, dims=dims, out_channels=out_ch)
+                    )
                     ds //= 2
                 self.output_blocks.append(TimestepEmbedSequential(*layers))
                 self._feature_size += ch

@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from tqdm import tqdm
 
-from libcom.shadow_generation.source.ldm.modules.diffusionmodules.util import make_ddim_sampling_parameters, make_ddim_timesteps, noise_like, extract_into_tensor
+from ....ldm.modules.diffusionmodules.util import make_ddim_sampling_parameters, make_ddim_timesteps, noise_like, extract_into_tensor
 
 
 class DDIMSampler(object):
@@ -98,7 +98,7 @@ class DDIMSampler(object):
         # sampling
         C, H, W = shape
         size = (batch_size, C, H, W)
-        # print(f'Data shape for DDIM sampling is {size}, eta {eta}')
+        print(f'Data shape for DDIM sampling is {size}, eta {eta}')
 
         samples, intermediates = self.ddim_sampling(conditioning, size,
                                                     callback=callback,
@@ -115,8 +115,8 @@ class DDIMSampler(object):
                                                     unconditional_guidance_scale=unconditional_guidance_scale,
                                                     unconditional_conditioning=unconditional_conditioning,
                                                     dynamic_threshold=dynamic_threshold,
-                                                    ucg_schedule=ucg_schedule
-                                                    )
+                                                    ucg_schedule=ucg_schedule,
+                                                    batch=kwargs['batch'])
         return samples, intermediates
 
     @torch.no_grad()
@@ -126,7 +126,7 @@ class DDIMSampler(object):
                       mask=None, x0=None, img_callback=None, log_every_t=100,
                       temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
                       unconditional_guidance_scale=1., unconditional_conditioning=None, dynamic_threshold=None,
-                      ucg_schedule=None):
+                      ucg_schedule=None,batch=None):
         device = self.model.betas.device
         b = shape[0]
         if x_T is None:
@@ -143,7 +143,7 @@ class DDIMSampler(object):
         intermediates = {'x_inter': [img], 'pred_x0': [img]}
         time_range = reversed(range(0,timesteps)) if ddim_use_original_steps else np.flip(timesteps)
         total_steps = timesteps if ddim_use_original_steps else timesteps.shape[0]
-        # print(f"Running DDIM Sampling with {total_steps} timesteps")
+        print(f"Running DDIM Sampling with {total_steps} timesteps")
 
         iterator = tqdm(time_range, desc='DDIM Sampler', total=total_steps)
 
@@ -166,7 +166,7 @@ class DDIMSampler(object):
                                       corrector_kwargs=corrector_kwargs,
                                       unconditional_guidance_scale=unconditional_guidance_scale,
                                       unconditional_conditioning=unconditional_conditioning,
-                                      dynamic_threshold=dynamic_threshold)
+                                      dynamic_threshold=dynamic_threshold,batch=batch)
             img, pred_x0 = outs
             if callback: callback(i)
             if img_callback: img_callback(pred_x0, i)
@@ -178,17 +178,19 @@ class DDIMSampler(object):
         return img, intermediates
 
     @torch.no_grad()
-    def p_sample_ddim(self, x, c, t, index, repeat_noise=False, use_original_steps=False, quantize_denoised=False,
+    def p_sample_ddim(self, x, c, t, index, repeat_noise=False, use_original_steps=False, quantize_denoised=False, #TODO
                       temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
                       unconditional_guidance_scale=1., unconditional_conditioning=None,
-                      dynamic_threshold=None):
+                      dynamic_threshold=None,batch=None):
         b, *_, device = *x.shape, x.device
 
         if unconditional_conditioning is None or unconditional_guidance_scale == 1.:
-            model_output = self.model.apply_model(x, t, c)
+            model_output = self.model.apply_model(x, t, c, batch=batch, show_premask=True)
         else:
             x_in = torch.cat([x] * 2)
             t_in = torch.cat([t] * 2)
+            # batch_ = {'objectmask':torch.cat([batch['objectmask']] * 2), 'hint':torch.cat([batch['hint']] * 2), 'hint2':torch.cat([batch['hint2']] * 2)}
+            batch_ = {'cls':torch.cat([batch['cls']] * 2), 'bbx':torch.cat([batch['bbx']] * 2), 'fg':torch.cat([batch['fg']] * 2), 'embeddings':torch.cat([batch['embeddings']] * 2)}
             if isinstance(c, dict):
                 assert isinstance(unconditional_conditioning, dict)
                 c_in = dict()
@@ -208,8 +210,10 @@ class DDIMSampler(object):
                     c_in.append(torch.cat([unconditional_conditioning[i], c[i]]))
             else:
                 c_in = torch.cat([unconditional_conditioning, c])
-            model_uncond, model_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
+            eps = self.model.apply_model(x_in, t_in, c_in, batch=batch_, show_premask=True)
+            model_uncond, model_t = eps.chunk(2) #eps
             model_output = model_uncond + unconditional_guidance_scale * (model_t - model_uncond)
+            # predicted_mask, _ = predicted_mask.chunk(2)
 
         if self.model.parameterization == "v":
             e_t = self.model.predict_eps_from_z_and_v(x, t, model_output)
@@ -322,7 +326,7 @@ class DDIMSampler(object):
 
         time_range = np.flip(timesteps)
         total_steps = timesteps.shape[0]
-        # print(f"Running DDIM Sampling with {total_steps} timesteps")
+        print(f"Running DDIM Sampling with {total_steps} timesteps")
 
         iterator = tqdm(time_range, desc='Decoding image', total=total_steps)
         x_dec = x_latent

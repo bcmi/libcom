@@ -1,8 +1,11 @@
 import einops
 import torch
-import torch as th
 import torch.nn as nn
-
+import torch.nn.functional as F
+import os
+import pickle
+import cv2
+import numpy as np
 from ..ldm.modules.diffusionmodules.util import (
     conv_nd,
     linear,
@@ -12,20 +15,20 @@ from ..ldm.modules.diffusionmodules.util import (
 
 from einops import rearrange, repeat
 from torchvision.utils import make_grid
-from libcom.shadow_generation.source.ldm.modules.attention import SpatialTransformer
-from libcom.shadow_generation.source.ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
-from libcom.shadow_generation.source.ldm.models.diffusion.ddpm import LatentDiffusion
-from libcom.shadow_generation.source.ldm.util import log_txt_as_img, exists, instantiate_from_config
-from libcom.shadow_generation.source.ldm.models.diffusion.ddim import DDIMSampler
-from libcom.shadow_generation.source.sampler.pndm import PNDMSampler
-from libcom.shadow_generation.source.ldm.models.mask_predictor.mask_predictor import latent_guidance_predictor, save_out_hook, resize_and_concatenate
+from ..ldm.modules.attention import SpatialTransformer
+from ..ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
+from ..ldm.models.diffusion.ddpm import LatentDiffusion
+from ..ldm.util import log_txt_as_img, exists, instantiate_from_config
+from ..ldm.models.diffusion.ddim import DDIMSampler
 
-import cv2
-import numpy as np
+from .base_network import MaskCls, RegNetwork
 
-
+    
 class ControlledUnetModel(UNetModel):
-    def forward(self, x, timesteps=None, context=None, control=None, only_mid_control=False, **kwargs):
+
+    def forward(self, x, timesteps=None, context=None, control=None, only_mid_control=False, get_stable_features=False, remask=None, **kwargs):
+        if remask is not None:
+            return self.out(remask)
         hs = []
         with torch.no_grad():
             t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
@@ -35,7 +38,9 @@ class ControlledUnetModel(UNetModel):
                 h = module(h, emb, context)
                 hs.append(h)
             h = self.middle_block(h, emb, context)
-
+        encoder_features = hs.copy()
+        unet_features = h.clone()
+        decoder_features = []
         if control is not None:
             h += control.pop()
 
@@ -45,8 +50,10 @@ class ControlledUnetModel(UNetModel):
             else:
                 h = torch.cat([h, hs.pop() + control.pop()], dim=1)
             h = module(h, emb, context)
-
+            decoder_features.append(h)
         h = h.type(x.dtype)
+        if get_stable_features:
+            return self.out(h), [unet_features, encoder_features, decoder_features]
         return self.out(h)
 
 
@@ -127,11 +134,12 @@ class ControlNet(nn.Module):
         self.channel_mult = channel_mult
         self.conv_resample = conv_resample
         self.use_checkpoint = use_checkpoint
-        self.dtype = th.float16 if use_fp16 else th.float32
+        self.dtype = torch.float16 if use_fp16 else torch.float32
         self.num_heads = num_heads
         self.num_head_channels = num_head_channels
         self.num_heads_upsample = num_heads_upsample
         self.predict_codebook_ids = n_embed is not None
+        self.add_color_channel = 0
 
         time_embed_dim = model_channels * 4
         self.time_embed = nn.Sequential(
@@ -147,10 +155,10 @@ class ControlNet(nn.Module):
                 )
             ]
         )
-        self.zero_convs = nn.ModuleList([self.make_zero_conv(model_channels)])
+        self.zero_convs = nn.ModuleList([self.make_zero_conv(model_channels, self.add_color_channel)])
 
         self.input_hint_block = TimestepEmbedSequential(
-            conv_nd(dims, 4, 16, 3, padding=1), #TODO
+            conv_nd(dims, 5, 16, 3, padding=1), #TODO
             nn.SiLU(),
             conv_nd(dims, 16, 16, 3, padding=1),
             nn.SiLU(),
@@ -214,7 +222,7 @@ class ControlNet(nn.Module):
                             )
                         )
                 self.input_blocks.append(TimestepEmbedSequential(*layers))
-                self.zero_convs.append(self.make_zero_conv(ch))
+                self.zero_convs.append(self.make_zero_conv(ch, self.add_color_channel))
                 self._feature_size += ch
                 input_block_chans.append(ch)
             if level != len(channel_mult) - 1:
@@ -239,7 +247,7 @@ class ControlNet(nn.Module):
                 )
                 ch = out_ch
                 input_block_chans.append(ch)
-                self.zero_convs.append(self.make_zero_conv(ch))
+                self.zero_convs.append(self.make_zero_conv(ch, self.add_color_channel))
                 ds *= 2
                 self._feature_size += ch
 
@@ -283,10 +291,10 @@ class ControlNet(nn.Module):
         self.middle_block_out = self.make_zero_conv(ch)
         self._feature_size += ch
 
-    def make_zero_conv(self, channels):
-        return TimestepEmbedSequential(zero_module(conv_nd(self.dims, channels, channels, 1, padding=0)))
+    def make_zero_conv(self, channels, color_hist_channels=0):
+        return TimestepEmbedSequential(zero_module(conv_nd(self.dims, channels + color_hist_channels, channels, 1, padding=0)))
 
-    def forward(self, x, hint, timesteps, context, **kwargs):
+    def forward(self, x, hint, timesteps, context, **kwargs): # TODO
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
         emb = self.time_embed(t_emb)
 
@@ -309,17 +317,31 @@ class ControlNet(nn.Module):
 
         return outs
 
-
 class ControlLDM(LatentDiffusion):
 
-    def __init__(self, control_stage_config, control_key, only_mid_control, *args, **kwargs):
+    def __init__(self, control_stage_config, control_key, only_mid_control, cls_net_path, reg_net_path, cls_label, *args, **kwargs):
+
         super().__init__(*args, **kwargs)
         self.control_model = instantiate_from_config(control_stage_config)
         self.control_key = control_key
-        self.shadow_mask = "mask"
         self.only_mid_control = only_mid_control
+        self.cls_net_path = cls_net_path
+        self.reg_net_path = reg_net_path
+        self.cls_label = cls_label
         self.control_scales = [1.0] * 13
-        self.LGP = latent_guidance_predictor(output_chan=1, input_chan=2240, num_encodings=9)
+        self.mask_cls = MaskCls(num_classes=256)
+        if os.path.exists(self.cls_net_path):
+            self.mask_cls.load_state_dict(torch.load(self.cls_net_path)['net'])
+            # print('Loading mask embeddings classification model successfully')
+        for param in self.mask_cls.parameters():
+            param.requires_grad = False
+        self.bbx_reg = RegNetwork()
+        if os.path.exists(self.reg_net_path):
+            self.bbx_reg.load_state_dict(torch.load(self.reg_net_path)['net'])
+            #print('Loading rotated bounding box regression model successfully')
+        for param in self.bbx_reg.parameters():
+            param.requires_grad = False
+        self.mask_threshold = 0.5
 
     @torch.no_grad()
     def get_input(self, batch, k, bs=None, *args, **kwargs):
@@ -330,103 +352,108 @@ class ControlLDM(LatentDiffusion):
         control = control.to(self.device)
         control = einops.rearrange(control, 'b h w c -> b c h w')
         control = control.to(memory_format=torch.contiguous_format).float()
-        mask = batch[self.shadow_mask]
-        # mask = None
-        return x, dict(c_crossattn=[c], c_concat=[control]), mask
+        return x, dict(c_crossattn=[c], c_concat=[control])
 
-    def apply_model(self, x_noisy, t, cond, *args, **kwargs):
+    def gen_bbx(self, pred_t, fg_instance_bbx, mask):
+        img_height, img_width = 512, 512
+        # fg_instance_bbx = fg_instance_bbx.cpu().numpy()
+        # fg_instance_bbx = fg_instance_bbx.to(self.device)
+        pred_bbx = pred_t.new(pred_t.shape)
+        pred_bbx[:,0] = pred_t[:,0] * fg_instance_bbx[:,2] + fg_instance_bbx[:,0]
+        pred_bbx[:,1] = pred_t[:,1] * fg_instance_bbx[:,3] + fg_instance_bbx[:,1]
+        pred_bbx[:,2] = fg_instance_bbx[:,2] * torch.exp(pred_t[:,2])
+        pred_bbx[:,3] = fg_instance_bbx[:,3] * torch.exp(pred_t[:,3])
+        pred_bbx[:,4] = pred_t[:,4] * 180 / np.pi +fg_instance_bbx[:,4]
+        mask = mask.cpu().numpy()
+        bs = mask.shape[0]
+        for i in range(bs):
+            if pred_bbx[i,4] > 0:
+                temp = pred_bbx[i,2]
+                pred_bbx[i,2] = pred_bbx[i,3]
+                pred_bbx[i,3] = temp
+                pred_bbx[i,4] = pred_bbx[i,4] - 90
+            x, y, w, h, theta = pred_bbx[i,0], pred_bbx[i,1], pred_bbx[i,2], pred_bbx[i,3], pred_bbx[i,4]
+            box = ((x, y), (w, h), theta)
+            box_points = cv2.boxPoints(box)
+            ## 训练时添加扰动
+            # perturbation = np.random.uniform(-5, 5, box_points.shape)
+            # box_points = box_points + perturbation
+            box_points = np.clip(box_points, 0, [img_width - 1, img_height - 1])
+            box_points_int = np.int32(box_points)
+            # box_points_int = box_points_int.reshape((-1, 1, 2))
+            # a = mask[i]
+            cv2.fillPoly(mask[i], [box_points_int], 1)
+        mask = torch.tensor(mask).unsqueeze(1).to(dtype=torch.float32).to(self.device)
+        return mask
+
+    def apply_model(self, x_noisy, t, cond, get_stable_features=True, batch=None, *args, **kwargs): # TODO
         assert isinstance(cond, dict)
-        diffusion_model = self.model.diffusion_model
-
+        diffusion_model = self.model.ip_adapter
         cond_txt = torch.cat(cond['c_crossattn'], 1)
 
         if cond['c_concat'] is None:
-            eps = diffusion_model(x=x_noisy, timesteps=t, context=cond_txt, control=None, only_mid_control=self.only_mid_control)
+            eps = diffusion_model(sample=x_noisy, timestep=t, encoder_hidden_states=cond_txt)
+            return eps
         else:
-            control = self.control_model(x=x_noisy, hint=torch.cat(cond['c_concat'], 1), timesteps=t, context=cond_txt)
+            input = batch['cls']
+            input = input.to(self.device)
+            input = einops.rearrange(input, 'b h w c -> b c h w')
+            pred_t = self.bbx_reg(input)
+            bbx_mask = batch['bbx']
+            fg_instance_bbx = batch['fg']
+            fg_instance_bbx = fg_instance_bbx.to(self.device)
+            bbx_region = self.gen_bbx(pred_t, fg_instance_bbx, bbx_mask)
+            hint = torch.cat(cond['c_concat'], 1)
+
+            ## 
+            control = self.control_model(x=x_noisy, hint=torch.cat((hint, bbx_region), 1), timesteps=t, context=cond_txt)
             control = [c * scale for c, scale in zip(control, self.control_scales)]
-            eps = diffusion_model(x=x_noisy, timesteps=t, context=cond_txt, control=control, only_mid_control=self.only_mid_control)
+            mid_control = control.pop()
+            down_control = tuple(control)
+            
+            mask_label = self.mask_cls(input)
+            with open(self.cls_label, 'rb') as f:
+                centroid_dict = pickle.load(f)
+            _, top64_label = torch.topk(mask_label, 64, largest=True, sorted=False)
+            mask_embeddings = batch['embeddings'].to(self.device)
+            for i in range(mask_embeddings.shape[0]):
+                for j in range(top64_label.shape[1]):
+                    label = top64_label[i,j].item()
+                    if label in centroid_dict:
+                        mask_embeddings[i,j,:] += torch.tensor(centroid_dict[label]).to(self.device)
+                    else:
+                        print(f"Warning: label {label} not found in centroid_dict")
 
-        return eps
-    '''
-    def training_step(self, batch, batch_idx):
-        self.LGP.train()
-        x, c, mask= self.get_input(batch, self.first_stage_key)
-        features, encoded_edge_maps, noise_levels = [], [], []
-        save_hook = save_out_hook
-        blocks = [0,1,2,3]
-        self.feature_blocks = []
-        batch_size = batch['mask'].shape[0]
-        if batch_size != 2:
-            return None
-        comp_img = batch['hint'][:, :, :, :3].permute(0,3,1,2)
-
-        for idx, block in enumerate(self.model.diffusion_model.down_blocks):
-            if idx in blocks:
-                h=block.register_forward_hook(save_hook)
-                self.feature_blocks.append([block,h]) 
-                
-        # for idx, block in enumerate(self.model.diffusion_model.up_blocks):
-        #     if idx in blocks:
-        #         h=block.register_forward_hook(save_hook)
-        #         self.feature_blocks.append([block,h])  
-
-        loss_noise1, _ = self(x, c, mask)
-
-        loss_noise2, _, pred_x0 = self(x, c, mask, train_mask_only=True)
-
-        activations = []
-
-        for block,h in self.feature_blocks:
-            activations.append(block.activations)
-            block.activations = None
-            h.remove()
-
-        features =  resize_and_concatenate(activations, x)
-
-        gt_mask = batch["gt_mask"].unsqueeze(1)
-
-        predicted_mask = self.LGP(features)
-        predicted_mask = predicted_mask.view(batch_size,1,64,64)
-
-        loss_mask = nn.functional.mse_loss(predicted_mask, gt_mask, reduction='none').mean()
-
-        predicted_mask = nn.functional.interpolate(
-            predicted_mask.detach(), size=(512,512), mode="bilinear"
-        )
-        predicted_mask = torch.greater_equal(predicted_mask, 0.6).int()
-
-        cv2.imwrite("./pred_mask.png", np.array(predicted_mask[0].squeeze(0).to('cpu') * 255))
-
-        # pred_img = self.decode_first_stage_with_grad(pred_x0) * predicted_mask + (1-predicted_mask) * comp_img
-
-        # loss_img = nn.functional.mse_loss(pred_img, batch['jpg'].permute(0,3,1,2), reduction='none').mean()
-
-        loss = loss_noise1 + loss_noise2 + loss_mask
-
-        return loss
-    '''
+            eps = diffusion_model(noisy_latents=x_noisy, timesteps=t, encoder_hidden_states=cond_txt, down_block_additional_residuals=down_control, mid_block_additional_residual=mid_control, mask_embeddings=mask_embeddings)
+            
+            return eps
 
     @torch.no_grad()
     def get_unconditional_conditioning(self, N):
         return self.get_learned_conditioning([""] * N)
 
     @torch.no_grad()
-    def log_images(self, batch, N=16, n_row=2, sample=False, ddim_steps=50, ddim_eta=0.0, return_keys=None,
+    def log_images(self, batch, N=1, n_row=2, sample=False, ddim_steps=50, ddim_eta=0.0, return_keys=None,
                    quantize_denoised=True, inpaint=True, plot_denoise_rows=False, plot_progressive_rows=True,
                    plot_diffusion_rows=False, unconditional_guidance_scale=9.0, unconditional_guidance_label=None,
-                   use_ema_scope=True, mode='ddim', input=None, add_noise_strength=1, 
+                   use_ema_scope=True, use_x_T=False,
                    **kwargs):
         use_ddim = ddim_steps is not None
 
         log = dict()
-        z, c, _= self.get_input(batch, self.first_stage_key, bs=N)
+        z, c = self.get_input(batch, self.first_stage_key, bs=N)
         c_cat, c = c["c_concat"][0][:N], c["c_crossattn"][0][:N]
         N = min(z.shape[0], N)
         n_row = min(z.shape[0], n_row)
         log["reconstruction"] = self.decode_first_stage(z)
-        log["control"] = c_cat * 2.0 - 1.0
+        log_control = c_cat * 2.0 - 1.0
+        log["control"] = log_control
         log["conditioning"] = log_txt_as_img((512, 512), batch[self.cond_stage_key], size=16)
+        
+        if use_x_T == True:
+            x_T = super().q_sample(x_start=z, t=torch.tensor([999], device=self.device, dtype=torch.long), noise=torch.randn_like(z))
+        else:
+            x_T = None
 
         if plot_diffusion_rows:
             # get diffusion row
@@ -449,50 +476,60 @@ class ControlLDM(LatentDiffusion):
         if sample:
             # get denoise row
             samples, z_denoise_row = self.sample_log(cond={"c_concat": [c_cat], "c_crossattn": [c]},
-                                                     batch_size=N, mode=mode,
+                                                     batch_size=N, ddim=use_ddim,
                                                      ddim_steps=ddim_steps, eta=ddim_eta,
-                                                     input=input, add_noise_strength=add_noise_strength)
+                                                     batch=batch)
             x_samples = self.decode_first_stage(samples)
             log["samples"] = x_samples
             if plot_denoise_rows:
                 denoise_grid = self._get_denoise_row_from_list(z_denoise_row)
                 log["denoise_row"] = denoise_grid
 
-        if unconditional_guidance_scale > 1.0:
+        if unconditional_guidance_scale >= 1.0:
             uc_cross = self.get_unconditional_conditioning(N)
             uc_cat = c_cat  # torch.zeros_like(c_cat)
             uc_full = {"c_concat": [uc_cat], "c_crossattn": [uc_cross]}
             samples_cfg, _ = self.sample_log(cond={"c_concat": [c_cat], "c_crossattn": [c]},
-                                             batch_size=N, mode=mode,ddim=use_ddim,
+                                             batch_size=N, ddim=use_ddim,
                                              ddim_steps=ddim_steps, eta=ddim_eta,
                                              unconditional_guidance_scale=unconditional_guidance_scale,
-                                             unconditional_conditioning=uc_full,
-                                            input=input, add_noise_strength=add_noise_strength
-                                             )
+                                             unconditional_conditioning=uc_full, x_T=x_T,
+                                             batch=batch)
             x_samples_cfg = self.decode_first_stage(samples_cfg)
             log[f"samples_cfg_scale_{unconditional_guidance_scale:.2f}"] = x_samples_cfg
+            # log['predicted_mask'] = pred_mask
 
         return log
 
     @torch.no_grad()
-    def sample_log(self, cond, batch_size, mode, ddim_steps, input, add_noise_strength, **kwargs):
+    def sample_log(self, cond, batch_size, ddim, ddim_steps, x_T=None, **kwargs):
         ddim_sampler = DDIMSampler(self)
-        pndm_sampler = PNDMSampler(self)
         b, c, h, w = cond["c_concat"][0].shape
         shape = (self.channels, h // 8, w // 8)
-        if mode == 'ddim':
-            samples, intermediates = ddim_sampler.sample(ddim_steps, batch_size, shape, cond, verbose=False, **kwargs)
-        elif mode == 'pndm':
-            samples, intermediates = pndm_sampler.sample(ddim_steps, batch_size, shape, cond, 
-                                                         verbose=False, input=input,
-                                                         strength=add_noise_strength, **kwargs)
+
+        samples, intermediates = ddim_sampler.sample(ddim_steps, batch_size, shape, cond, verbose=False, x_T=x_T, **kwargs) #add x_T
         return samples, intermediates
 
     def configure_optimizers(self):
         lr = self.learning_rate
-        params = list(self.control_model.parameters())
+        params = []
+        params += list(self.control_model.parameters())
+        params += list(self.model.adapter_modules.parameters())
+        params += list(self.model.image_proj_model.parameters())
         if not self.sd_locked:
             params += list(self.model.diffusion_model.output_blocks.parameters())
             params += list(self.model.diffusion_model.out.parameters())
         opt = torch.optim.AdamW(params, lr=lr)
         return opt
+
+    def low_vram_shift(self, is_diffusing):
+        if is_diffusing:
+            self.model = self.model.cuda()
+            self.control_model = self.control_model.cuda()
+            self.first_stage_model = self.first_stage_model.cpu()
+            self.cond_stage_model = self.cond_stage_model.cpu()
+        else:
+            self.model = self.model.cpu()
+            self.control_model = self.control_model.cpu()
+            self.first_stage_model = self.first_stage_model.cuda()
+            self.cond_stage_model = self.cond_stage_model.cuda()
