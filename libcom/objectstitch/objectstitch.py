@@ -70,8 +70,8 @@ class Mure_ObjectStitchModel:
     .. image:: _static/image/mureobjectstitch_result2.jpg
         :scale: 38 %
             
+        
     """
-
     def __init__(self, device=0, model_type='ObjectStitch', **kwargs):
         assert model_type in model_set, f'Not implementation for {model_type}'
         self.model_type = model_type
@@ -301,7 +301,6 @@ class Mure_ObjectStitchModel:
             foreground_image (str | numpy.ndarray): The path to the list of foreground images or the foreground images in ndarray form.
             foreground_mask (None | str | numpy.ndarray): Mask of foreground image which indicates the foreground object region in the foreground image.
             bbox (list): The bounding box which indicates the foreground's location in the background. [x1, y1, x2, y2].
-            
             num_samples (int): Number of images to be generated. default: 1.
             sample_steps (int): Number of denoising steps. The recommended setting is 25 for PLMS sampler and 50 for DDIM sampler. default: 50.
             guidance_scale (int): Scale in classifier-free guidance (minimum: 1; maximum: 20). default: 5.
@@ -309,8 +308,9 @@ class Mure_ObjectStitchModel:
 
         Returns:
             composite_images (numpy.ndarray): Generated images with a shape of 512x512x3 or Nx512x512x3, where N indicates the number of generated images. 
+
+
         """
-        
         seed_everything(seed)
 
         ## c, uc: torch.Size([3, 257, 768])

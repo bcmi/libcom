@@ -86,6 +86,7 @@ class ShadowGenerationModel:
     .. image:: _static/image/shadow_generation_result4.jpg
         :scale: 32 %
         
+        
     """
     def __init__(self, device=0, model_type='ShadowGeneration', **kwargs):
         assert model_type in model_set, f'Not implementation for {model_type}'
