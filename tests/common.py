@@ -114,6 +114,7 @@ def get_objectstitch_test_list():
                     fg_img_path = fg_img_path.replace('.jpg', '.png')
                 assert os.path.exists(fg_img_path), fg_img_path
                 fg_path_list.append(fg_img_path)
+            fg_path_list.sort()
             pair[k]  = fg_path_list
         samples.append(pair)
 
