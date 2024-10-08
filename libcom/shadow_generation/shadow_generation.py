@@ -101,6 +101,7 @@ class ShadowGenerationModel:
         download_pretrained_model(cldm_weight_path)
         download_pretrained_model(cls_weight_path)
         download_pretrained_model(reg_weight_path)
+        download_pretrained_model(cls_label_path)
         self.device = check_gpu_device(device)
         self.build_pretrained_model(ppp_weight_path, cldm_weight_path, cls_weight_path, reg_weight_path, cls_label_path)
         self.build_data_transformer()
