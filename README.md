@@ -41,9 +41,9 @@
 - **HarmonyScoreModel** [[BargainNet]](https://github.com/bcmi/BargainNet-Image-Harmonization) evaluates the harmony level between foreground and background in a composite image.
 - **InharmoniousLocalizationModel** [[MadisNet]](https://github.com/bcmi/MadisNet-Inharmonious-Region-Localization) localizes the inharmonious region in a synthetic image.
 - **FOSScoreModel** [[DiscoFOS]](https://github.com/bcmi/Foreground-Object-Search-Dataset-FOSD) evaluates the compatibility between foreground and background in a composite image in terms of geometry and semantics.
-- **ShadowGenerationModel** [[GPSDiffusion]](https://github.com/bcmi/GPSDiffusion-Object-Shadow-Generation) generates plausible shadow for the inserted object in a composite image. 
-- **ControlComModel** [[ControlCom]](https://github.com/bcmi/ControlCom-Image-Composition) is a generative image composition model which unifies image blending and image harmonization. The generated foreground has high fidelity. 
-- **MureObjectStitchModel** [[MureObjectStitch]](https://github.com/bcmi/MureObjectStitch-Image-Composition) is another generative image composition model which can adjust the pose and view of foreground, but the fidelity of generated foreground is worse than ControlComModel. 
+- **ShadowGenerationModel** [[GPSDiffusion]](https://github.com/bcmi/GPSDiffusion-Object-Shadow-Generation) generates plausible shadow for the inserted object in a composite image. This model is unstable and you can pick the most satisfactory one from multiple generated results. 
+- **ControlComModel** [[ControlCom]](https://github.com/bcmi/ControlCom-Image-Composition) is a generative image composition model which unifies image blending and image harmonization. The pose and view of foreground stay unchanged. 
+- **MureObjectStitchModel** [[MureObjectStitch]](https://github.com/bcmi/MureObjectStitch-Image-Composition) is another generative image composition model which can adjust the pose and view of foreground. It supports multiple reference images of one foreground object. If you have a few images containing the foreground object, we suggest finetuning MureObjectStitch using these images for better detail preservation. 
 
 
 **For the detailed method descriptions, code examples, visualization results, and performance comments, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/).** If the model performance is not satisfactory, you can finetune the pretrained model on your own dataset using the source repository and replace the original model. 
