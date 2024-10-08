@@ -65,9 +65,9 @@ class Mure_ObjectStitchModel:
     Expected result:
 
     .. image:: _static/image/mureobjectstitch_result1.jpg
-        :scale: 30 %
+        :scale: 21 %
     .. image:: _static/image/mureobjectstitch_result2.jpg
-        :scale: 30 %
+        :scale: 21 %
             
         
     """

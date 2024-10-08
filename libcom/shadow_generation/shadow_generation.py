@@ -82,9 +82,9 @@ class ShadowGenerationModel:
     Expected result:
 
     .. image:: _static/image/shadow_generation_result3.jpg
-        :scale: 25 %
+        :scale: 21 %
     .. image:: _static/image/shadow_generation_result4.jpg
-        :scale: 25 %
+        :scale: 21 %
 
         
     """
