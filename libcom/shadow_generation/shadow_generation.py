@@ -24,36 +24,6 @@ cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 model_set = ['ShadowGeneration']
 
-def opencv_to_pil(input):
-    return Image.fromarray(cv2.cvtColor(input, cv2.COLOR_BGR2RGB))
-
-def read_image_pil(input):
-    if isinstance(input, str):
-        assert os.path.exists(input), input
-        input = Image.open(input).convert('RGB')
-    elif isinstance(input, np.ndarray):
-        input = opencv_to_pil(input)
-    return input   
-
-def read_mask_pil(input):
-    if isinstance(input, str):
-        assert os.path.exists(input), input
-        input = Image.open(input).convert('L')
-    elif isinstance(input, np.ndarray):
-        input = Image.fromarray(input).convert('L')
-    return input
-
-def check_gpu_device(device):
-    assert torch.cuda.is_available(), 'Only GPU are supported'
-    if isinstance(device, (int, str)):
-        device = int(device)
-        assert 0 <= device < torch.cuda.device_count(), f'invalid device id: {device}'
-        device = torch.device(f'cuda:{device}')
-    if isinstance(device, torch.device):
-        return device
-    else:
-        raise Exception('invalid device type: type({})={}'.format(device, type(device)))
-
 class ShadowGenerationModel:
     """
     Foreground shadow generation model based on diffusion model and control net.
@@ -161,7 +131,6 @@ class ShadowGenerationModel:
     
     def outputs_postprocess(self, outputs):
         img, output = outputs
-        #img = img * 255
         img = (img + 1) * 127.5
         pred_mask = torch.greater_equal(output[:, :, :, 3], 0).int()
         adjusted_img = output[:, :, :, :3]
@@ -170,7 +139,6 @@ class ShadowGenerationModel:
         adjusted_img = (adjusted_img * 255).int()
         composite_img = adjusted_img * pred_mask.unsqueeze(3) + (1-pred_mask.unsqueeze(3)) * img
         composite_img = np.array(composite_img.cpu().squeeze(0), dtype=np.uint8)
-        # change rgb to bgr color
         composite_img = composite_img[:,:,[2,1,0]]
         return composite_img
     
@@ -178,11 +146,8 @@ class ShadowGenerationModel:
     def inf_img(self, inputs):
         target, mask, cat_img, bbx_instance, mask_embeddings, bbx_region = inputs
         batch = dict(jpg=target, cls=cat_img, fg=bbx_instance, bbx=bbx_region, embeddings=mask_embeddings, txt=[''], hint=cat_img)
-        # batch = dict(jpg=img, txt=[''], hint=cat_img, mask=None, gt_mask=mask)
-        # get predicted image   
         images = self.model.model.log_images(batch, use_x_T=True)
         image_scaled = images['samples_cfg_scale_9.00'].permute(0,2,3,1)
-        # go through post process net
         input = torch.concat([image_scaled, target, mask], dim=-1)
         null_timeteps = torch.zeros(1, device=input.device)
         output = self.model.post_process_net(input.permute(0,3,1,2), timesteps=null_timeteps)

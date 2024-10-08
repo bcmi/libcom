@@ -311,13 +311,6 @@ class Mure_ObjectStitchModel:
 
         """
         seed_everything(seed)
-
-        ## c, uc: torch.Size([3, 257, 768])
-        ## test_kewargs: dict_keys(['bg_latent', 'bg_mask', 'bbox'])
-        # torch.Size([3, 4, 64, 64])
-        # torch.Size([3, 1, 64, 64])
-        # torch.Size([3, 4])
-
         test_kwargs, c, uc, show_fg_img = self.inputs_preprocess(background_image, foreground_image, 
                                                     foreground_mask, bbox, num_samples)
 

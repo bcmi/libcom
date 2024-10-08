@@ -89,7 +89,7 @@ def get_controlcom_test_list():
     return samples
 
 def get_objectstitch_test_list():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'objectstitch')
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mure_objectstitch')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'background')):
         pair = {}
