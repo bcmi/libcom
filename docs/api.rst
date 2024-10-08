@@ -58,12 +58,12 @@ libcom.fopa_heat_map
 
 libcom.shadow_generation
 ----------------------------------------
-.. autoclass:: libcom::ShadowGenerationModel
+.. autoclass:: libcom.ShadowGenerationModel
     :members:
     :special-members: __call__
 
 libcom.objectstitch
 ----------------------------------------
-.. autoclass:: libcom::Mure_ObjectStitchModel
+.. autoclass:: libcom.Mure_ObjectStitchModel
     :members:
     :special-members: __call__
