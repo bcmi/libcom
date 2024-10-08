@@ -4,7 +4,7 @@ from tqdm import tqdm
 import zipfile
 
 hf_repo = 'BCMIZB/Libcom_pretrained_models'
-ms_repo = 'bcmizb/Libcom_pretrained_models'
+ms_repo = 'yujieouo/Libcom_pretrained_models'
 
 def download_pretrained_model(weight_path):
     if os.path.exists(weight_path):
