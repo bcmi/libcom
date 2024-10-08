@@ -82,10 +82,10 @@ class ShadowGenerationModel:
     Expected result:
 
     .. image:: _static/image/shadow_generation_result3.jpg
-        :scale: 32 %
+        :scale: 25 %
     .. image:: _static/image/shadow_generation_result4.jpg
-        :scale: 32 %
-        
+        :scale: 25 %
+
         
     """
     def __init__(self, device=0, model_type='ShadowGeneration', **kwargs):

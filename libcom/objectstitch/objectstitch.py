@@ -52,7 +52,6 @@ class Mure_ObjectStitchModel:
         >>> sample_list = ['000000003658', '000000165136']
         >>> sample_dir  = '../tests/mureobjectstitch/'
         >>> bbox_list   = [[0, 253, 186, 509], [217, 177, 499, 410]]
-        
         >>> for i, sample in enumerate(sample_list):
         >>>     bg_img = sample_dir + f'{sample}/background/{sample}.png'
         >>>     fg_img = sample_dir + f'{sample}/foreground/'
@@ -66,9 +65,9 @@ class Mure_ObjectStitchModel:
     Expected result:
 
     .. image:: _static/image/mureobjectstitch_result1.jpg
-        :scale: 38 %
+        :scale: 30 %
     .. image:: _static/image/mureobjectstitch_result2.jpg
-        :scale: 38 %
+        :scale: 30 %
             
         
     """
