@@ -8,7 +8,7 @@ Controllable image composition unifies multiple image composition sub-tasks (*i.
 
 ## Brief Method Summary
 
-![controllable_composition](../resources/controllable_composition.jpg)
+![controllable_composition](../resources/controlcom.jpg)
 
 
 ### ControlCom
