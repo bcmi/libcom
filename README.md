@@ -15,7 +15,6 @@
 [![Static Badge](https://img.shields.io/badge/Resources-Awesome-green?style=flat&label=Resources)](https://github.com/bcmi/Awesome-Image-Composition)
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
 
-**We co-founded a startup company [miguo.ai](https://miguocomics.com/), dedicated to accelerating the production of comics and animations using AIGC technology. If you are seeking internship or full-time positions, please feel free to send your resume to hr@miguocomics.com.**
 
 ---
 
