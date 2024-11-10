@@ -29,6 +29,8 @@
 
 **The ultimate goal of this library is solving all the problems related to image composition with simple `import libcom`.**
 
+Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.com/blog.html) or Zhihu Column ["Newly CVer"](https://www.zhihu.com/column/c_1333918224900206592) to get the latest information about image composition! 
+
 ### Main Functions
 
 - **get_composite_image** generates composite images using naive copy-and-paste followed by image blending.
