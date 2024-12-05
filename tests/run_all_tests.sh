@@ -6,7 +6,7 @@ python test_composite_generation.py
 
 python test_controllable_composition.py
 
-python test_objectstitch.py
+python test_mure_objectstitch.py
 
 python test_shadow_generation.py
 
