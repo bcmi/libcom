@@ -147,7 +147,7 @@ if __name__ == '__main__':
         license='Apache License 2.0',
         setup_requires=parse_requirements('requirements/build.txt'),
         tests_require=parse_requirements('requirements/tests.txt'),
-        install_requires=parse_requirements('requirements/requirements.txt'),
+        install_requires=parse_requirements('requirements/runtime.txt'),
         ext_modules=[get_ext_modules(cur_dir)],
         cmdclass={'build_ext': BuildExtension},
         extras_require={
