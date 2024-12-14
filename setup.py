@@ -2,10 +2,25 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
-import torch
-from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
 import os
+import sys
+import subprocess
 from os.path import join
+
+
+def install_package(package_name):
+    """Install a package using pip."""
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+
+try:
+    import torch
+    from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
+except ImportError:
+    print("PyTorch is not installed. Installing PyTorch first...")
+    install_package("torch")  # You can specify a version if needed
+    import torch
+    from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
+
 
 
 def readme():
@@ -132,7 +147,7 @@ if __name__ == '__main__':
         license='Apache License 2.0',
         setup_requires=parse_requirements('requirements/build.txt'),
         tests_require=parse_requirements('requirements/tests.txt'),
-        install_requires=parse_requirements('requirements/requirements.txt'),
+        install_requires=parse_requirements('requirements/runtime.txt'),
         ext_modules=[get_ext_modules(cur_dir)],
         cmdclass={'build_ext': BuildExtension},
         extras_require={
