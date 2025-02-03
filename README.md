@@ -28,7 +28,7 @@
 
 **_libcom_ covers a diversity of related tasks in the field of image composition**, including image blending, standard/painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
 
-**The ultimate goal of this library is solving all the problems related to image composition with simple `import libcom`. We are seeking collaboration to make libcom a more user-friendly and efficient tool. If you have a strong team and a real passion for image composition, you can take over libcom. (contact email: ustcnewly@sjtu.edu.cn)**
+**The ultimate goal of this library is solving all the problems related to image composition with simple `import libcom`.**
 
 Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.com/blog.html) or Zhihu Column ["Newly CVer"](https://www.zhihu.com/column/c_1333918224900206592) to get the latest information about image composition! 
 
