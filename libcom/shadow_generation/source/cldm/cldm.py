@@ -373,7 +373,7 @@ class ControlLDM(LatentDiffusion):
                 pred_bbx[i,3] = temp
                 pred_bbx[i,4] = pred_bbx[i,4] - 90
             x, y, w, h, theta = pred_bbx[i,0], pred_bbx[i,1], pred_bbx[i,2], pred_bbx[i,3], pred_bbx[i,4]
-            box = ((x, y), (w, h), theta)
+            box = ((float(x), float(y)), (float(w), float(h)), float(theta))
             box_points = cv2.boxPoints(box)
             ## 训练时添加扰动
             # perturbation = np.random.uniform(-5, 5, box_points.shape)
