@@ -62,7 +62,7 @@ Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/main/docs/g
 - Project Initiator & Team Manager: [Li Niu](https://www.ustcnewly.com/index.html). 
 - Architect & Lead Developer: [Bo Zhang](https://bo-zhang-cs.github.io/), [Yujie Zhou](https://github.com/YujieOuO).
 - Documentation Manager: [Jiacheng Sui](https://github.com/charlessjc).
-- Module Developers: [Jiacheng Sui](https://github.com/charlessjc), [Binjie Gao](https://github.com/WhynotHAHA), [Lingxiao Lu](https://github.com/pokaaa), [Xinhao Tao](https://github.com/taoxinhao13), [Junyan Cao](https://github.com/cjy-4), [Haonan Zhao](https://github.com/nononononno), [Jiaxuan Chen](https://github.com/csdahunzi), [Junqi You](https://github.com/dhmbb2).
+- Module Developers: [Jiacheng Sui](https://github.com/charlessjc), [Bingjie Gao](https://github.com/WhynotHAHA), [Lingxiao Lu](https://github.com/pokaaa), [Xinhao Tao](https://github.com/taoxinhao13), [Junyan Cao](https://github.com/cjy-4), [Haonan Zhao](https://github.com/nononononno), [Jiaxuan Chen](https://github.com/csdahunzi), [Junqi You](https://github.com/dhmbb2).
 
 ## License
 
