@@ -176,14 +176,16 @@ class FOPAHeatMapModel:
             destination_path_png = os.path.join(composite_dir_choose, image.replace(".jpg", ".png"))
             shutil.copyfile(source_path, destination_path)
             shutil.copyfile(png_source_path, destination_path_png)
-            last_four_numbers = [int(part) for part in source_path.split('_')[-5:-1]]
+            bbox_list_parts = os.path.splitext(os.path.split(source_path)[1])[0].split('_')
+            x_box, y_box, w_box, h_box = int(bbox_list_parts[2]), int(bbox_list_parts[3]), int(bbox_list_parts[4]), int(bbox_list_parts[5])
+            last_four_numbers = [x_box, y_box, w_box, h_box]
             bbox_list.append(last_four_numbers)
         return bbox_list
 
 
     @torch.no_grad()
     def __call__(self, foreground_image, foreground_mask, background_image, cache_dir, heatmap_dir,
-                 fg_scale_num=16, composite_num_choose=1, composite_num=50):
+                 fg_scale_num=16, composite_num_choose=3, composite_num=50):
         """
         Generate a heatmap for a pair of scaled foreground and background.
         
@@ -208,7 +210,3 @@ class FOPAHeatMapModel:
         box_list     = self.generate_bounding_box(foreground_image, foreground_mask, background_image, csv_file,
                                                   cache_dir, heatmap_dir, fg_scale_num, composite_num_choose, composite_num)
         return box_list, heatmap_list
-
-
-    
-    
