@@ -1,1 +1,0 @@
-from libcom.objectstitch.source.ObjectStitch.ldm.modules.losses.contperceptual import LPIPSWithDiscriminator

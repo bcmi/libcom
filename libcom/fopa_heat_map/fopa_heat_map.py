@@ -135,7 +135,7 @@ class FOPAHeatMapModel:
                 icount += 1
                 heatmap = Image.open(os.path.join(heatmap_dir, save_name))
                 heatmap = np.array(heatmap)
-                heatmap_center = np.zeros_like(heatmap, dtype=np.float_)
+                heatmap_center = np.zeros_like(heatmap, dtype=np.float64)
                 hb = int(h / bg_img.height * heatmap.shape[0] / 2)
                 wb = int(w / bg_img.width  * heatmap.shape[1] / 2)
                 heatmap_center[hb:-hb, wb:-wb] = heatmap[hb:-hb, wb:-wb]

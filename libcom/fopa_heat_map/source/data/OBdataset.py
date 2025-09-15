@@ -273,11 +273,11 @@ def make_composite_PIL(fg_img, mask_img, bg_img, pos, return_mask=False):
     mask_img_ = mask_img.resize((w,h))
     
     fg_img_ = np.array(fg_img_)
-    mask_img_ = np.array(mask_img_, dtype=np.float_)/255
+    mask_img_ = np.array(mask_img_, dtype=np.float64)/255
     bg_img = np.array(bg_img)
     
     fg_img = np.zeros((bg_h, bg_w, 3), dtype=np.uint8) 
-    mask_img  = np.zeros((bg_h, bg_w, 3), dtype=np.float_) 
+    mask_img  = np.zeros((bg_h, bg_w, 3), dtype=np.float64) 
     
     fg_img[top:bottom, left:right, :] = fg_img_[top - y:bottom - y, left - x:right - x, :]
     mask_img[top:bottom, left:right, :] = mask_img_[top - y:bottom - y, left - x:right - x, :]

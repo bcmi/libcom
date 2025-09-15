@@ -51,8 +51,8 @@ class InharmoniousLocalizationModel:
 
     def build_pretrained_model(self, weight_path_g, weight_path_ihdrnet):
         model = MadisNet()
-        model.g.load_state_dict(torch.load(weight_path_g)['state_dict'])
-        model.ihdrnet.load_state_dict(torch.load(weight_path_ihdrnet)['state_dict'])
+        model.g.load_state_dict(torch.load(weight_path_g, weights_only=True)['state_dict'])
+        model.ihdrnet.load_state_dict(torch.load(weight_path_ihdrnet, weights_only=True)['state_dict'])
         self.MadisNet_model = model.to(self.device).eval()
         
     def build_data_transformer(self):

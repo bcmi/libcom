@@ -1,3 +1,21 @@
--r requirements/build.txt
--r requirements/runtime.txt
--r requirements/tests.txt
+einops
+huggingface_hub
+imageio
+torch==2.6.0
+torchvision==0.21.0
+diffusers==0.34.0
+mmdet==3.2.0
+mmpose==1.2.0
+peft
+sentencepiece
+protobuf
+modelscope
+omegaconf
+opencv_python
+opencv_python_headless
+pytorch_lightning
+transformers
+tqdm
+open_clip_torch
+taming-transformers-rom1504
+scikit-learn

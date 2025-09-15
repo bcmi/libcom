@@ -57,7 +57,7 @@ class HarmonyScoreModel:
 
     def build_pretrained_model(self, weight_path):
         model = StyleEncoder(style_dim=16)
-        model.load_state_dict(torch.load(weight_path, map_location='cpu'))
+        model.load_state_dict(torch.load(weight_path, map_location='cpu', weights_only=True))
         self.model = model.to(self.device).eval()
         
     def build_data_transformer(self):

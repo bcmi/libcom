@@ -77,7 +77,7 @@ class ImageHarmonizationModel:
             model = CDTNet()
         else:
             model = PCTNet()
-        model.load_state_dict(torch.load(weight_path, map_location='cpu'))
+        model.load_state_dict(torch.load(weight_path, map_location='cpu', weights_only=True))
         self.model = model.to(self.device).eval()
         
     def build_data_transformer(self):

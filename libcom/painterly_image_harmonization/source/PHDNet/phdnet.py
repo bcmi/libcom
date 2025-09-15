@@ -38,7 +38,7 @@ class PHDNet(nn.Module):
             if isinstance(net, torch.nn.DataParallel):
                 net = net.module
             # print('loading the model from %s' % load_path)
-            state_dict = torch.load(load_path, map_location=self.device)
+            state_dict = torch.load(load_path, map_location=self.device,weights_only=True)
             if hasattr(state_dict, '_metadata'):
                 del state_dict._metadata
 

@@ -72,11 +72,11 @@ class FOSScoreModel:
         """
         if self.model_type == "FOS_E":
             model = StudentModel(self.cfg)
-            model.load_state_dict(torch.load(weight_path, map_location='cpu'), strict=True)
+            model.load_state_dict(torch.load(weight_path, map_location='cpu', weights_only=True), strict=True)
             self.model = model.to(self.device).eval()
         else:
             model = SingleScaleD(False)
-            model.load_state_dict(torch.load(weight_path, map_location='cpu'), strict=True)
+            model.load_state_dict(torch.load(weight_path, map_location='cpu', weights_only=True), strict=True)
             self.model = model.to(self.device).eval()
         
     def build_data_transformer(self):

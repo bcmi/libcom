@@ -1,12 +1,10 @@
 from torch import nn
+from .cldm.cldm import ControlLDM
 import torch
 import pytorch_lightning as pl
 import os
 import numpy as np
 from PIL import Image
-
-from .cldm.cldm import ControlLDM
-from .cldm.model import create_model, load_state_dict
 from .ldm.modules.diffusionmodules.openaimodel import (ResBlock, TimestepEmbedSequential, AttentionBlock, 
                                                       Upsample, SpatialTransformer, Downsample)
 from .ldm.modules.diffusionmodules.util import (
@@ -374,7 +372,7 @@ class Post_Process_Net(nn.Module):
     
 
 class PostProcess(pl.LightningModule):
-    def __init__(self, model_path, control_net_path, infe_steps=50, *args, **kwargs):
+    def __init__(self, infe_steps=50, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.post_process_net = Post_Process_Net(image_size=256, 
                                                  in_channels=7, 
@@ -390,11 +388,10 @@ class PostProcess(pl.LightningModule):
                                                  context_dim=320,
                                                  legacy=False,
                                                  use_checkpoint=True)
-        self.model = create_model(model_path).cpu()
-        self.model.load_state_dict(load_state_dict(control_net_path, location='cuda'), strict=False)
         self.learning_rate = 1e-5
+        self.model = None
         self.infe_steps = infe_steps
-        # self.generated_image_path = "/data/youjunqi/Foreground-Reconstruction/output"
+        self.generated_image_path = "/data/youjunqi/Foreground-Reconstruction/output"
 
     def training_step(self, batch, batch_idx):
         self.post_process_net.train()

@@ -8,10 +8,7 @@ import numbers
 import torch.nn.functional as F
 from functools import partial
 import os
-import trilinear
 
-
- 
  
 class Bottleneck(torch.nn.Module):
     expansion = 1 

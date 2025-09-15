@@ -41,10 +41,10 @@ def download_file_from_network(file_name, save_dir):
     print('Try to download {} to {}'.format(file_name, save_dir))
     try:
         from huggingface_hub import hf_hub_download
-        file_path = hf_hub_download(repo_id=hf_repo, 
-                                    filename=file_name, 
-                                    cache_dir=save_dir)
-    except:
+        file_path = hf_hub_download(repo_id=hf_repo, filename=file_name, cache_dir=save_dir)
+    except Exception as e:
+        raise RuntimeError("huggingface download error, we will upload the weight to modelscope soon") from e
+    
         from modelscope.hub.file_download import model_file_download
         file_path = model_file_download(model_id=ms_repo, 
                                         file_path=file_name, 

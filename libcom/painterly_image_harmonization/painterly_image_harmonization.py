@@ -91,7 +91,7 @@ class PainterlyHarmonizationModel:
             clip_path = os.path.join(model_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
             download_entire_folder(clip_path)
             self.config.model.params.cond_stage_config.params.model_path = clip_path
-            pl_sd = torch.load(sd_weight_path, map_location="cpu")
+            pl_sd = torch.load(sd_weight_path, map_location="cpu", weights_only=False)
             sd = pl_sd["state_dict"]
             model = instantiate_from_config(self.config.model)
             model.load_state_dict(sd, strict=False)

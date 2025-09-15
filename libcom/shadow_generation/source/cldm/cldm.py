@@ -1,12 +1,13 @@
 import einops
 import torch
+import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
 import os
 import pickle
 import cv2
-import numpy as np
-from ..ldm.modules.diffusionmodules.util import (
+
+from ldm.modules.diffusionmodules.util import (
     conv_nd,
     linear,
     zero_module,
@@ -15,14 +16,14 @@ from ..ldm.modules.diffusionmodules.util import (
 
 from einops import rearrange, repeat
 from torchvision.utils import make_grid
-from ..ldm.modules.attention import SpatialTransformer
-from ..ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
-from ..ldm.models.diffusion.ddpm import LatentDiffusion
-from ..ldm.util import log_txt_as_img, exists, instantiate_from_config
-from ..ldm.models.diffusion.ddim import DDIMSampler
-
+from ldm.modules.attention import SpatialTransformer
+from ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
+from ldm.models.diffusion.ddpm import LatentDiffusion
+from ldm.util import log_txt_as_img, exists, instantiate_from_config
+from ldm.models.diffusion.ddim import DDIMSampler
+import numpy as np
 from .base_network import MaskCls, RegNetwork
-
+import torchvision.models as models
     
 class ControlledUnetModel(UNetModel):
 
@@ -134,7 +135,7 @@ class ControlNet(nn.Module):
         self.channel_mult = channel_mult
         self.conv_resample = conv_resample
         self.use_checkpoint = use_checkpoint
-        self.dtype = torch.float16 if use_fp16 else torch.float32
+        self.dtype = th.float16 if use_fp16 else th.float32
         self.num_heads = num_heads
         self.num_head_channels = num_head_channels
         self.num_heads_upsample = num_heads_upsample
@@ -319,26 +320,23 @@ class ControlNet(nn.Module):
 
 class ControlLDM(LatentDiffusion):
 
-    def __init__(self, control_stage_config, control_key, only_mid_control, cls_net_path, reg_net_path, cls_label, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
+    def __init__(self, control_stage_config, control_key, only_mid_control, K, *args, **kwargs):
+        super().__init__(K, *args, **kwargs)
         self.control_model = instantiate_from_config(control_stage_config)
         self.control_key = control_key
         self.only_mid_control = only_mid_control
-        self.cls_net_path = cls_net_path
-        self.reg_net_path = reg_net_path
-        self.cls_label = cls_label
         self.control_scales = [1.0] * 13
         self.mask_cls = MaskCls(num_classes=256)
-        if os.path.exists(self.cls_net_path):
-            self.mask_cls.load_state_dict(torch.load(self.cls_net_path)['net'])
-            # print('Loading mask embeddings classification model successfully')
+        self.k = K
+        if os.path.exists('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_cls.pth'):
+            self.mask_cls.load_state_dict(torch.load('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_cls.pth')['net'])
+            print('Loading mask embeddings classification model successfully')
         for param in self.mask_cls.parameters():
             param.requires_grad = False
         self.bbx_reg = RegNetwork()
-        if os.path.exists(self.reg_net_path):
-            self.bbx_reg.load_state_dict(torch.load(self.reg_net_path)['net'])
-            #print('Loading rotated bounding box regression model successfully')
+        if os.path.exists('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_reg.pth'):
+            self.bbx_reg.load_state_dict(torch.load('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_reg.pth')['net'])
+            print('Loading rotated bounding box regression model successfully')
         for param in self.bbx_reg.parameters():
             param.requires_grad = False
         self.mask_threshold = 0.5
@@ -373,7 +371,7 @@ class ControlLDM(LatentDiffusion):
                 pred_bbx[i,3] = temp
                 pred_bbx[i,4] = pred_bbx[i,4] - 90
             x, y, w, h, theta = pred_bbx[i,0], pred_bbx[i,1], pred_bbx[i,2], pred_bbx[i,3], pred_bbx[i,4]
-            box = ((float(x), float(y)), (float(w), float(h)), float(theta))
+            box = ((x, y), (w, h), theta)
             box_points = cv2.boxPoints(box)
             ## 训练时添加扰动
             # perturbation = np.random.uniform(-5, 5, box_points.shape)
@@ -404,17 +402,15 @@ class ControlLDM(LatentDiffusion):
             fg_instance_bbx = fg_instance_bbx.to(self.device)
             bbx_region = self.gen_bbx(pred_t, fg_instance_bbx, bbx_mask)
             hint = torch.cat(cond['c_concat'], 1)
-
-            ## 
             control = self.control_model(x=x_noisy, hint=torch.cat((hint, bbx_region), 1), timesteps=t, context=cond_txt)
             control = [c * scale for c, scale in zip(control, self.control_scales)]
             mid_control = control.pop()
             down_control = tuple(control)
             
             mask_label = self.mask_cls(input)
-            with open(self.cls_label, 'rb') as f:
+            with open('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_cls_label.pkl', 'rb') as f:
                 centroid_dict = pickle.load(f)
-            _, top64_label = torch.topk(mask_label, 64, largest=True, sorted=False)
+            _, top64_label = torch.topk(mask_label, self.k, largest=True, sorted=False)
             mask_embeddings = batch['embeddings'].to(self.device)
             for i in range(mask_embeddings.shape[0]):
                 for j in range(top64_label.shape[1]):
@@ -425,7 +421,7 @@ class ControlLDM(LatentDiffusion):
                         print(f"Warning: label {label} not found in centroid_dict")
 
             eps = diffusion_model(noisy_latents=x_noisy, timesteps=t, encoder_hidden_states=cond_txt, down_block_additional_residuals=down_control, mid_block_additional_residual=mid_control, mask_embeddings=mask_embeddings)
-            
+            # eps = diffusion_model(noisy_latents=x_noisy, timesteps=t, encoder_hidden_states=cond_txt, down_block_additional_residuals=down_control, mid_block_additional_residual=mid_control, mask_embeddings=mask_embeddings, attention_mask=bbx_region)
             return eps
 
     @torch.no_grad()
@@ -506,7 +502,6 @@ class ControlLDM(LatentDiffusion):
         ddim_sampler = DDIMSampler(self)
         b, c, h, w = cond["c_concat"][0].shape
         shape = (self.channels, h // 8, w // 8)
-
         samples, intermediates = ddim_sampler.sample(ddim_steps, batch_size, shape, cond, verbose=False, x_T=x_T, **kwargs) #add x_T
         return samples, intermediates
 

@@ -19,6 +19,7 @@ if __name__ == '__main__':
     print(f'begin testing {task_name}...')
     phd_net = PainterlyHarmonizationModel(device=0, model_type='PHDNet')
     gpu_num = torch.cuda.device_count()
+    
     if gpu_num > 2:
         phdiff_gpu, phdiffres_gpu = 1, 2
     elif gpu_num > 1:
