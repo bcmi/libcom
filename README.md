@@ -55,7 +55,7 @@ Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.c
 The main branch is built on the Linux system with **Python 3.8** and **PyTorch>=1.10.1**. For other dependencies, please refer to [[conda_env]](https://github.com/bcmi/libcom/blob/main/requirements/libcom.yaml) and [[runtime_dependencies]](https://github.com/bcmi/libcom/blob/main/requirements/runtime.txt).
 
 ## Get Started
-Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/main/docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guidance.
+Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/test/docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guidance.
 
 ## Contributors
 - Institution: [Brain-like Computing and Machine Intelligence (BCMI) Lab](https://bcmi.sjtu.edu.cn/).

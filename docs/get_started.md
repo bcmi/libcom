@@ -10,7 +10,7 @@ pip install -r requirements.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ## Installation
 ```shell
-pip install libcom
+pip install libcom==0.1.1.post1
 ```
 or
 ```shell
