@@ -7,6 +7,7 @@ git clone https://github.com/bcmi/libcom.git
 conda create -n libcom python=3.10
 conda activate libcom
 pip install -r requirements.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
 
 ## Installation
 ```shell
