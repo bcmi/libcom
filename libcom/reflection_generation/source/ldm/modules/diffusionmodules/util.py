@@ -15,7 +15,17 @@ import torch.nn as nn
 import numpy as np
 from einops import repeat
 
-from ....ldm.util import instantiate_from_config
+from libcom.reflection_generation.source.ldm.util import instantiate_from_config
+
+def instantiate_from_config(config):
+    if not "target" in config:
+        if config == '__is_first_stage__':
+            return None
+        elif config == "__is_unconditional__":
+            return None
+        raise KeyError("Expected key `target` to instantiate.")
+
+    return get_obj_from_str(config["target"])(**config.get("params", dict()))
 
 
 def make_beta_schedule(schedule, n_timestep, linear_start=1e-4, linear_end=2e-2, cosine_s=8e-3):

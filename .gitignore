@@ -12,3 +12,4 @@ make_package.sh
 *template*
 **/*results
 **/developer_readme.md
+*.safetensors
