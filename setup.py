@@ -21,8 +21,6 @@ except ImportError:
     import torch
     from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
 
-
-
 def readme():
     with open('README.md', encoding='utf-8') as f:
         content = f.read()
@@ -107,23 +105,6 @@ def parse_requirements(fname='requirements.txt', with_version=True):
     packages = list(gen_packages_items())
     return packages
 
-def get_ext_modules(cur_dir):
-    # if encounter compilation issues, please refer to https://github.com/HuiZeng/Image-Adaptive-3DLUT?tab=readme-ov-file#build.
-    if torch.cuda.is_available():
-        if torch.__version__ >= '1.11.0':
-            print('torch version >= 1.11.0')
-            trilinear_cuba_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp_torch1.11/src/trilinear_cuda.cpp')
-            trilinear_kernel_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp_torch1.11/src/trilinear_kernel.cu')
-            return CUDAExtension('trilinear', [trilinear_cuba_abs_path, trilinear_kernel_abs_path])
-        else:
-            trilinear_cuba_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_cuda.cpp')
-            trilinear_kernel_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear_kernel.cu')
-            return CUDAExtension('trilinear', [trilinear_cuba_abs_path, trilinear_kernel_abs_path])
-    else:
-        trilinear_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src/trilinear.cpp')
-        src_abs_path = join(cur_dir, 'libcom/image_harmonization/source/trilinear_cpp/src')
-        return CppExtension('trilinear', [trilinear_abs_path], include_dirs=[src_abs_path]) 
-
 if __name__ == '__main__':
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     setup(
@@ -145,14 +126,6 @@ if __name__ == '__main__':
             'Programming Language :: Python :: 3.8',
         ],
         license='Apache License 2.0',
-        setup_requires=parse_requirements('requirements/build.txt'),
-        tests_require=parse_requirements('requirements/tests.txt'),
-        install_requires=parse_requirements('requirements/runtime.txt'),
-        ext_modules=[get_ext_modules(cur_dir)],
+        install_requires=parse_requirements('requirements.txt'),
         cmdclass={'build_ext': BuildExtension},
-        extras_require={
-            'all': parse_requirements('requirements.txt'),
-            'build': parse_requirements('requirements/build.txt'),
-            'test': parse_requirements('requirements.txt'),
-        },
     )
