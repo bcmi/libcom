@@ -38,14 +38,15 @@ Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.c
 - **OPAScoreModel** [[OPA]](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) evaluates the rationality of foreground object placement in a composite image.
 - **FOPAHeatMapModel** [[FOPA]](https://github.com/bcmi/FOPA-Fast-Object-Placement-Assessment) can predict the rationality scores for all locations/scales given a background-foreground pair, and output the composite image with optimal location/scale.  
 - **color_transfer** adjusts the foreground color to match the background using traditional color transfer method.
-- **ImageHarmonizationModel** [[CDTNet]](https://github.com/bcmi/CDTNet-High-Resolution-Image-Harmonization)  [[PCTNet]](https://github.com/rakutentech/PCT-Net-Image-Harmonization) adjusts the foreground illumination to be compatible the background given photorealistic background and photorealistic foreground.
+- **ImageHarmonizationModel** [[PCTNet]](https://github.com/rakutentech/PCT-Net-Image-Harmonization) adjusts the foreground illumination to be compatible the background given photorealistic background and photorealistic foreground.
 - **PainterlyHarmonizationModel** [[PHDNet]](https://github.com/bcmi/PHDNet-Painterly-Image-Harmonization)  [[PHDiffusion]](https://github.com/bcmi/PHDiffusion-Painterly-Image-Harmonization) adjusts the foreground style to be compatible with the background given artistic background and photorealistic foreground.
 - **HarmonyScoreModel** [[BargainNet]](https://github.com/bcmi/BargainNet-Image-Harmonization) evaluates the harmony level between foreground and background in a composite image.
 - **InharmoniousLocalizationModel** [[MadisNet]](https://github.com/bcmi/MadisNet-Inharmonious-Region-Localization) localizes the inharmonious region in a synthetic image.
 - **FOSScoreModel** [[DiscoFOS]](https://github.com/bcmi/Foreground-Object-Search-Dataset-FOSD) evaluates the compatibility between foreground and background in a composite image in terms of geometry and semantics.
-- **ShadowGenerationModel** [[GPSDiffusion]](https://github.com/bcmi/GPSDiffusion-Object-Shadow-Generation) generates plausible shadow for the inserted object in a composite image. This model is unstable and you can pick the most satisfactory one from multiple generated results. 
-- **ControlComModel** [[ControlCom]](https://github.com/bcmi/ControlCom-Image-Composition) is a generative image composition model which unifies image blending and image harmonization. The pose and view of foreground stay unchanged. **Note that in the provided foreground image, the foreground object's length and width should fully extend to the edges of the image (see our example), otherwise the performance would be severely affected.**
-- **MureObjectStitchModel** [[MureObjectStitch]](https://github.com/bcmi/MureObjectStitch-Image-Composition) is another generative image composition model which can adjust the pose and view of foreground. It supports multiple reference images of one foreground object. If you have a few images containing the foreground object, we suggest finetuning MureObjectStitch using these images for better detail preservation. **Note that in the provided foreground image, the foreground object's length and width should fully extend to the edges of the image (see our example), otherwise the performance would be severely affected.**
+- **ShadowGenerationModel** [[GPSDiffusion]](https://github.com/bcmi/GPSDiffusion-Object-Shadow-Generation) generates plausible shadow for the inserted object in a composite image. 
+- **ReflectionGenerationModel** generates plausible reflection for the inserted object in a composite image. 
+- **KontextBlendingHarmonizationModel** [[FluxKontext]](https://github.com/black-forest-labs/flux) is a generative image composition model which inserts foreground into the specified bounding box in the background. The pose and view of foreground stay unchanged. The "blending" mode does not adjust the foreground illumination, while the "harmonization" mode adjusts the foreground illumination to make the composite image harmonious. 
+- **InsertAnythingModel** [[InsertAnything]](https://github.com/song-wensong/insert-anything) is a generative image composition model which inserts foreground into the specified bounding box in the background. The model has reasonable ability to adjust the pose and view of foreground according to the background. 
 
 
 **For the detailed method descriptions, code examples, visualization results, and performance comments, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/).** If the model performance is not satisfactory, you can finetune the pretrained model on your own dataset using the source repository and replace the original model. 
@@ -80,3 +81,4 @@ If you use our toolbox, please cite our survey paper using the following BibTeX 
   year={2021}
 }
 ```
+
