@@ -24,6 +24,6 @@ sh run_all_tests.sh
 The visualization results can be found in `results` folder.
 
 ## Download pretrained models
-During using the toolbox, the pretrained models and related files will be automatically downloaded to the installation directory. Note downloading the pretrained models may take some time when you first call some models, especially `ShadowGenerationModel`, `ControlComModel`, and `PainterlyHarmonizationModel`.
+During using the toolbox, the pretrained models and related files will be automatically downloaded to the installation directory. Note downloading the pretrained models may take some time when you first call some models.
 
 Alternatively, you can download these files from [[Modelscope]](https://modelscope.cn/models/bcmizb/Libcom_pretrained_models/files) or [[Huggingface]](https://huggingface.co/BCMIZB/Libcom_pretrained_models/tree/main) in advance, and move them to the installation directory. The correct directory to store pretrained models can be identified from the printed message during the automatic download process. For ``ZIP`` files, don't forget to manually extract them to the installation directory. More details can be found in the [``model_download.py``](https://github.com/bcmi/libcom/blob/main/libcom/utils/model_download.py).
