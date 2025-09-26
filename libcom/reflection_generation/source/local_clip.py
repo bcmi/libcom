@@ -707,7 +707,7 @@ class Transformer(nn.Module):
 class FrozenCLIPImageEmbedder(AbstractEncoder):
     """Uses the CLIP transformer encoder for text (from Hugging Face)"""
 
-    def __init__(self, version='/data/zhaohaonan/model/hugging_face/openai-clip-vit-large-patch14'):
+    def __init__(self, version='openai/clip-vit-large-patch14'):
         super().__init__()
         self.transformer = CLIPVisionModel.from_pretrained(version)
         self.final_ln = LayerNorm(1024)

@@ -1374,7 +1374,7 @@ class DiffusionWrapper(pl.LightningModule):
         self.sequential_cross_attn = diff_model_config.pop("sequential_crossattn", False)
 
         ## sd-1.5
-        model_name = "/data/zhaohaonan/model/hugging_face/stable-diffusion-v1-5"
+        model_name = "stable-diffusion-v1-5/stable-diffusion-v1-5"
         pipeline = StableDiffusionPipeline.from_pretrained(model_name)
         self.diffusion_model = pipeline.unet
         self.diffusion_model.requires_grad_(False)

@@ -97,37 +97,6 @@ def generate_global_dictionary(features, num_samples=10000, num_clusters=512, D=
     
     return torch.tensor(kmeans.cluster_centers_)
 
-def main():
-
-    image_dir = "/data2/zhaohaonan/model/PowerPaint/20250217dataset/shadow_imgs"  
-    mask_dir = "/data2/zhaohaonan/model/PowerPaint/20250217dataset/shadow_masks"    
-    image_names = os.listdir(image_dir) 
-
-    all_global_features = []
-    all_local_features = []
-
-    for image_name in tqdm(image_names):
-        image_path = os.path.join(image_dir, image_name)
-        mask_path = os.path.join(mask_dir, image_name.replace(".jpg", ".png"))
-        shadow_img, shadow_mask = load_image_and_mask(image_path, mask_path)
-
-        shadow_area_pil = crop_and_resize_shadow(shadow_img, shadow_mask)
-        if shadow_area_pil is None:
-            print(f"跳过 {image_name}：未找到阴影区域")
-            continue
-
-        preprocess, device = None, None
-        features_global, feature_local = extract_clip_features(shadow_area_pil, model, preprocess, device)
-        all_global_features.append(features_global)
-        all_local_features.append(feature_local)
-
-    # all_features = np.concatenate(all_features, axis=0)
-    all_global_features = torch.concatenate(all_global_features, axis=0)
-    all_local_features = torch.concatenate(all_local_features, axis=0)
-
-    global_dictionary = generate_global_dictionary(all_global_features)
-    local_dictionary = generate_global_dictionary(all_local_features)   
-
 
 def generate_shadow_clip_features(shadow_img, shadow_mask):
     device = shadow_img.device
@@ -138,7 +107,3 @@ def generate_shadow_clip_features(shadow_img, shadow_mask):
     
     concatenated_tensor = torch.cat(split_tensors, dim=1)
     return concatenated_tensor
-
-
-if __name__ == "__main__":
-    main()

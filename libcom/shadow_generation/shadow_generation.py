@@ -243,12 +243,10 @@ def import_model_class_from_model_name_or_path(
 
 def parse_args(input_args=None):
     parser = argparse.ArgumentParser(description="Simple example of a ControlNet script.")
-    parser.add_argument('--dataset_path', default='/data/zhaohaonan/data/desobav2-256', type=str)
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
-        default='/data/zhaohaonan/model/hugging_face/stable-diffusion-xl-base-1.0',
-        # required=True,
+        default='stabilityai/stable-diffusion-xl-base-1.0',
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(

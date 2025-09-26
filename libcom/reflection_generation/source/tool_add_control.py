@@ -3,7 +3,7 @@ import os
 
 # assert len(sys.argv) == 3, 'Args are wrong.'
 
-input_path = '/data/zhn/model/hugging_face/stable-diffusion-v1-5/v1-5-pruned.ckpt'
+input_path = 'stable-diffusion-v1-5/stable-diffusion-v1-5/v1-5-pruned.ckpt'
 output_path = './models/only_cls/init.ckpt'
 
 assert os.path.exists(input_path), 'Input model does not exist.'

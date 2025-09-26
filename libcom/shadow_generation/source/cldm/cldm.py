@@ -320,23 +320,24 @@ class ControlNet(nn.Module):
 
 class ControlLDM(LatentDiffusion):
 
-    def __init__(self, control_stage_config, control_key, only_mid_control, K, *args, **kwargs):
-        super().__init__(K, *args, **kwargs)
+    def __init__(self, control_stage_config, control_key, only_mid_control, cls_net_path, reg_net_path, cls_label, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.control_model = instantiate_from_config(control_stage_config)
         self.control_key = control_key
         self.only_mid_control = only_mid_control
+        self.cls_net_path = cls_net_path
+        self.reg_net_path = reg_net_path
+        self.cls_label = cls_label
         self.control_scales = [1.0] * 13
         self.mask_cls = MaskCls(num_classes=256)
-        self.k = K
-        if os.path.exists('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_cls.pth'):
-            self.mask_cls.load_state_dict(torch.load('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_cls.pth')['net'])
-            print('Loading mask embeddings classification model successfully')
+        
+        if os.path.exists(self.cls_net_path):
+            self.mask_cls.load_state_dict(torch.load(self.cls_net_path)['net'])
         for param in self.mask_cls.parameters():
             param.requires_grad = False
         self.bbx_reg = RegNetwork()
-        if os.path.exists('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_reg.pth'):
-            self.bbx_reg.load_state_dict(torch.load('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_reg.pth')['net'])
-            print('Loading rotated bounding box regression model successfully')
+        if os.path.exists(self.reg_net_path):
+            self.bbx_reg.load_state_dict(torch.load(self.reg_net_path)['net'])
         for param in self.bbx_reg.parameters():
             param.requires_grad = False
         self.mask_threshold = 0.5
@@ -354,8 +355,6 @@ class ControlLDM(LatentDiffusion):
 
     def gen_bbx(self, pred_t, fg_instance_bbx, mask):
         img_height, img_width = 512, 512
-        # fg_instance_bbx = fg_instance_bbx.cpu().numpy()
-        # fg_instance_bbx = fg_instance_bbx.to(self.device)
         pred_bbx = pred_t.new(pred_t.shape)
         pred_bbx[:,0] = pred_t[:,0] * fg_instance_bbx[:,2] + fg_instance_bbx[:,0]
         pred_bbx[:,1] = pred_t[:,1] * fg_instance_bbx[:,3] + fg_instance_bbx[:,1]
@@ -373,13 +372,9 @@ class ControlLDM(LatentDiffusion):
             x, y, w, h, theta = pred_bbx[i,0], pred_bbx[i,1], pred_bbx[i,2], pred_bbx[i,3], pred_bbx[i,4]
             box = ((x, y), (w, h), theta)
             box_points = cv2.boxPoints(box)
-            ## 训练时添加扰动
-            # perturbation = np.random.uniform(-5, 5, box_points.shape)
-            # box_points = box_points + perturbation
+
             box_points = np.clip(box_points, 0, [img_width - 1, img_height - 1])
             box_points_int = np.int32(box_points)
-            # box_points_int = box_points_int.reshape((-1, 1, 2))
-            # a = mask[i]
             cv2.fillPoly(mask[i], [box_points_int], 1)
         mask = torch.tensor(mask).unsqueeze(1).to(dtype=torch.float32).to(self.device)
         return mask
@@ -408,7 +403,7 @@ class ControlLDM(LatentDiffusion):
             down_control = tuple(control)
             
             mask_label = self.mask_cls(input)
-            with open('/data/zhaohaonan/model/GPSDiffusion-open-source/models/pretrained_models/Shadow_cls_label.pkl', 'rb') as f:
+            with open(self.cls_label, 'rb') as f:
                 centroid_dict = pickle.load(f)
             _, top64_label = torch.topk(mask_label, self.k, largest=True, sorted=False)
             mask_embeddings = batch['embeddings'].to(self.device)
@@ -421,7 +416,6 @@ class ControlLDM(LatentDiffusion):
                         print(f"Warning: label {label} not found in centroid_dict")
 
             eps = diffusion_model(noisy_latents=x_noisy, timesteps=t, encoder_hidden_states=cond_txt, down_block_additional_residuals=down_control, mid_block_additional_residual=mid_control, mask_embeddings=mask_embeddings)
-            # eps = diffusion_model(noisy_latents=x_noisy, timesteps=t, encoder_hidden_states=cond_txt, down_block_additional_residuals=down_control, mid_block_additional_residual=mid_control, mask_embeddings=mask_embeddings, attention_mask=bbx_region)
             return eps
 
     @torch.no_grad()
