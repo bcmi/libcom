@@ -51,9 +51,9 @@ class ReflectionGenerationModel:
 
     Expected result:
 
-    .. image:: _static/image/reflection_generation_result1.jpg
+    .. image:: _static/image/reflection_generation1.jpg
         :scale: 21 %
-    .. image:: _static/image/reflection_generation_result2.jpg
+    .. image:: _static/image/reflection_generation2.jpg
         :scale: 21 %
 
         

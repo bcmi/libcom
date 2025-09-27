@@ -44,9 +44,9 @@ class KontextBlendingHarmonizationModel:
     Expected result:
 
     .. image:: _static/image/kontext_result1.jpg
-        :scale: 38 %
+        :scale: 21 %
     .. image:: _static/image/kontext_result2.jpg
-        :scale: 38 %
+        :scale: 21 %
  
     """
 
