@@ -30,6 +30,8 @@ Welcome to Libcom's documentation!
    fopa_heat_map.md
    shadow_generation.md
    mure_object_stitch.md
+   insert_anything.md
+   kontext.md
 
 Indices and tables
 ==================

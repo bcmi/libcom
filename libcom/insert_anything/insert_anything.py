@@ -38,30 +38,28 @@ class InsertAnythingModel:
         >>> from libcom import InsertAnythingModel
         >>> from libcom.utils.process_image import make_image_grid, draw_bbox_on_image
         >>> import cv2
-        >>> import os
-        >>> net    = InsertAnythingModel(device=0)
-        >>> sample_list = ['000000000003', '000000000004']
-        >>> sample_dir  = './tests/insertanything/'
-        >>> bbox_list   = [[623, 1297, 1159, 1564], [363, 205, 476, 276]]
-        >>> for i, sample in enumerate(sample_list):
-        >>>     bg_img = sample_dir + f'background/{sample}.jpg'
-        >>>     fg_img_path = sample_dir + f'foreground/{sample}/'
-        >>>     fg_mask_path = sample_dir + f'foreground_mask/{sample}/'
-        >>>     fg_img_list = [os.path.join(fg_img_path, f) for f in os.listdir(fg_img_path)]
-        >>>     fg_mask_list = [os.path.join(fg_mask_path, f) for f in os.listdir(fg_mask_path)]
-        >>>     bbox   = bbox_list[i]
-        >>>     comp, show_fg_img = net(bg_img, fg_img_list, fg_mask_list, bbox, sample_steps=25, num_samples=3)
-        >>>     bg_img   = draw_bbox_on_image(bg_img, bbox)
-        >>>     grid_img = make_image_grid([bg_img, show_fg_img] + [comp[i] for i in range(len(comp))])
+
+        >>> net = InsertAnythingModel(device=0)
+        >>> img_names = ["000000049931.png", "000000460450.png", "6c5601278dcb5e6d_m09728_f5cd2891_17.png"]
+        >>> bboxes = [[168, 137, 488, 413], [134, 158, 399, 511], [130, 91, 392, 271]]
+        >>> test_dir  = 'tests/controllable_composition/'
+
+        >>> for i in range(len(img_names)):
+        >>>     bg_img  = test_dir + 'background/' + img_names[i]
+        >>>     fg_img  = test_dir + 'foreground/' + img_names[i]
+        >>>     bbox    = bboxes[i]
+        >>>     mask    = test_dir + 'foreground_mask/' + img_names[i]
+        >>>     comp    = net(bg_img, fg_img, mask, bbox, num_samples=2)
+        >>>     bg_img  = draw_bbox_on_image(bg_img, bbox)
+        >>>     grid_img = make_image_grid([bg_img, fg_img, comp[0]])
         >>>     cv2.imwrite(f'../docs/_static/image/insertanything_result{i+1}.jpg', grid_img)
 
     Expected result:
 
-    .. image:: _static/image/insertanything_result1.jpg
+    .. image:: _static/image/insert_anything_result1.jpg
         :scale: 21 %
-    .. image:: _static/image/insertanything_result2.jpg
+    .. image:: _static/image/insert_anything_result2.jpg
         :scale: 21 %
-
 
     """
     def __init__(self, device=0, model_type='insertanything', **kwargs):

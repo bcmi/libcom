@@ -67,3 +67,15 @@ libcom.objectstitch
 .. automodule:: libcom.objectstitch
     :members:
     :special-members: __call__
+
+libcom.insert_anything
+----------------------------------------
+.. automodule:: libcom.insert_anything
+    :members:
+    :special-members: __call__
+
+libcom.kontext_blending_harmonization
+----------------------------------------
+.. automodule:: libcom.kontext_blending_harmonization
+    :members:
+    :special-members: __call__
