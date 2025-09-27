@@ -28,10 +28,10 @@ Welcome to Libcom's documentation!
    inharmonious_region_localization.md
    painterly_image_harmonization.md
    fopa_heat_map.md
-   shadow_generation.md
-   mure_object_stitch.md
    insert_anything.md
    kontext.md
+   shadow_generation.md
+   reflection_generation.md
 
 Indices and tables
 ==================

@@ -412,6 +412,36 @@ model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
 logger = logging.getLogger(__name__)
 
 class ShadowGenerationModel:
+    """
+    Foreground Shadow generation model based on diffusion model.
+
+    Args:
+        device (str | torch.device): gpu id
+
+    Examples:
+        >>> from libcom import ShadowGenerationModel
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> import cv2
+        >>> net = ShadowGenerationModel()
+        >>> comp_image1 = "../tests/shadow_generation/composite/1.png"
+        >>> comp_mask1 = "../tests/shadow_generation/composite_mask/1.png"
+        >>> preds = net(comp_image1, comp_mask1, number=5)
+        >>> grid_img  = make_image_grid([comp_image1, comp_mask1] + preds)
+        >>> cv2.imwrite('../docs/_static/image/shadow_generation_result1.jpg', grid_img)
+        >>> comp_image2 = "../tests/shadow_generation/composite/2.png"
+        >>> comp_mask2 = "../tests/shadow_generation/composite_mask/2.png"
+        >>> preds = net(comp_image2, comp_mask2, number=5)
+        >>> grid_img  = make_image_grid([comp_image2, comp_mask2] + preds)
+        >>> cv2.imwrite('../docs/_static/image/shadow_generation_result2.jpg', grid_img)
+
+    Expected result:
+
+    .. image:: _static/image/shadow_generation_result1.jpg
+        :scale: 21 %
+    .. image:: _static/image/shadow_generation_result2.jpg
+        :scale: 21 %
+
+    """
     def __init__(self, device=0):
         self.args = parse_args()
         self.device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
@@ -575,7 +605,20 @@ class ShadowGenerationModel:
 
 
     
-    def __call__(self, shadowfree_img, object_mask, number):
+    def __call__(self, shadowfree_img, object_mask, number=5):
+        """
+        Generate shadow for foreground object.
+        
+        Args:
+            shadowfree_img (str | numpy.ndarray): The path to composite image or composite image in ndarray form.
+            object_mask (str | numpy.ndarray): The path to foreground object mask or foreground object mask in ndarray form.
+            number (int): Number of images to be inferenced. default: 5.
+        
+        Returns: 
+            generated_images (list): A list of images with generated foreground shadows. Each image is in ndarray form with a shape of 512x512x3
+
+        """
+        
         test_dataset = TestDataset(
             shadowfree_img=shadowfree_img,
             object_mask=object_mask,

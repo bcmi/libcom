@@ -56,18 +56,6 @@ libcom.fopa_heat_map
     :members:
     :special-members: __call__
 
-libcom.shadow_generation
-----------------------------------------
-.. automodule:: libcom.shadow_generation
-    :members:
-    :special-members: __call__
-
-libcom.objectstitch
-----------------------------------------
-.. automodule:: libcom.objectstitch
-    :members:
-    :special-members: __call__
-
 libcom.insert_anything
 ----------------------------------------
 .. automodule:: libcom.insert_anything
@@ -77,5 +65,17 @@ libcom.insert_anything
 libcom.kontext_blending_harmonization
 ----------------------------------------
 .. automodule:: libcom.kontext_blending_harmonization
+    :members:
+    :special-members: __call__
+
+libcom.reflection_generation
+----------------------------------------
+.. automodule:: libcom.reflection_generation
+    :members:
+    :special-members: __call__
+
+libcom.shadow_generation
+----------------------------------------
+.. automodule:: libcom.shadow_generation
     :members:
     :special-members: __call__
