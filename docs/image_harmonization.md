@@ -1,19 +1,6 @@
 # Image Harmonization
 
-Image harmonization is to harmonize a composite image by adjusting its foreground illumination to be consistent with the background. We provide two methods: CDTNet and PCTNet. Both methods are color-to-color transformation methods, that is, learning a color mapping to transform the composite foreground. Color-to-color transformation methods are efficient and applicable to an image with arbitrary resolution. CDTNet learns global color mapping while PCTNet learns local color mapping. The difference between "global" and "local" lies in whether applying different color mappings to different local regions. 
-
-**CDTNet(sim)**:
-
-> **High-Resolution Image Harmonization via Collaborative Dual Transformations**  [[pdf]](https://openaccess.thecvf.com/content/CVPR2022/papers/Cong_High-Resolution_Image_Harmonization_via_Collaborative_Dual_Transformations_CVPR_2022_paper.pdf)  [[code]](https://github.com/bcmi/CDTNet-High-Resolution-Image-Harmonization)<br>
->
-> Wenyan Cong, Xinhao Tao, Li Niu, Jing Liang, Xuesong Gao, Qihao Sun, Liqing Zhang<br>
-> Accepted by **CVPR2022**.
-
-## Brief Method Summary
-
-![image_harmonization_CDTNet1](../resources/image_harmonization_CDTNet1.jpg)
-
-The original CDTNet combines pixel-to-pixel transformation and RGB-to-RGB transformation coherently in an end-to-end framework. Here, we only use the CDTNet(sim) model, which realizes pixel-to-pixel transformation. CDTNet(sim) employs an encoder, which takes in a downsampled image and outputs the image-specific coefficients to combine basis look-up tables (LUTs). The combined LUT is applied to the foreground region of full-resolution composite image. 
+Image harmonization aims to adjust the foreground illumination of a composite image so that it is consistent with the background. We propose a method called PCTNet, which is a color-to-color transformation approach that learns a color mapping to transform the composite foreground. This type of method is efficient and applicable to images of arbitrary resolution. Unlike traditional global color mapping, PCTNet learns local color mapping, meaning it adaptively applies different color transformations to different local regions, resulting in more detailed and natural harmonization effects.
 
 **PCTNet**:
 

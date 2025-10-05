@@ -3,12 +3,6 @@ libcom.color_transfer
 .. automodule:: libcom.color_transfer
     :members:
 
-libcom.controllable_composition
---------------------------------
-.. automodule:: libcom.controllable_composition
-    :members:
-    :special-members: __call__
-
 libcom.fos_score
 -------------------
 .. automodule:: libcom.fos_score

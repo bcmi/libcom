@@ -19,7 +19,6 @@ Welcome to Libcom's documentation!
    :caption: Method Summary
 
    color_transfer.md
-   controllable_composition.md
    harmony_score.md
    get_composite_image.md
    opa_score.md

@@ -27,17 +27,6 @@ class ImageHarmonizationModel:
         >>> import os
         >>> import numpy as np
         >>> from PIL import Image
-
-        >>> #Use CDTNet
-        >>> CDTNet = ImageHarmonizationModel(device=0, model_type='CDTNet')
-        >>> comp_img1  = '../tests/source/composite/comp1_CDTNet.jpg'
-        >>> comp_mask1 = '../tests/source/composite_mask/mask1_CDTNet.png'
-        >>> CDT_result1 = CDTNet(comp_img1, comp_mask1)
-        >>> cv2.imwrite('../docs/_static/image/image_harmonization_CDT_result1.jpg', np.concatenate([cv2.imread(comp_img1), cv2.imread(comp_mask1), CDT_result1],axis=1))
-        >>> comp_img2  = '../tests/source/composite/comp2_CDTNet.jpg'
-        >>> comp_mask2 = '../tests/source/composite_mask/mask2_CDTNet.png'
-        >>> CDT_result2 = CDTNet(comp_img2, comp_mask2)
-        >>> cv2.imwrite('../docs/_static/image/image_harmonization_CDT_result2.jpg', np.concatenate([cv2.imread(comp_img2), cv2.imread(comp_mask2), CDT_result2],axis=1))
         >>> #Use PCTNet
         >>> PCTNet = ImageHarmonizationModel(device=0, model_type='PCTNet')
         >>> comp_img1  = '../tests/source/composite/comp1_PCTNet.jpg'
@@ -51,8 +40,6 @@ class ImageHarmonizationModel:
 
     Expected result:
 
-    .. image:: _static/image/image_harmonization_CDT_result1.jpg
-    .. image:: _static/image/image_harmonization_CDT_result2.jpg
     .. image:: _static/image/image_harmonization_PCT_result1.jpg
     .. image:: _static/image/image_harmonization_PCT_result2.jpg
 
