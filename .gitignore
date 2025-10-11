@@ -12,3 +12,4 @@ make_package.sh
 **/*results
 **/developer_readme.md
 *.safetensors
+.DS_Store
