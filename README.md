@@ -11,7 +11,7 @@
 [![PyPI](https://img.shields.io/pypi/v/libcom)](https://pypi.org/project/libcom)
 [![Downloads](https://static.pepy.tech/badge/libcom)](https://pepy.tech/project/libcom)
 [![Hits](https://hits.sh/github.com/bcmi/libcom.svg?label=views)](https://hits.sh/github.com/bcmi/libcom/)
-[![Static Badge](https://img.shields.io/badge/Online_Workbench-green)](http://libcom.ustcnewly.com/)
+[![Static Badge](https://img.shields.io/badge/Online_Workbench-yellow)](http://libcom.ustcnewly.com/)
 [![Static Badge](https://img.shields.io/badge/Dataset&Code_Resources-green)](https://github.com/bcmi/Awesome-Object-Insertion)
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
 [![Static Badge](https://img.shields.io/github/stars/bcmi/libcom.svg?style=social)](https://github.com/bcmi/libcom/stargazers)
@@ -81,6 +81,7 @@ If you use our toolbox, please cite our survey paper using the following BibTeX 
   year={2021}
 }
 ```
+
 
 
 
