@@ -570,14 +570,14 @@ class ShadowGenerationModel:
         shadowfree_img: np.uint8 HWC [0-255] RGB
         object_mask: np.uint8 HW [0-255]
         """
-        width, height = 256, 256
-        decoded_256 = cv2.resize(decoded, (width, height))
-        shadowfree_img_256 = cv2.resize(shadowfree_img, (width, height))
-        object_mask_256 = cv2.resize(object_mask, (width, height))
+        width, height = 512, 512
+        decoded_512 = cv2.resize(decoded, (width, height))
+        shadowfree_img_512 = cv2.resize(shadowfree_img, (width, height))
+        object_mask_512 = cv2.resize(object_mask, (width, height))
 
-        comp_img_scaled = shadowfree_img_256.astype(np.float32)/127.5 - 1.0
-        obj_mask = object_mask_256[:,:,np.newaxis].astype(np.float32)/255.0
-        image_scaled = decoded_256.astype(np.float32)/127.5 - 1.0
+        comp_img_scaled = shadowfree_img_512.astype(np.float32)/127.5 - 1.0
+        obj_mask = object_mask_512[:,:,np.newaxis].astype(np.float32)/255.0
+        image_scaled = decoded_512.astype(np.float32)/127.5 - 1.0
 
         comp_img_scaled = torch.from_numpy(comp_img_scaled).float().unsqueeze(0).to(self.device)
         obj_mask = torch.from_numpy(obj_mask).float().unsqueeze(0).to(self.device)
@@ -603,8 +603,6 @@ class ShadowGenerationModel:
         new_composite_512 = cv2.resize(new_composite, (512,512))
         return new_composite_512
 
-
-    
     def __call__(self, shadowfree_img, object_mask, number=5):
         """
         Generate shadow for foreground object.
