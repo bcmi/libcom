@@ -32,7 +32,17 @@
 
 Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.com/blog.html) or Zhihu Column ["Newly CVer"](https://www.zhihu.com/column/c_1333918224900206592) to get the latest information about image composition! 
 
-### Main Functions
+## Online Workbench
+
+We have built the [image composition workbench](http://libcom.ustcnewly.com/) based on our Libcom toolbox. The interface is as follows:
+
+<div align="center">
+</br>
+<img src="https://raw.githubusercontent.com/bcmi/libcom/main/resources/online_workbench.jpg" width="1000" />
+</div>
+
+
+## Main Functions
 
 - **get_composite_image** generates composite images using naive copy-and-paste followed by image blending.
 - **OPAScoreModel** [[OPA]](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) evaluates the rationality of foreground object placement in a composite image.
@@ -81,6 +91,7 @@ If you use our toolbox, please cite our survey paper using the following BibTeX 
   year={2021}
 }
 ```
+
 
 
 
