@@ -109,7 +109,7 @@ if __name__ == '__main__':
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     setup(
         name='libcom',
-        version='0.1.3',
+        version='0.1.4',
         description='Image Composition Toolbox',
         long_description=readme(),
         long_description_content_type='text/markdown',
