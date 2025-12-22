@@ -102,7 +102,7 @@ class KontextBlendingHarmonizationModel:
         fg_resized = fg_img.resize((x2 - x1, y2 - y1))
         # 把前景贴到背景上
         bg_img.paste(fg_resized, (x1, y1, x2, y2))
-
+        bg_img = bg_img.resize((1024, 1024))
         return bg_img
         
     
