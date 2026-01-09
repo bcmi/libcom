@@ -28,9 +28,10 @@
 
 **_libcom_ covers a diversity of related tasks in the field of image composition**, including image blending, standard/painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
 
-**The ultimate goal of this library is solving all the problems related to image composition with simple `import libcom`.**
-
+**The ultimate goal of this library is solving all the problems related to image composition with simple `import libcom`.** 
 Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.com/blog.html) or Zhihu Column ["Newly CVer"](https://www.zhihu.com/column/c_1333918224900206592) to get the latest information about image composition! 
+
+We compare the performance of Libcom and Banana Pro across various image composition tasks and write a brief summary in [English](https://zhuanlan.zhihu.com/p/1992987450860118091)/[Chinese](https://zhuanlan.zhihu.com/p/1976625829741082597). 
 
 ## Online Workbench
 
@@ -91,6 +92,7 @@ If you use our toolbox, please cite our survey paper using the following BibTeX 
   year={2021}
 }
 ```
+
 
 
 
