@@ -14,7 +14,7 @@ from torchvision.utils import save_image
 from einops import rearrange
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.environ.get('LIBCOM_MODEL_DIR',cur_dir)
-model_set = ['FOS_D', 'FOS_E'] 
+model_set = ['FOS_D'] 
 
 class FOSScoreModel:
     """
@@ -31,7 +31,7 @@ class FOSScoreModel:
         >>> import cv2
         >>> import torch
         >>> task_name = 'fos_score_prediction'
-        >>> MODEL_TYPE = 'FOS_D' # choose from 'FOS_D', 'FOS_E'
+        >>> MODEL_TYPE = 'FOS_D'
         >>> background = '../tests/source/background/f80eda2459853824_m09g1w_b2413ec8_11.png'
         >>> fg_bbox    = [175, 82, 309, 310] # x1,y1,x2,y2
         >>> foreground = '../tests/source/foreground/f80eda2459853824_m09g1w_b2413ec8_11.png'
@@ -70,14 +70,10 @@ class FOSScoreModel:
         """
         Build pretrained model from path of weight.
         """
-        if self.model_type == "FOS_E":
-            model = StudentModel(self.cfg)
-            model.load_state_dict(torch.load(weight_path, map_location='cpu', weights_only=True), strict=True)
-            self.model = model.to(self.device).eval()
-        else:
-            model = SingleScaleD(False)
-            model.load_state_dict(torch.load(weight_path, map_location='cpu', weights_only=True), strict=True)
-            self.model = model.to(self.device).eval()
+
+        model = SingleScaleD(False)
+        model.load_state_dict(torch.load(weight_path, map_location='cpu', weights_only=True), strict=True)
+        self.model = model.to(self.device).eval()
         
     def build_data_transformer(self):
         self.image_size = self.cfg.image_size
@@ -94,17 +90,14 @@ class FOSScoreModel:
         if foreground_mask is not None:
             fg_mask = cv2.cvtColor(read_image_opencv(foreground_mask), cv2.COLOR_BGR2GRAY)
             assert fg.shape[:2] == fg_mask.shape
-            fg[np.where(fg_mask != 255)] = 255
-        if self.model_type == 'FOS_D':
-            x1, y1, x2, y2 = bbox
-            rs_fg = cv2.resize(fg.copy(), (x2 - x1, y2 - y1))
-            bg[y1:y2, x1:x2] = rs_fg
-            x1, y1, x2, y2 = self.get_crop_bbox(bbox, bg_h, bg_w)
-            scale_comp = bg.copy()
-            scale_comp_r = Image.fromarray(scale_comp, mode="RGB")
-            return scale_comp_r
-
-        return bg, fg
+            fg[np.where(fg_mask != 255)] = 128
+        x1, y1, x2, y2 = bbox
+        rs_fg = cv2.resize(fg.copy(), (x2 - x1, y2 - y1))
+        bg[y1:y2, x1:x2] = rs_fg
+        x1, y1, x2, y2 = self.get_crop_bbox(bbox, bg_h, bg_w)
+        scale_comp = bg.copy()[y1:y2, x1:x2]
+        scale_comp_r = Image.fromarray(scale_comp, mode="RGB")
+        return scale_comp_r
     
     def get_crop_bbox(self, bbox, bg_h, bg_w):
         x1, y1, x2, y2 = bbox
@@ -185,19 +178,11 @@ class FOSScoreModel:
             fos_score (float): Predicted compatibility score between the given background image and the given foreground image.
 
         """
-        if self.model_type == 'FOS_E':
-            background_image, foreground_image = self.inputs_preprocess(background_image, foreground_image, foreground_mask, bounding_box)
-            sample = self.prepare_input_encoders(background_image, foreground_image, bounding_box)
-            bg_im = sample['bg'].to(self.device)
-            fg_im = sample['fg'].to(self.device)
-            q_box  = sample['query_box'].to(self.device)
-            c_box  = sample['crop_box'].to(self.device)
-            output = self.model(bg_im, fg_im, q_box, c_box)[-1].item()
-        else:
-            composite_image = self.inputs_preprocess(background_image, foreground_image, foreground_mask, bounding_box)
-            composite_image = self.prepare_input_disc(composite_image).to(self.device)
-            _, score = self.model(composite_image)
-            output = score[-1].item()
+        
+        composite_image = self.inputs_preprocess(background_image, foreground_image, foreground_mask, bounding_box)
+        composite_image = self.prepare_input_disc(composite_image).to(self.device)
+        _, score = self.model(composite_image)
+        output = score[-1].item()
         return output
     
 def fill_box_with_specified_pixel(bg_im, query_box, fill_value):

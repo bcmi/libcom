@@ -10,12 +10,6 @@ FOS score measures the compatibility between foreground and background in terms 
 
 ## Brief Method Summary
 
-### FOS-E
-
-![fos_score_FOSE](../resources/fos_score_FOSE.jpg)
-
-The foreground encoder extracts the foreground feature and the background encoder extracts the background feature. The interacted output feature is used to predict the compatibility score.
-
 ### FOS-D
 
 ![fos_score_FOSD](../resources/fos_score_FOSD.jpg)
