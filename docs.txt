@@ -6,3 +6,5 @@ sphinx-copybutton
 sphinx_markdown_tables
 sphinx_rtd_theme==0.5.2
 urllib3<2.0.0
+torch==2.6.0
+torchvision==0.21.0
