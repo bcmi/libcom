@@ -9,6 +9,9 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.10"
+  commands:
+    - python -m ensurepip --upgrade
+    - python -m pip install --upgrade pip setuptools wheel
     # You can also specify other tool versions:
     # nodejs: "20"
     # rust: "1.70"
@@ -25,12 +28,7 @@ sphinx:
 # Optionally build your docs in additional formats such as PDF and ePub
 # formats:
 #   - pdf
-#   - epub
-
-build:
-  commands:
-    - python -m ensurepip --upgrade
-    - python -m pip install --upgrade pip setuptools wheel
+#   - epub  
 
 # Optional but recommended, declare the Python requirements required
 # to build your documentation
