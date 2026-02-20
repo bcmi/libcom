@@ -123,7 +123,10 @@ class ReflectionGenerationModel:
         mask_embeddings = torch.zeros((1, 64, 2048), dtype=torch.float32)
         bbx_region = torch.zeros((1, 512, 512), dtype=torch.float32)
 
-        object_mask = cv2.imread(composite_mask, cv2.IMREAD_GRAYSCALE)
+        if isinstance(composite_mask, str):
+            object_mask = cv2.imread(composite_mask, cv2.IMREAD_GRAYSCALE)
+        else:
+            object_mask = composite_mask
         object_mask = cv2.resize(object_mask, (512, 512))
         object_mask = object_mask.astype(np.float32) / 255.0
         object_mask = torch.from_numpy(object_mask).unsqueeze(0).to(self.device)

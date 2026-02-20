@@ -74,7 +74,8 @@ class ImageHarmonizationModel:
     
     def inputs_preprocess(self, composite_image, composite_mask):
         img = read_image_opencv(composite_image)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        if isinstance(composite_image, str):
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         mask = read_mask_opencv(composite_mask) / 255.0
         img_lr = cv2.resize(img, (256, 256))
         mask_lr = cv2.resize(mask, (256, 256))

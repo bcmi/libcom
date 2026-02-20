@@ -84,11 +84,19 @@ class FOSScoreModel:
         ])
     
     def inputs_preprocess(self, background_image, foreground_image, foreground_mask, bbox):
-        bg  = cv2.cvtColor(read_image_opencv(background_image), cv2.COLOR_BGR2RGB)
+        bg = read_image_opencv(background_image)
+        if isinstance(background_image, str):
+            bg = cv2.cvtColor(bg, cv2.COLOR_BGR2RGB)
         bg_h, bg_w, _ = bg.shape
-        fg = cv2.cvtColor(read_image_opencv(foreground_image), cv2.COLOR_BGR2RGB)
+        fg = read_image_opencv(foreground_image)
+        if isinstance(foreground_image, str):
+            fg = cv2.cvtColor(fg, cv2.COLOR_BGR2RGB)
         if foreground_mask is not None:
-            fg_mask = cv2.cvtColor(read_image_opencv(foreground_mask), cv2.COLOR_BGR2GRAY)
+            fg_mask = read_image_opencv(foreground_mask)
+            if isinstance(foreground_mask, str):
+                fg_mask = cv2.cvtColor(fg_mask, cv2.COLOR_BGR2GRAY)
+            elif fg_mask.ndim == 3:
+                fg_mask = cv2.cvtColor(fg_mask, cv2.COLOR_RGB2GRAY)
             assert fg.shape[:2] == fg_mask.shape
             fg[np.where(fg_mask != 255)] = 128
         x1, y1, x2, y2 = bbox

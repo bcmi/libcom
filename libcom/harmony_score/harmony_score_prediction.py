@@ -82,7 +82,8 @@ class HarmonyScoreModel:
         bg_mask = self.mask_transform(Image.fromarray(bg_mask))
         bg_mask = bg_mask.unsqueeze(0).to(self.device)
 
-        image   = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if isinstance(composite_image, str):
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image   = self.transform(Image.fromarray(image))
         image   = image.unsqueeze(0).to(self.device)
         return image, bg_mask, fg_mask
