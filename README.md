@@ -26,7 +26,7 @@
 <img src="https://raw.githubusercontent.com/bcmi/libcom/main/resources/image_composition_task.gif" width="600" />
 </div>
 
-**_libcom_ covers a diversity of related tasks in the field of image composition**, including image blending, standard/painterly image harmonization, shadow generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
+**_libcom_ covers a diversity of related tasks in the field of image composition**, including image blending, standard/painterly image harmonization, shadow generation, reflection generation, object placement, generative composition, quality evaluation, *etc*. For each task, we integrate one or two selected methods considering both efficiency and effectiveness. The selected methods will be continuously updated upon the emergence of better methods. 
 
 **The ultimate goal of this library is solving all the problems related to image composition with simple `import libcom`.** 
 Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.com/blog.html) or Zhihu Column ["Newly CVer"](https://www.zhihu.com/column/c_1333918224900206592) to get the latest information about image composition! 
@@ -54,9 +54,9 @@ We have built the [image composition workbench](https://libcom.ustcnewly.com/) b
 - **PainterlyHarmonizationModel** [[PHDNet]](https://github.com/bcmi/PHDNet-Painterly-Image-Harmonization)  [[PHDiffusion]](https://github.com/bcmi/PHDiffusion-Painterly-Image-Harmonization) adjusts the foreground style to be compatible with the background given artistic background and photorealistic foreground.
 - **HarmonyScoreModel** [[BargainNet]](https://github.com/bcmi/BargainNet-Image-Harmonization) evaluates the harmony level between foreground and background in a composite image.
 - **InharmoniousLocalizationModel** [[MadisNet]](https://github.com/bcmi/MadisNet-Inharmonious-Region-Localization) localizes the inharmonious region in a synthetic image.
-- **FOSScoreModel** [[DiscoFOS]](https://github.com/bcmi/Foreground-Object-Search-Dataset-FOSD) evaluates the compatibility between foreground and background in a composite image in terms of geometry and semantics. Due to limited training data, the generalization ability of this model is poor. 
+- **FOSScoreModel** [[DiscoFOS]](https://github.com/bcmi/Foreground-Object-Search-Dataset-FOSD) evaluates the compatibility between foreground and background in a composite image in terms of geometry and semantics. 
 - **ShadowGenerationModel** [[GPSDiffusion]](https://github.com/bcmi/GPSDiffusion-Object-Shadow-Generation) generates plausible shadow for the inserted object in a composite image. 
-- **ReflectionGenerationModel** generates plausible reflection for the inserted object in a composite image. 
+- **ReflectionGenerationModel** [[RGDiffusion]](https://github.com/bcmi/Object-Reflection-Generation-Dataset-DEROBA) generates plausible reflection for the inserted object in a composite image. 
 - **KontextBlendingHarmonizationModel** [[FluxKontext]](https://github.com/black-forest-labs/flux) is a generative image composition model which inserts foreground into the specified bounding box in the background. The pose and view of foreground stay unchanged. The "blending" mode does not adjust the foreground illumination, while the "harmonization" mode adjusts the foreground illumination to make the composite image harmonious. 
 - **InsertAnythingModel** [[InsertAnything]](https://github.com/song-wensong/insert-anything) is a generative image composition model which inserts foreground into the specified bounding box in the background. The model has reasonable ability to adjust the pose and view of foreground according to the background. 
 
@@ -74,7 +74,6 @@ Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/main/docs/g
 - Institution: [Brain-like Computing and Machine Intelligence (BCMI) Lab](https://bcmi.sjtu.edu.cn/).
 - Project Initiator & Team Manager: [Li Niu](https://www.ustcnewly.com/index.html). 
 - Architect & Lead Developer: [Bo Zhang](https://bo-zhang-cs.github.io/), [Yujie Zhou](https://github.com/YujieOuO).
-- Documentation Manager: [Jiacheng Sui](https://github.com/charlessjc).
 - Module Developers: [Jiacheng Sui](https://github.com/charlessjc), [Bingjie Gao](https://github.com/WhynotHAHA), [Lingxiao Lu](https://github.com/pokaaa), [Xinhao Tao](https://github.com/taoxinhao13), [Junyan Cao](https://github.com/cjy-4), [Haonan Zhao](https://github.com/nononononno), [Jiaxuan Chen](https://github.com/csdahunzi), [Junqi You](https://github.com/dhmbb2).
 
 ## License
