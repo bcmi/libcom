@@ -14,8 +14,16 @@ omegaconf
 opencv_python
 opencv_python_headless
 pytorch_lightning
-transformers
+transformers==4.44.2
 tqdm
 open_clip_torch
 taming-transformers-rom1504
 scikit-learn
+
+## os_insert
+segment_anything
+clip
+
+## lbm
+pydantic==2.6.1
+lpips==0.1.4

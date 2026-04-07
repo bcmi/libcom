@@ -6,7 +6,7 @@ import os
 import pickle
 import cv2
 import numpy as np
-from ..ldm.modules.diffusionmodules.util import (
+from libcom.reflection_generation.source.ldm.modules.diffusionmodules.util import (
     conv_nd,
     linear,
     zero_module,
@@ -15,11 +15,11 @@ from ..ldm.modules.diffusionmodules.util import (
 
 from einops import rearrange, repeat
 from torchvision.utils import make_grid
-from ..ldm.modules.attention import SpatialTransformer
-from ..ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
-from ..ldm.models.diffusion.ddpm import LatentDiffusion
-from ..ldm.util import log_txt_as_img, exists, instantiate_from_config
-from ..ldm.models.diffusion.ddim import DDIMSampler
+from libcom.reflection_generation.source.ldm.modules.attention import SpatialTransformer
+from libcom.reflection_generation.source.ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
+from libcom.reflection_generation.source.ldm.models.diffusion.ddpm import LatentDiffusion
+from libcom.reflection_generation.source.ldm.util import log_txt_as_img, exists, instantiate_from_config
+from libcom.reflection_generation.source.ldm.models.diffusion.ddim import DDIMSampler
 
 from .base_network import MaskCls, RegNetwork
 from ..cluster_feature import generate_shadow_clip_features

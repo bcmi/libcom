@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from functools import partial
 
-from .functions import PCT, ViT_Harmonizer
+from libcom.image_harmonization.source.functions import PCT, ViT_Harmonizer
 
 
 class PCTNet(nn.Module):

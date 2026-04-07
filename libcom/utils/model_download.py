@@ -37,11 +37,12 @@ def download_entire_folder(folder_path):
     
 def download_file_from_network(file_name, save_dir):
     if not os.path.exists(save_dir):
-        os.mkdir(save_dir)
+        os.makedirs(save_dir, exist_ok=True)
     print('Try to download {} to {}'.format(file_name, save_dir))
     try:
         from huggingface_hub import hf_hub_download
-        file_path = hf_hub_download(repo_id=hf_repo, filename=file_name, cache_dir=save_dir)
+        file_path = hf_hub_download(repo_id=hf_repo, filename=file_name, cache_dir=save_dir, progress=True)
+
     except Exception as e:
         from modelscope.hub.file_download import model_file_download
         file_path = model_file_download(model_id=ms_repo, 

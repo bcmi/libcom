@@ -36,7 +36,7 @@ model:
         legacy: False
 
     unet_config:
-      target: cldm.cldm.ControlledUnetModel
+      target: libcom.reflection_generation.source.cldm.cldm.ControlledUnetModel
       params:
         image_size: 32 # unused
         in_channels: 4

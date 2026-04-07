@@ -22,6 +22,6 @@ python test_shadow_generation.py
 
 python test_reflection_generation.py
 
-python test_insert_anything.py
-
 python test_flux_kontext.py
+
+python test_os_insert.py
