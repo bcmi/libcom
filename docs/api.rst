@@ -50,9 +50,9 @@ libcom.fopa_heat_map
     :members:
     :special-members: __call__
 
-libcom.insert_anything
+libcom.os_insert
 ----------------------------------------
-.. automodule:: libcom.insert_anything
+.. automodule:: libcom.os_insert
     :members:
     :special-members: __call__
 

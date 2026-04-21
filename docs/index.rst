@@ -27,7 +27,7 @@ Welcome to Libcom's documentation!
    inharmonious_region_localization.md
    painterly_image_harmonization.md
    fopa_heat_map.md
-   insert_anything.md
+   os_insert.md
    kontext.md
    shadow_generation.md
    reflection_generation.md

@@ -16,7 +16,6 @@
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
 [![Static Badge](https://img.shields.io/github/stars/bcmi/libcom.svg?style=social)](https://github.com/bcmi/libcom/stargazers)
 
-
 ---
 
 ## Introduction
@@ -50,7 +49,7 @@ We have built the [image composition workbench](https://libcom.ustcnewly.com/) b
 - **OPAScoreModel** [[OPA]](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) evaluates the rationality of foreground object placement in a composite image.
 - **FOPAHeatMapModel** [[FOPA]](https://github.com/bcmi/FOPA-Fast-Object-Placement-Assessment) can predict the rationality scores for all locations/scales given a background-foreground pair, and output the composite image with optimal location/scale.  
 - **color_transfer** adjusts the foreground color to match the background using traditional color transfer method.
-- **ImageHarmonizationModel** [[PCTNet]](https://github.com/rakutentech/PCT-Net-Image-Harmonization) adjusts the foreground illumination to be compatible the background given photorealistic background and photorealistic foreground.
+- **ImageHarmonizationModel** [[PCTNet]](https://github.com/rakutentech/PCT-Net-Image-Harmonization) [[LBM]](https://github.com/gojasper/LBM)  adjusts the foreground illumination to be compatible the background given photorealistic background and photorealistic foreground.
 - **PainterlyHarmonizationModel** [[PHDNet]](https://github.com/bcmi/PHDNet-Painterly-Image-Harmonization)  [[PHDiffusion]](https://github.com/bcmi/PHDiffusion-Painterly-Image-Harmonization) adjusts the foreground style to be compatible with the background given artistic background and photorealistic foreground.
 - **HarmonyScoreModel** [[BargainNet]](https://github.com/bcmi/BargainNet-Image-Harmonization) evaluates the harmony level between foreground and background in a composite image.
 - **InharmoniousLocalizationModel** [[MadisNet]](https://github.com/bcmi/MadisNet-Inharmonious-Region-Localization) localizes the inharmonious region in a synthetic image.
@@ -58,8 +57,7 @@ We have built the [image composition workbench](https://libcom.ustcnewly.com/) b
 - **ShadowGenerationModel** [[GPSDiffusion]](https://github.com/bcmi/GPSDiffusion-Object-Shadow-Generation) generates plausible shadow for the inserted object in a composite image. 
 - **ReflectionGenerationModel** [[RGDiffusion]](https://github.com/bcmi/Object-Reflection-Generation-Dataset-DEROBA) generates plausible reflection for the inserted object in a composite image. 
 - **KontextBlendingHarmonizationModel** [[FluxKontext]](https://github.com/black-forest-labs/flux) is a generative image composition model which inserts foreground into the specified bounding box in the background. The pose and view of foreground stay unchanged. The "blending" mode does not adjust the foreground illumination, while the "harmonization" mode adjusts the foreground illumination to make the composite image harmonious. 
-- **InsertAnythingModel** [[InsertAnything]](https://github.com/song-wensong/insert-anything) is a generative image composition model which inserts foreground into the specified bounding box in the background. The model has reasonable ability to adjust the pose and view of foreground according to the background. 
-
+- **OSInsertModel** [[OSInsert]](https://github.com/bcmi/OSInsert-Image-Composition) is a generative image composition model which inserts foreground into the specified bounding box in the background. The "conservative" mode has weak ability to adjust the pose and view of foreground according to the background. The "aggressive" mode has stronger ability to adjust the pose and view of foreground according to the background. 
 
 **For the detailed method descriptions, code examples, visualization results, and performance comments, please refer to our [[documents]](https://libcom.readthedocs.io/en/latest/).** If the model performance is not satisfactory, you can finetune the pretrained model on your own dataset using the source repository and replace the original model. 
 

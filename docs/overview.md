@@ -18,7 +18,7 @@ This chapter introduces you to the **libcom** toolbox, and provides links to the
 - **OPAScoreModel**  evaluates the rationality of foreground object placement in a composite image.
 - **FOPAHeatMapModel** can predict the rationality scores for all locations/scales given a background-foreground pair, and output the composite image with optimal location/scale.  
 - **color_transfer** adjusts the foreground color to match the background using traditional color transfer method.
-- **ImageHarmonizationModel** adjusts the foreground illumination to be compatible the background given photorealistic background and photorealistic foreground.
+- **ImageHarmonizationModel** adjusts the foreground illumination to be compatible with the background, and supports both `PCTNet` and `LBM` backends.
 - **PainterlyHarmonizationModel** adjusts the foreground style to be compatible with the background given artistic background and photorealistic foreground.
 - **HarmonyScoreModel** evaluates the harmony level between foreground and background in a composite image.
 - **InharmoniousLocalizationModel** localizes the inharmonious region in a synthetic image.
