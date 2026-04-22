@@ -46,11 +46,21 @@ myst_heading_anchors = 3
 
 autodoc_mock_imports = [
     'matplotlib', 'pycocotools', 'terminaltables',
-    'torch', 'torchvision', 'torchvision.transforms', 'torchvision.utils',
+    'torch', 'torchvision', 'torchvision.transforms', 'torchvision.utils', 'torch_xla',
     'diffusers', 'transformers',
     'pytorch_lightning', 'lightning_fabric',
     'omegaconf', 'einops', 'wandb',
-    'cv2',
+    'cv2', 'PIL',
+    'mmdet', 'mmpose', 'mmcv',
+    'modelscope', 'huggingface_hub',
+    'open_clip', 'clip', 'local_clip',
+    'segment_anything', 'timm',
+    'basicsr', 'xformers',
+    'lbm', 'ldm', 'taming',
+    'scipy', 'skimage', 'sklearn',
+    'webdataset', 'safetensors', 'pydantic',
+    'lpips', 'albumentations', 'academictorrents', 'natsort',
+    'yaml',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
