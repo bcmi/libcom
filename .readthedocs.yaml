@@ -4,19 +4,6 @@
 # Required
 version: 2
 
-# Set the OS, Python version and other tools you might need
-build:
-  os: ubuntu-22.04
-  tools:
-    python: "3.10"
-  # commands:
-  #   - python -m ensurepip --upgrade
-  #   - python -m pip install --upgrade pip setuptools wheel
-    # You can also specify other tool versions:
-    # nodejs: "20"
-    # rust: "1.70"
-    # golang: "1.20"
-
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
   configuration: docs/conf.py
@@ -39,3 +26,21 @@ python:
     - requirements: requirements.txt
     - method: pip
       path: .
+
+# Set the OS, Python version and other tools you might need
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.10"
+  commands:
+    # 确保pip是最新版本
+    - python -m ensurepip --upgrade
+    - python -m pip install --upgrade pip setuptools wheel
+    # 安装文档构建依赖
+    - python -m pip install -r docs.txt
+    # 安装chumpy，使用--no-build-isolation避免pip模块错误
+    - python -m pip install chumpy --no-build-isolation
+    # 安装项目本身
+    - python -m pip install -e .
+    # 构建文档并指定输出目录
+    - cd docs && python -m sphinx -b html . $READTHEDOCS_OUTPUT/html
