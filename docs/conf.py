@@ -60,7 +60,7 @@ autodoc_mock_imports = [
     'scipy', 'skimage', 'sklearn',
     'webdataset', 'safetensors', 'pydantic',
     'lpips', 'albumentations', 'academictorrents', 'natsort',
-    'yaml',
+    'yaml', 'tqdm'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
