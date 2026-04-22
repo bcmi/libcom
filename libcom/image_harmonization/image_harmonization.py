@@ -18,8 +18,6 @@ if src_dir not in sys.path:
     sys.path.insert(0, src_dir)
 
 from libcom.image_harmonization.source.pct_net import *
-from libcom.image_harmonization.source.cdt_net import *
-
 
 from libcom.image_harmonization.source.src.lbm.inference import get_model
 from diffusers import FlowMatchEulerDiscreteScheduler
