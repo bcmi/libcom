@@ -40,7 +40,5 @@ build:
     - python -m pip install -r docs.txt
     # 安装chumpy，使用--no-build-isolation避免pip模块错误
     - python -m pip install chumpy --no-build-isolation
-    # 安装项目本身
-    - python -m pip install -e .
     # 构建文档并指定输出目录
     - cd docs && python -m sphinx -b html . $READTHEDOCS_OUTPUT/html

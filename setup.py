@@ -16,18 +16,6 @@ class PostInstallCommand(install):
         print("  https://libcom.ustcnewly.com/")
         print("=" * 60 + "\n")
 
-def install_package(package_name):
-    """Install a package using pip."""
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
-
-try:
-    import torch
-    from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
-except ImportError:
-    print("PyTorch is not installed. Installing PyTorch first...")
-    install_package("torch")  # You can specify a version if needed
-    import torch
-    from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
 
 def readme():
     with open('README.md', encoding='utf-8') as f:
@@ -137,5 +125,5 @@ if __name__ == '__main__':
         ],
         license='Apache License 2.0',
         install_requires=parse_requirements('requirements.txt'),
-        cmdclass={'build_ext': BuildExtension, 'install': PostInstallCommand},
+        cmdclass={'install': PostInstallCommand},
     )
