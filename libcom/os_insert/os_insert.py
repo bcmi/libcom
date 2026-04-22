@@ -32,7 +32,6 @@ from .source.utils import load_bbox_txt, make_rect_mask_from_bbox
 class OSInsertConfig:
     model_dir: Path
     device: str = "cuda:0"
-    # Optional explicit checkpoint paths (override model_dir conventions)
     objectstitch_ckpt_path: Path | None = None
     objectstitch_config_path: Path | None = None
     objectstitch_clip_dir: Path | None = None
@@ -40,6 +39,7 @@ class OSInsertConfig:
     flux_fill_path: Path | None = None
     flux_redux_path: Path | None = None
     ia_lora_path: Path | None = None
+
 class OSInsertModel:
     """
     High-level OSInsert interface.
@@ -120,6 +120,8 @@ class OSInsertModel:
     Expected result:
         The foreground object is inserted into the background image
         at the specified bounding box, with realistic blending.
+
+    .. image:: _static/image/os_insert_result.jpg
 
     """
     def __init__(
@@ -283,6 +285,9 @@ class OSInsertModel:
             Random seed for InsertAnything.
         strength:
             InsertAnything strength parameter.
+
+        Returns:
+            Generated composited image (np.array): The inserted result.
         """
 
         if mode not in {"aggressive", "conservative"}:
