@@ -11,7 +11,6 @@ import torch
 from PIL import Image
 from diffusers import FluxFillPipeline, FluxPriorReduxPipeline
 
-from libcom.utils.model_download import download_pretrained_model
 from .ia_utils import (
     get_bbox_from_mask,
     expand_bbox,
@@ -52,17 +51,17 @@ def _resolve_ia_paths(
     ia_lora = str(ia_lora_path) if ia_lora_path is not None else os.getenv("IA_LORA_PATH")
 
     if flux_fill is None:
-        # 使用 HuggingFace 上的公有模型
-        flux_fill = "black-forest-labs/FLUX.1-Fill-dev"
+        if base is None:
+            raise ValueError("model_dir must be provided when FLUX_FILL_PATH is not set")
+        flux_fill = str(base / "flux" / "FLUX.1-Fill-dev")
     if flux_redux is None:
-        # 使用 HuggingFace 上的公有模型
-        flux_redux = "black-forest-labs/FLUX.1-Redux-dev"
+        if base is None:
+            raise ValueError("model_dir must be provided when FLUX_REDUX_PATH is not set")
+        flux_redux = str(base / "flux" / "FLUX.1-Redux-dev")
     if ia_lora is None:
         if base is None:
             raise ValueError("model_dir must be provided when IA_LORA_PATH is not set")
-        ia_lora = str(base / "pretrained_models" / "insert_anything_lora.safetensors")
-        # 下载 LoRA 权重
-        download_pretrained_model(ia_lora)
+        ia_lora = str(base / "insert_anything" / "20250321_steps5000_pytorch_lora_weights.safetensors")
 
     return Path(flux_fill), Path(flux_redux), Path(ia_lora)
 
@@ -343,7 +342,7 @@ def _run_insertanything_with_pipes(
 
     for seed in seeds:
         generator = torch.Generator(device=device).manual_seed(seed)
-        from libcom.os_insert.diffusers_osinsert import patch_context
+        from ..diffusers_osinsert import patch_context
 
         with patch_context():
             edited_image = pipe(
