@@ -3,10 +3,9 @@ from libcom import OSInsertModel
 import os
 import cv2
 import shutil
-import torch
 
 task_name = 'os_insert'
-MODE = 'aggressive' # choose from 'conservative', 'aggressive'
+MODE = 'conservative' # choose from 'conservative', 'aggressive'
 
 if __name__ == '__main__':
     test_set = get_test_list()
@@ -35,5 +34,10 @@ if __name__ == '__main__':
             verbose=True
         )
         
-        print(f'Processed {os.path.basename(bg_path)}')
+        grid_img  = make_image_grid([cv2.imread(fg_path), cv2.imread(bg_path), cv2.cvtColor(result, cv2.COLOR_RGB2BGR)])
+        img_name  = os.path.basename(bg_path).replace('.png', '.jpg')
+        res_path  = os.path.join(result_dir, img_name)
+        cv2.imwrite(res_path, grid_img)
+        print('save result to ', res_path)
+        
     print(f'end testing {task_name}!\n')
