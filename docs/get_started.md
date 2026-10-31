@@ -3,19 +3,25 @@
 ## Create runtime environment
 
 ```shell
-git clone https://github.com/bcmi/libcom.git
-cd libcom
 conda create -n libcom python=3.10
 conda activate libcom
-pip install chumpy --no-build-isolation 
-pip install -r requirements.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## Installation
+
+For most users, install from PyPI directly:
+
 ```shell
 pip install libcom
-or
-python setup.py install
+```
+
+For developers who want to modify the source code:
+
+```shell
+git clone https://github.com/bcmi/libcom.git
+cd libcom
+pip install -r requirements.txt # -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -e .
 ```
 
 After installation, you can verify the installation by running:
