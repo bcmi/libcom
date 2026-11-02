@@ -12,7 +12,15 @@ import sys
 sys.path.append(os.path.dirname(__file__))
 from local_clip import FrozenCLIPImageEmbedder
 
-model = FrozenCLIPImageEmbedder()
+model = None
+
+def _get_model():
+    """Lazily instantiate the CLIP image embedder on first use, so that
+    `import libcom` does not trigger a model download/load."""
+    global model
+    if model is None:
+        model = FrozenCLIPImageEmbedder()
+    return model
 
 import torch
 import torch.nn.functional as F
@@ -101,7 +109,7 @@ def generate_global_dictionary(features, num_samples=10000, num_clusters=512, D=
 def generate_shadow_clip_features(shadow_img, shadow_mask):
     device = shadow_img.device
     crop_image = process_image_with_mask(shadow_mask, shadow_img[:,:,:,:3])
-    clip_features = extract_clip_features_2(crop_image, model, device)
+    clip_features = extract_clip_features_2(crop_image, _get_model(), device)
     b = clip_features.size(0) // 2  # 计算 b
     split_tensors = torch.split(clip_features, b, dim=0)  
     

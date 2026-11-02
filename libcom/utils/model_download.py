@@ -1,10 +1,46 @@
 import os
 import shutil
+import contextlib
 from tqdm import tqdm
 import zipfile
 
 hf_repo = 'BCMIZB/Libcom_pretrained_models'
 ms_repo = 'yujieouo/Libcom_pretrained_models'
+
+
+class GatedModelDownloadError(RuntimeError):
+    """Raised when a gated Hugging Face model cannot be downloaded because
+    the user is not authenticated or has not accepted the license."""
+
+
+_GATED_HINT_KEYWORDS = (
+    'gated repo', 'gatedrepoerror', 'access to model', 'restricted',
+    '401 client error', '403 client error', 'invalid username or token',
+    'repository not found',
+)
+
+
+@contextlib.contextmanager
+def hf_gated_download_guard(model_id):
+    """Wrap Hugging Face download calls for gated models.
+
+    Converts authentication-related failures into a concise, actionable
+    error telling the user to `hf auth login` and retry. Other exceptions
+    are re-raised unchanged.
+    """
+    try:
+        yield
+    except Exception as e:
+        text = f'{type(e).__name__}: {e}'.lower()
+        if any(k in text for k in _GATED_HINT_KEYWORDS):
+            raise GatedModelDownloadError(
+                f"Failed to download gated model '{model_id}' from Hugging Face.\n"
+                f"Please do the following and then re-run your script:\n"
+                f"  1. Accept the license at https://huggingface.co/{model_id}\n"
+                f"  2. Log in with:  hf auth login\n"
+                f"  3. Re-run to download the model."
+            ) from e
+        raise
 
 def download_pretrained_model(weight_path):
     if os.path.exists(weight_path):

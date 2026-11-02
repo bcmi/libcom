@@ -6,7 +6,7 @@ import numpy as np
 from .source.pipeline import FluxKontextPipeline 
 from diffusers import FluxTransformer2DModel
 import cv2
-from libcom.utils.model_download import download_pretrained_model
+from libcom.utils.model_download import download_pretrained_model, hf_gated_download_guard
 
 cur_dir   = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.environ.get('LIBCOM_MODEL_DIR', cur_dir)
@@ -72,14 +72,15 @@ class KontextBlendingHarmonizationModel:
         self.build_pretrained_model(weight_path, lora_path)
 
     def build_pretrained_model(self, weight_path, lora_path):
-        transformer = FluxTransformer2DModel.from_pretrained(weight_path, subfolder="transformer")
-        transformer.requires_grad_(False)
-        self.pipeline = FluxKontextPipeline.from_pretrained(
-            weight_path,
-            transformer=transformer,
-            torch_dtype=torch.bfloat16
-        )
-        self.pipeline.load_lora_weights(lora_path)
+        with hf_gated_download_guard(weight_path):
+            transformer = FluxTransformer2DModel.from_pretrained(weight_path, subfolder="transformer")
+            transformer.requires_grad_(False)
+            self.pipeline = FluxKontextPipeline.from_pretrained(
+                weight_path,
+                transformer=transformer,
+                torch_dtype=torch.bfloat16
+            )
+            self.pipeline.load_lora_weights(lora_path)
         self.pipeline = self.pipeline.to(self.device, dtype=torch.bfloat16)
         
         

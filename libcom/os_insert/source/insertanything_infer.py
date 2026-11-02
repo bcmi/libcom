@@ -11,7 +11,7 @@ import torch
 from PIL import Image
 from diffusers import FluxFillPipeline, FluxPriorReduxPipeline
 
-from libcom.utils.model_download import download_pretrained_model
+from libcom.utils.model_download import download_pretrained_model, hf_gated_download_guard
 from .ia_utils import (
     get_bbox_from_mask,
     expand_bbox,
@@ -92,12 +92,13 @@ def _get_pipes(
     if _PIPE is not None and _REDUX is not None and _PIPE_KEY == key:
         return _PIPE, _REDUX
 
-    pipe = FluxFillPipeline.from_pretrained(
-        str(flux_fill_path),
-        torch_dtype=dtype,
-    )
-    pipe.load_lora_weights(str(ia_lora_path))
-    redux = FluxPriorReduxPipeline.from_pretrained(str(flux_redux_path)).to(dtype=dtype)
+    with hf_gated_download_guard('black-forest-labs/FLUX.1-Fill-dev'):
+        pipe = FluxFillPipeline.from_pretrained(
+            str(flux_fill_path),
+            torch_dtype=dtype,
+        )
+        pipe.load_lora_weights(str(ia_lora_path))
+        redux = FluxPriorReduxPipeline.from_pretrained(str(flux_redux_path)).to(dtype=dtype)
 
     # Prefer explicit device. If device is None, fall back to diffusers defaults.
     if device is None:
