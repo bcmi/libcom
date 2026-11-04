@@ -11,17 +11,15 @@
 [![PyPI](https://img.shields.io/pypi/v/libcom)](https://pypi.org/project/libcom)
 [![Downloads](https://static.pepy.tech/badge/libcom)](https://pepy.tech/project/libcom)
 ![visitors](https://visitor-badge.laobi.icu/badge?page_id=bcmi.libcom&left_color=2ea44f&right_color=green&left_text=visitors)
-[![Static Badge](https://img.shields.io/badge/Online_Workbench-yellow)](https://libcom.ustcnewly.com/)
+[![Static Badge](https://img.shields.io/badge/libcom_Workbench-yellow)](https://libcom.ustcnewly.com/)
+[![Static Badge](https://img.shields.io/badge/libcom_API-yellow)](https://libcom.ustcnewly.com/guide-api)
+[![Static Badge](https://img.shields.io/badge/libcom_MCP-yellow)](https://libcom.ustcnewly.com/guide-mcp)
 [![Static Badge](https://img.shields.io/badge/Dataset&Code_Resources-green)](https://github.com/bcmi/Awesome-Image-Composition)
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
-[![Static Badge](https://img.shields.io/github/stars/bcmi/libcom.svg?style=social)](https://github.com/bcmi/libcom/stargazers)
+
 
 ---
 
-Welcome to scan the WeChat QR code to join the discussion group on image composition/compositing, object insertion/addition.
-<p align="center">
-<img width="150" height="150" alt="Image" src="https://github.com/user-attachments/assets/8572a7c4-0f62-4a5f-bc06-9a1d9fcb14e3" />
-</p>
 
 ## Introduction
 **_libcom_ (the library of image composition) is an image composition toolbox.** The goal of [image composition](https://github.com/bcmi/Awesome-Image-Composition) ([object insertion](https://github.com/bcmi/Awesome-Object-Insertion)) is inserting one foreground into a background image to get a realistic composite image, by addressing the inconsistencies (appearance, geometry, and semantic inconsistency) between foreground and background. Generally speaking, image composition could be used to combine the visual elements from different images.
@@ -39,16 +37,6 @@ Welcome to follow WeChat public account ["Newly AIGCer"](https://www.ustcnewly.c
 
 **If you specialize in model inference acceleration, we welcome both voluntary and paid collaborations. Please contact us at ustcnewly@sjtu.edu.cn.**
 
-## Online Workbench
-
-We have built the [image composition workbench](https://libcom.ustcnewly.com/) based on our Libcom toolbox. The interface is as follows:
-
-<div align="center">
-</br>
-<img src="https://raw.githubusercontent.com/bcmi/libcom/main/resources/online_workbench.jpg" width="1000" />
-</div>
-
-[![]](https://github.com/user-attachments/assets/87416ec5-2461-42cb-9f2d-5030b1e1b5ec)
 
 ## Main Functions
 
@@ -74,6 +62,21 @@ The main branch is built on the Linux system with **Python 3.10** and **PyTorch>
 
 ## Get Started
 Please refer to [[Installation]](https://github.com/bcmi/libcom/blob/main/docs/get_started.md) for installation instructions and [[documents]](https://libcom.readthedocs.io/en/latest/) for user guidance.
+
+## Online Workbench
+
+We have built the [image composition workbench](https://libcom.ustcnewly.com/) based on our Libcom toolbox. The interface is as follows:
+
+<div align="center">
+</br>
+<img src="https://raw.githubusercontent.com/bcmi/libcom/main/resources/online_workbench.jpg" width="1000" />
+</div>
+
+[![]](https://github.com/user-attachments/assets/87416ec5-2461-42cb-9f2d-5030b1e1b5ec)
+
+## API and MCP
+
+We encapsulate all functions of libcom into APIs, and further wrap them into MCP. Refer to the documentation [[API]](https://libcom.ustcnewly.com/guide-api) and [[MCP]](https://libcom.ustcnewly.com/guide-mcp) for usage details.
 
 ## Contributors
 - Institution: [Brain-like Computing and Machine Intelligence (BCMI) Lab](https://bcmi.sjtu.edu.cn/).
