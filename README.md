@@ -14,7 +14,7 @@
 [![Static Badge](https://img.shields.io/badge/libcom_Workbench-yellow)](https://libcom.ustcnewly.com/)
 [![Static Badge](https://img.shields.io/badge/libcom_API-yellow)](https://libcom.ustcnewly.com/guide-api)
 [![Static Badge](https://img.shields.io/badge/libcom_MCP-yellow)](https://libcom.ustcnewly.com/guide-mcp)
-[![Static Badge](https://img.shields.io/badge/Dataset&Code_Resources-green)](https://github.com/bcmi/Awesome-Image-Composition)
+[![Static Badge](https://img.shields.io/badge/Dataset&Code-green)](https://github.com/bcmi/Awesome-Image-Composition)
 [![Static Badge](https://img.shields.io/badge/survey-arxiv%3A2106.14490-red)](https://arxiv.org/pdf/2106.14490.pdf)
 
 
