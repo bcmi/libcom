@@ -376,13 +376,13 @@ class Post_Process_Net(nn.Module):
 class PostProcess(pl.LightningModule):
     def __init__(self, model_path, control_net_path, infe_steps=50, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.post_process_net = Post_Process_Net(image_size=256, 
+        self.post_process_net = Post_Process_Net(image_size=512, 
                                                  in_channels=7, 
                                                  out_channels=4, 
                                                  model_channels=96,
                                                  attention_resolutions=[],
-                                                 num_res_blocks=2,
-                                                 channel_mult=[ 1, 2, 2, 4 ],
+                                                 num_res_blocks=3,
+                                                 channel_mult=[ 1, 2, 3, 4 ],
                                                  num_head_channels=64,
                                                  use_spatial_transformer=False,
                                                  use_linear_in_transformer=True,

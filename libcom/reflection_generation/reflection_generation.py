@@ -10,7 +10,6 @@ import numpy as np
 import os
 import cv2
 from PIL import Image
-import numpy as np
 
 try:
     from lightning_fabric.utilities.seed import log
@@ -64,7 +63,7 @@ class ReflectionGenerationModel:
         self.option = kwargs
         
         cldm_weight_path = os.path.join(model_dir, 'pretrained_models', 'Reflection_cldm.ckpt')
-        ppp_weight_path = os.path.join(model_dir, 'pretrained_models', 'Reflection_ppp.ckpt')
+        ppp_weight_path = os.path.join(model_dir, 'pretrained_models', 'Reflection_ppp_mine.ckpt')
         reg_net_path = os.path.join(model_dir, 'pretrained_models', 'Reflection_reg.pth')
         
         download_pretrained_model(cldm_weight_path)
@@ -76,7 +75,7 @@ class ReflectionGenerationModel:
         self.build_data_transformer()
 
     def build_pretrained_model(self, ppp_weight_path, cldm_weight_path, reg_weight_path):
-        config_path = '../libcom/reflection_generation/source/cldm_v15.yaml'
+        config_path = os.path.join(cur_dir, 'source', 'cldm_v15.yaml')
         config = OmegaConf.load(config_path)
         config.model.params.reg_net_path = reg_weight_path
         clip_path = os.path.join(model_dir, '../shared_pretrained_models', 'openai-clip-vit-large-patch14')
@@ -92,14 +91,18 @@ class ReflectionGenerationModel:
         
     def build_data_transformer(self):
         self.image_size = 512
-        self.transformer = transforms.Compose([
+        self.image_transformer = transforms.Compose([
+            transforms.Resize((self.image_size, self.image_size), interpolation=transforms.InterpolationMode.BICUBIC),
+            transforms.ToTensor(),
+        ])
+        self.mask_transformer = transforms.Compose([
             transforms.Resize((self.image_size, self.image_size)),
             transforms.ToTensor(),
         ])
     
     def inputs_preprocess(self, composite_image, composite_mask):
         img = read_image_pil(composite_image)
-        img = self.transformer(img).permute(1, 2, 0)
+        img = self.image_transformer(img).permute(1, 2, 0)
         target = img * 2 - 1
 
         mask = read_mask_pil(composite_mask)
@@ -116,7 +119,7 @@ class ReflectionGenerationModel:
         bbx_instance = np.array([x, y, w + 1, h + 1, theta]).astype(int)
         bbx_instance = torch.tensor(bbx_instance).unsqueeze(0)
 
-        mask = self.transformer(mask).permute(1, 2, 0)
+        mask = self.mask_transformer(mask).permute(1, 2, 0)
         img, mask, target = img.unsqueeze(0), mask.unsqueeze(0), target.unsqueeze(0)
 
         cat_img = torch.cat([img, mask], dim=-1)
@@ -138,7 +141,79 @@ class ReflectionGenerationModel:
         composite_img = np.array(composite_img.cpu().squeeze(0), dtype=np.uint8)
         composite_img = composite_img[:,:,[2,1,0]]
         return composite_img
-    
+
+    def background_blending(self, decoded, composite_image, composite_mask,
+                            blur_sigma=8.0, alpha_gain=1.3):
+        """Soft mask 融合：用网络预测的倒影概率掩码做 alpha 混合。
+
+        掩码由第 4 通道 logits 经 sigmoid 得到，保持连续值不做二值化；
+        掩码值趋近 0 的区域基本保留原图，不做前景剔除保护。
+        """
+        width, height = 512, 512
+
+        decoded = cv2.cvtColor(decoded, cv2.COLOR_BGR2RGB)
+        decoded = cv2.resize(decoded, (width, height), interpolation=cv2.INTER_AREA)
+
+        if isinstance(composite_image, str):
+            comp_np = cv2.imread(composite_image)
+            if comp_np is None:
+                raise ValueError(f"Could not read composite image: {composite_image}")
+            comp_np = cv2.cvtColor(comp_np, cv2.COLOR_BGR2RGB)
+        else:
+            comp_np = np.ascontiguousarray(composite_image)
+            if comp_np.ndim == 2:
+                comp_np = cv2.cvtColor(comp_np, cv2.COLOR_GRAY2BGR)
+            elif comp_np.shape[2] == 4:
+                comp_np = comp_np[:, :, :3]
+            comp_np = cv2.cvtColor(comp_np, cv2.COLOR_BGR2RGB)
+        comp_np = cv2.resize(comp_np, (width, height))
+
+        if isinstance(composite_mask, str):
+            mask_np = cv2.imread(composite_mask, cv2.IMREAD_GRAYSCALE)
+            if mask_np is None:
+                raise ValueError(f"Could not read composite mask: {composite_mask}")
+        else:
+            mask_np = np.ascontiguousarray(composite_mask)
+        if mask_np.ndim == 3:
+            mask_np = mask_np[:, :, 0]
+        mask_np = cv2.resize(mask_np, (width, height), interpolation=cv2.INTER_NEAREST)
+        _, mask_np = cv2.threshold(mask_np, 127, 255, cv2.THRESH_BINARY)
+
+        dis_scaled = decoded.astype(np.float32) / 127.5 - 1.0
+        comp_scaled = comp_np.astype(np.float32) / 127.5 - 1.0
+        obj_mask = mask_np[:, :, np.newaxis].astype(np.float32) / 255.0
+
+        dis_t = torch.from_numpy(dis_scaled).float().unsqueeze(0).to(self.device)
+        comp_t = torch.from_numpy(comp_scaled).float().unsqueeze(0).to(self.device)
+        obj_t = torch.from_numpy(obj_mask).float().unsqueeze(0).to(self.device)
+
+        input_tensor = torch.concat([dis_t, comp_t, obj_t], dim=-1).permute(0, 3, 1, 2)
+        null_timesteps = torch.zeros(1, device=self.device)
+
+        with torch.no_grad():
+            output = self.model.post_process_net(input_tensor, timesteps=null_timesteps)
+            output = output.permute(0, 2, 3, 1)      # (1, H, W, 4)
+
+            # 纯原色提取：[-1, 1] 还原到 0~255，不做任何画质修改
+            adjusted = torch.clamp(output[:, :, :, :3], -1., 1.)
+            adjusted = (adjusted + 1.0) / 2.0 * 255
+
+            # soft mask：对第 4 通道 logits 做 sigmoid，保持连续值，不做二值化
+            pred_mask = torch.sigmoid(output[:, :, :, 3]).float().squeeze(0).cpu().numpy()  # (H, W) in [0, 1]
+
+        gen_bgr = cv2.cvtColor(
+            adjusted.squeeze(0).cpu().numpy().astype(np.uint8),
+            cv2.COLOR_RGB2BGR,
+        ).astype(np.float32)
+        comp_bgr = cv2.cvtColor(comp_np, cv2.COLOR_RGB2BGR).astype(np.float32)
+
+        # soft alpha 融合：掩码外概率趋近 0，基本保留原图；不做二值化、不做前景剔除
+        mask3 = pred_mask[:, :, np.newaxis]
+        result = gen_bgr * mask3 + comp_bgr * (1.0 - mask3)
+        result = np.clip(result, 0, 255).astype(np.uint8)
+
+        return result
+
     @torch.no_grad()
     def inf_img(self, inputs):
         target, mask, cat_img, object_mask, bbx_instance, mask_embeddings, bbx_region = inputs
@@ -170,5 +245,9 @@ class ReflectionGenerationModel:
         for _ in range(number):
             outputs = self.inf_img(inputs)
             pred = self.outputs_postprocess(outputs)
-            preds.append(pred)
+
+            ##cv2.imwrite("debug_main_model.jpg", pred) ,调试用，已注释
+           
+            blended = self.background_blending(pred, composite_image, composite_mask)
+            preds.append(blended)
         return preds
