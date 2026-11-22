@@ -31,6 +31,8 @@ Welcome to Libcom's documentation!
    kontext.md
    shadow_generation.md
    reflection_generation.md
+   qwen_score.md
+   qwen_edit.md
 
 Indices and tables
 ==================

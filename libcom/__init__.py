@@ -11,13 +11,15 @@ from .kontext_blending_harmonization import *
 from .shadow_generation import *
 from .reflection_generation import *
 from .os_insert import *
+from .qwen_score import *
+from .qwen_edit import *
 
 __all__ = [
-    'color_transfer', 'get_composite_image', 'OPAScoreModel', 
+    'color_transfer', 'get_composite_image', 'OPAScoreModel',
     'HarmonyScoreModel', 'InharmoniousLocalizationModel',
     'ImageHarmonizationModel', 'PainterlyHarmonizationModel',
     'FOPAHeatMapModel', 'FOSScoreModel',
     'KontextBlendingHarmonizationModel',
     'ShadowGenerationModel', 'ReflectionGenerationModel',
-    'OSInsertModel'
+    'OSInsertModel', 'QwenScoreModel', 'QwenEditModel'
 ]

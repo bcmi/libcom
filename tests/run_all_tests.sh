@@ -25,3 +25,7 @@ python test_reflection_generation.py
 python test_flux_kontext.py
 
 python test_os_insert.py
+
+python test_qwen_score.py
+
+python test_qwen_edit.py
