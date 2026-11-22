@@ -100,10 +100,10 @@ class KontextBlendingHarmonizationModel:
             fg_img = Image.fromarray(fg_img_np)
         # 按照bbox缩放前景
         x1, y1, x2, y2 = [int(v) for v in bbox]
-        fg_resized = fg_img.resize((x2 - x1, y2 - y1))
+        fg_resized = fg_img.resize((x2 - x1, y2 - y1), Image.BICUBIC)
         # 把前景贴到背景上
         bg_img.paste(fg_resized, (x1, y1, x2, y2))
-        bg_img = bg_img.resize((1024, 1024))
+        bg_img = bg_img.resize((1024, 1024), Image.BICUBIC)
         return bg_img
         
     

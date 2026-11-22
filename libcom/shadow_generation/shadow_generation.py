@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import pickle
 import numpy as np
 import os, cv2, torch, random
+from PIL import Image
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer, PretrainedConfig
 from diffusers import (
@@ -59,7 +60,7 @@ class TestDataset(Dataset):
             img = cv2.cvtColor(img_input, cv2.COLOR_BGR2RGB)
         else:
             raise TypeError("shadowfree_img must be str or np.ndarray")
-        img = cv2.resize(img, (512, 512))
+        img = np.array(Image.fromarray(img).resize((512, 512), Image.BICUBIC))
         return img
 
     def _load_mask(self, mask_input):
@@ -571,8 +572,8 @@ class ShadowGenerationModel:
         object_mask: np.uint8 HW [0-255]
         """
         width, height = 512, 512
-        decoded_512 = cv2.resize(decoded, (width, height))
-        shadowfree_img_512 = cv2.resize(shadowfree_img, (width, height))
+        decoded_512 = np.array(Image.fromarray(decoded).resize((width, height), Image.BICUBIC))
+        shadowfree_img_512 = np.array(Image.fromarray(shadowfree_img).resize((width, height), Image.BICUBIC))
         object_mask_512 = cv2.resize(object_mask, (width, height))
 
         comp_img_scaled = shadowfree_img_512.astype(np.float32)/127.5 - 1.0
@@ -590,7 +591,7 @@ class ShadowGenerationModel:
             output = self.post_model.post_process_net(input_tensor, timesteps=null_timesteps)
             output = output.permute(0,2,3,1)  # [B,H,W,C]
 
-            pred_mask = torch.greater_equal(output[:,:,:,3],0).float()
+            pred_mask = torch.sigmoid(output[:,:,:,3]).float()
             pred_mask = pred_mask.unsqueeze(-1)  # [B,H,W,1]
 
             adjusted_img = torch.clamp(image_scaled, -1.,1)
@@ -600,7 +601,7 @@ class ShadowGenerationModel:
             new_composite = adjusted_img * pred_mask + (1 - pred_mask) * comp_img_tensor
             new_composite = new_composite.squeeze(0).cpu().numpy().astype(np.uint8)
 
-        new_composite_512 = cv2.resize(new_composite, (512,512))
+        new_composite_512 = np.array(Image.fromarray(new_composite).resize((512,512), Image.BICUBIC))
         return new_composite_512
 
     def __call__(self, shadowfree_img, object_mask, number=5):

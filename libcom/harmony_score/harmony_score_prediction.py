@@ -63,7 +63,7 @@ class HarmonyScoreModel:
     def build_data_transformer(self):
         self.image_size = 256
         self.transform = transforms.Compose([
-            transforms.Resize((self.image_size, self.image_size)),
+            transforms.Resize((self.image_size, self.image_size), interpolation=transforms.InterpolationMode.BICUBIC),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ])

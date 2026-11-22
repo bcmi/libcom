@@ -64,16 +64,20 @@ class OPAScoreModel:
         
     def build_data_transformer(self):
         self.image_size = 256
-        self.transformer = transforms.Compose([
+        self.image_transformer = transforms.Compose([
+            transforms.Resize((self.image_size, self.image_size), interpolation=transforms.InterpolationMode.BICUBIC),
+            transforms.ToTensor(),
+        ])
+        self.mask_transformer = transforms.Compose([
             transforms.Resize((self.image_size, self.image_size)),
             transforms.ToTensor(),
         ])
     
     def inputs_preprocess(self, composite_image, composite_mask):
         img  = read_image_pil(composite_image)
-        img  = self.transformer(img)
+        img  = self.image_transformer(img)
         mask = read_mask_pil(composite_mask)
-        mask = self.transformer(mask)
+        mask = self.mask_transformer(mask)
         cat_img = torch.cat([img, mask], dim=0)
         cat_img = cat_img.unsqueeze(0).to(self.device)
         return cat_img

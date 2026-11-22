@@ -79,7 +79,7 @@ def make_image_grid(img_list, text_list=None, resolution=(512,512), cols=None, b
         row_img = []
         for j in range(cols):
             img = read_image_opencv(img_list[index])
-            img = cv2.resize(img, resolution)
+            img = np.array(Image.fromarray(img).resize(resolution, Image.BICUBIC))
             if img.ndim == 2:
                 img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             if text_list and len(text_list[index]) > 0:

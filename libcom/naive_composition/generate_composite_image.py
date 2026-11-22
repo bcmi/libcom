@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import cv2
+from PIL import Image
 from libcom.utils.process_image import *
 
 
@@ -69,7 +70,7 @@ def crop_and_resize_foreground(fg_img, fg_mask, bbox):
     fg_bbox = convert_mask_to_bbox(fg_mask)
     fg_region = fg_img[fg_bbox[1] : fg_bbox[3], fg_bbox[0] : fg_bbox[2]]
     x1, y1, x2, y2 = bbox
-    fg_region = cv2.resize(fg_region, (x2-x1, y2-y1), cv2.INTER_CUBIC)
+    fg_region = np.array(Image.fromarray(fg_region).resize((x2-x1, y2-y1), Image.BICUBIC))
     fg_mask   = fg_mask[fg_bbox[1] : fg_bbox[3], fg_bbox[0] : fg_bbox[2]]
     fg_mask   = cv2.resize(fg_mask, (x2-x1, y2-y1))
     fg_mask   = np.where(fg_mask > 127, 255, 0).astype(fg_img.dtype)
@@ -94,7 +95,7 @@ def gaussian_composite_image(bg_img, fg_img, fg_mask, bbox, kernel_size=15):
     fg_bbox = convert_mask_to_bbox(fg_mask)
     fg_region = fg_img[fg_bbox[1] : fg_bbox[3], fg_bbox[0] : fg_bbox[2]]
     x1, y1, x2, y2 = bbox
-    fg_region = cv2.resize(fg_region, (x2-x1, y2-y1), cv2.INTER_CUBIC)
+    fg_region = np.array(Image.fromarray(fg_region).resize((x2-x1, y2-y1), Image.BICUBIC))
     fg_mask   = fg_mask[fg_bbox[1] : fg_bbox[3], fg_bbox[0] : fg_bbox[2]]
     fg_mask   = cv2.resize(fg_mask, (x2-x1, y2-y1))
     norm_mask = (fg_mask.astype(np.float32) / 255)[:,:,np.newaxis]

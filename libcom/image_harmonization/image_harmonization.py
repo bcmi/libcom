@@ -107,7 +107,7 @@ class ImageHarmonizationModel:
         img = read_image_opencv(composite_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         mask = read_mask_opencv(composite_mask) / 255.0
-        img_lr = cv2.resize(img, (256, 256))
+        img_lr = np.array(Image.fromarray(img).resize((256, 256), Image.BICUBIC))
         mask_lr = cv2.resize(mask, (256, 256))
 
         #to tensor
@@ -167,7 +167,7 @@ class ImageHarmonizationModel:
 
         ori_w, ori_h = src_raw.size
 
-        src_resized = src_raw.resize((inference_size, inference_size), Image.BILINEAR)
+        src_resized = src_raw.resize((inference_size, inference_size), Image.BICUBIC)
         src_t = (ToTensor()(src_resized).unsqueeze(0) * 2 - 1).to(self.device, dtype=torch.bfloat16)
         batch = {"source_image_paste": src_t}
 
@@ -188,6 +188,6 @@ class ImageHarmonizationModel:
         preds = (torch.clamp(255.0 * res_tensor.permute(1, 2, 0), 0, 255)).numpy().astype(np.uint8)
         preds = cv2.cvtColor(preds, cv2.COLOR_RGB2BGR)
         
-        preds = cv2.resize(preds, (ori_w, ori_h))
+        preds = np.array(Image.fromarray(preds).resize((ori_w, ori_h), Image.BICUBIC))
         
         return preds

@@ -1,5 +1,6 @@
 import torch
 import torchvision
+from PIL import Image
 from libcom.utils.model_download import download_pretrained_model
 from libcom.utils.process_image import *
 from libcom.utils.environment import *
@@ -78,7 +79,7 @@ class FOSScoreModel:
     def build_data_transformer(self):
         self.image_size = self.cfg.image_size
         self.transformer = transforms.Compose([
-            transforms.Resize(self.cfg.image_size),
+            transforms.Resize(self.cfg.image_size, interpolation=transforms.InterpolationMode.BICUBIC),
             transforms.ToTensor(),
             transforms.Normalize(mean=self.IMAGE_NET_MEAN, std=self.IMAGE_NET_STD)
         ])
@@ -92,7 +93,7 @@ class FOSScoreModel:
             assert fg.shape[:2] == fg_mask.shape
             fg[np.where(fg_mask != 255)] = 128
         x1, y1, x2, y2 = bbox
-        rs_fg = cv2.resize(fg.copy(), (x2 - x1, y2 - y1))
+        rs_fg = np.array(Image.fromarray(fg.copy()).resize((x2 - x1, y2 - y1), Image.BICUBIC))
         bg[y1:y2, x1:x2] = rs_fg
         x1, y1, x2, y2 = self.get_crop_bbox(bbox, bg_h, bg_w)
         scale_comp = bg.copy()[y1:y2, x1:x2]

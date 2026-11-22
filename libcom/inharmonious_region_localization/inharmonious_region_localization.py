@@ -67,7 +67,7 @@ class InharmoniousLocalizationModel:
     def inputs_preprocess(self, composite_image):
         img = read_image_opencv(composite_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (256,256))
+        img = np.array(Image.fromarray(img).resize((256,256), Image.BICUBIC))
         img = self.transformer(img).float().to(self.device).unsqueeze(0)
         return img
     

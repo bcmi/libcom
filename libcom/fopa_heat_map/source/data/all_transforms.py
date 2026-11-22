@@ -10,8 +10,8 @@ class JointResize(object):
             raise RuntimeError("size should be int or tuple")
 
     def __call__(self, bg, fg, mask):
-        bg = bg.resize(self.size, Image.BILINEAR)
-        fg = fg.resize(self.size, Image.BILINEAR)
+        bg = bg.resize(self.size, Image.BICUBIC)
+        fg = fg.resize(self.size, Image.BICUBIC)
         mask = mask.resize(self.size, Image.NEAREST)
         return bg, fg, mask
 
