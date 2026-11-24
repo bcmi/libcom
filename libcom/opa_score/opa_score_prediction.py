@@ -69,7 +69,7 @@ class OPAScoreModel:
             transforms.ToTensor(),
         ])
         self.mask_transformer = transforms.Compose([
-            transforms.Resize((self.image_size, self.image_size)),
+            transforms.Resize((self.image_size, self.image_size), interpolation=transforms.InterpolationMode.NEAREST),
             transforms.ToTensor(),
         ])
     

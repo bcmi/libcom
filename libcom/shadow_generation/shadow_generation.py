@@ -73,7 +73,7 @@ class TestDataset(Dataset):
             mask = mask_input
         else:
             raise TypeError("object_mask must be str or np.ndarray")
-        mask = cv2.resize(mask, (512, 512))
+        mask = np.array(Image.fromarray(mask).resize((512, 512), Image.NEAREST))
         return mask
 
     def preprocess_data(self):
@@ -574,7 +574,7 @@ class ShadowGenerationModel:
         width, height = 512, 512
         decoded_512 = np.array(Image.fromarray(decoded).resize((width, height), Image.BICUBIC))
         shadowfree_img_512 = np.array(Image.fromarray(shadowfree_img).resize((width, height), Image.BICUBIC))
-        object_mask_512 = cv2.resize(object_mask, (width, height))
+        object_mask_512 = np.array(Image.fromarray(object_mask).resize((width, height), Image.NEAREST))
 
         comp_img_scaled = shadowfree_img_512.astype(np.float32)/127.5 - 1.0
         obj_mask = object_mask_512[:,:,np.newaxis].astype(np.float32)/255.0

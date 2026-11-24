@@ -107,7 +107,7 @@ class ReflectionGenerationModel:
 
         mask = read_mask_pil(composite_mask)
         mask_np = np.array(mask)
-        mask_np = cv2.resize(mask_np, (512, 512))
+        mask_np = np.array(Image.fromarray(mask_np).resize((512, 512), Image.NEAREST))
         _, fg_instance_thresh = cv2.threshold(mask_np, 128, 255, cv2.THRESH_BINARY)
         contours_instance, _ = cv2.findContours(fg_instance_thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
         merged_contour_points_instance = np.concatenate(contours_instance)
@@ -152,7 +152,7 @@ class ReflectionGenerationModel:
         width, height = 512, 512
 
         decoded = cv2.cvtColor(decoded, cv2.COLOR_BGR2RGB)
-        decoded = cv2.resize(decoded, (width, height), interpolation=cv2.INTER_AREA)
+        decoded = np.array(Image.fromarray(decoded).resize((width, height), Image.BICUBIC))
 
         if isinstance(composite_image, str):
             comp_np = cv2.imread(composite_image)
@@ -166,7 +166,7 @@ class ReflectionGenerationModel:
             elif comp_np.shape[2] == 4:
                 comp_np = comp_np[:, :, :3]
             comp_np = cv2.cvtColor(comp_np, cv2.COLOR_BGR2RGB)
-        comp_np = cv2.resize(comp_np, (width, height))
+        comp_np = np.array(Image.fromarray(comp_np).resize((width, height), Image.BICUBIC))
 
         if isinstance(composite_mask, str):
             mask_np = cv2.imread(composite_mask, cv2.IMREAD_GRAYSCALE)
@@ -176,7 +176,7 @@ class ReflectionGenerationModel:
             mask_np = np.ascontiguousarray(composite_mask)
         if mask_np.ndim == 3:
             mask_np = mask_np[:, :, 0]
-        mask_np = cv2.resize(mask_np, (width, height), interpolation=cv2.INTER_NEAREST)
+        mask_np = np.array(Image.fromarray(mask_np).resize((width, height), Image.NEAREST))
         _, mask_np = cv2.threshold(mask_np, 127, 255, cv2.THRESH_BINARY)
 
         dis_scaled = decoded.astype(np.float32) / 127.5 - 1.0

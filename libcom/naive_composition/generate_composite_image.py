@@ -66,13 +66,13 @@ def get_composite_image(foreground_image, foreground_mask, background_image, bbo
 
 def crop_and_resize_foreground(fg_img, fg_mask, bbox):
     if fg_mask.shape[:2] != fg_img.shape[:2]:
-        fg_mask = cv2.resize(fg_mask, (fg_img.shape[1], fg_img.shape[0]))
+        fg_mask = np.array(Image.fromarray(fg_mask).resize((fg_img.shape[1], fg_img.shape[0]), Image.NEAREST))
     fg_bbox = convert_mask_to_bbox(fg_mask)
     fg_region = fg_img[fg_bbox[1] : fg_bbox[3], fg_bbox[0] : fg_bbox[2]]
     x1, y1, x2, y2 = bbox
     fg_region = np.array(Image.fromarray(fg_region).resize((x2-x1, y2-y1), Image.BICUBIC))
     fg_mask   = fg_mask[fg_bbox[1] : fg_bbox[3], fg_bbox[0] : fg_bbox[2]]
-    fg_mask   = cv2.resize(fg_mask, (x2-x1, y2-y1))
+    fg_mask   = np.array(Image.fromarray(fg_mask).resize((x2-x1, y2-y1), Image.NEAREST))
     fg_mask   = np.where(fg_mask > 127, 255, 0).astype(fg_img.dtype)
     return fg_region, fg_mask 
 
@@ -89,7 +89,7 @@ def simple_composite_image(bg_img, fg_img, fg_mask, bbox):
     
 def gaussian_composite_image(bg_img, fg_img, fg_mask, bbox, kernel_size=15):
     if fg_mask.shape[:2] != fg_img.shape[:2]:
-        fg_mask = cv2.resize(fg_mask, (fg_img.shape[1], fg_img.shape[0]))
+        fg_mask = np.array(Image.fromarray(fg_mask).resize((fg_img.shape[1], fg_img.shape[0]), Image.NEAREST))
     fg_mask = cv2.GaussianBlur(255-fg_mask, (kernel_size, kernel_size), kernel_size/3.)
     fg_mask = 255 - fg_mask
     fg_bbox = convert_mask_to_bbox(fg_mask)
@@ -97,7 +97,7 @@ def gaussian_composite_image(bg_img, fg_img, fg_mask, bbox, kernel_size=15):
     x1, y1, x2, y2 = bbox
     fg_region = np.array(Image.fromarray(fg_region).resize((x2-x1, y2-y1), Image.BICUBIC))
     fg_mask   = fg_mask[fg_bbox[1] : fg_bbox[3], fg_bbox[0] : fg_bbox[2]]
-    fg_mask   = cv2.resize(fg_mask, (x2-x1, y2-y1))
+    fg_mask   = np.array(Image.fromarray(fg_mask).resize((x2-x1, y2-y1), Image.BICUBIC))
     norm_mask = (fg_mask.astype(np.float32) / 255)[:,:,np.newaxis]
     
     comp_mask = np.zeros((bg_img.shape[0], bg_img.shape[1]), dtype=np.uint8) 

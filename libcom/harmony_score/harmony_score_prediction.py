@@ -68,7 +68,7 @@ class HarmonyScoreModel:
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ])
         self.mask_transform = transforms.Compose([
-            transforms.Resize((self.image_size, self.image_size)),
+            transforms.Resize((self.image_size, self.image_size), interpolation=transforms.InterpolationMode.NEAREST),
             transforms.ToTensor(),
         ])
     

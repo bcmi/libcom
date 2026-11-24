@@ -108,7 +108,7 @@ class ImageHarmonizationModel:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         mask = read_mask_opencv(composite_mask) / 255.0
         img_lr = np.array(Image.fromarray(img).resize((256, 256), Image.BICUBIC))
-        mask_lr = cv2.resize(mask, (256, 256))
+        mask_lr = np.array(Image.fromarray(mask).resize((256, 256), Image.NEAREST))
 
         #to tensor
         img = self.transformer(img).float().to(self.device)
@@ -171,7 +171,7 @@ class ImageHarmonizationModel:
         src_t = (ToTensor()(src_resized).unsqueeze(0) * 2 - 1).to(self.device, dtype=torch.bfloat16)
         batch = {"source_image_paste": src_t}
 
-        mask_latent_img = mask_raw.resize((latent_size, latent_size), Image.BILINEAR)
+        mask_latent_img = mask_raw.resize((latent_size, latent_size), Image.BICUBIC)
         mask_t = ToTensor()(mask_latent_img).unsqueeze(0).to(self.device, dtype=torch.bfloat16)
 
         z_source = self.model.vae.encode(batch["source_image_paste"])

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Literal
 
 import os
+from PIL import Image
 
 import cv2
 import numpy as np
@@ -360,9 +361,9 @@ class OSInsertModel:
             os_bgr = cv2.cvtColor(os_rgb, cv2.COLOR_RGB2BGR)
 
             hh, ww = bg_bgr.shape[:2]
-            os_bgr = cv2.resize(os_bgr, (ww, hh), interpolation=cv2.INTER_AREA)
+            os_bgr = np.array(Image.fromarray(os_bgr).resize((ww, hh), Image.BICUBIC))
             if sam_mask.shape[:2] != (hh, ww):
-                sam_mask = cv2.resize(sam_mask, (ww, hh), interpolation=cv2.INTER_NEAREST)
+                sam_mask = np.array(Image.fromarray(sam_mask).resize((ww, hh), Image.NEAREST))
 
             m = (sam_mask > 127).astype(np.float32)
             m3 = np.stack([m, m, m], axis=-1)
@@ -475,9 +476,9 @@ class OSInsertModel:
             bg_bgr = background
             os_bgr = cv2.cvtColor(os_rgb, cv2.COLOR_RGB2BGR)
             hh, ww = bg_bgr.shape[:2]
-            os_bgr = cv2.resize(os_bgr, (ww, hh), interpolation=cv2.INTER_AREA)
+            os_bgr = np.array(Image.fromarray(os_bgr).resize((ww, hh), Image.BICUBIC))
             if sam_mask.shape[:2] != (hh, ww):
-                sam_mask = cv2.resize(sam_mask, (ww, hh), interpolation=cv2.INTER_NEAREST)
+                sam_mask = np.array(Image.fromarray(sam_mask).resize((ww, hh), Image.NEAREST))
 
             m = (sam_mask > 127).astype(np.float32)
             m3 = np.stack([m, m, m], axis=-1)

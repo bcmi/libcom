@@ -38,7 +38,7 @@ def color_transfer(composite_image, composite_mask):
     comp_img  = read_image_opencv(composite_image)
     comp_mask = read_mask_opencv(composite_mask)
     if comp_mask.shape[:2] != comp_img.shape[:2]:
-        comp_mask = cv2.resize(comp_mask, (comp_img.shape[1], comp_img.shape[0]))
+        comp_mask = np.array(Image.fromarray(comp_mask).resize((comp_img.shape[1], comp_img.shape[0]), Image.NEAREST))
     trans_comp = reinhard(comp_img, comp_mask)
     return trans_comp
         
