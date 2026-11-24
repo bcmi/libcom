@@ -18,20 +18,21 @@ Welcome to Libcom's documentation!
    :maxdepth: 1
    :caption: Method Summary
 
-   color_transfer.md
-   harmony_score.md
+   
    get_composite_image.md
-   opa_score.md
-   fos_score.md
+   color_transfer.md
    image_harmonization.md
-   inharmonious_region_localization.md
    painterly_image_harmonization.md
+   inharmonious_region_localization.md
+   harmony_score.md
+   fos_score.md
+   opa_score.md
    fopa_heat_map.md
-   os_insert.md
-   kontext.md
+   qwen_score.md
    shadow_generation.md
    reflection_generation.md
-   qwen_score.md
+   kontext.md
+   os_insert.md
    qwen_edit.md
 
 Indices and tables

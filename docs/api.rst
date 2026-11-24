@@ -73,15 +73,3 @@ libcom.shadow_generation
 .. automodule:: libcom.shadow_generation
     :members:
     :special-members: __call__
-
-libcom.qwen_score
-----------------------------------------
-.. automodule:: libcom.qwen_score
-    :members:
-    :special-members: __call__
-
-libcom.qwen_edit
-----------------------------------------
-.. automodule:: libcom.qwen_edit
-    :members:
-    :special-members: __call__
