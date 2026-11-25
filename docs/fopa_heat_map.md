@@ -10,6 +10,6 @@ Given a pair of foreground and background, the model predicts rationality heatma
 
 ## Brief Method Summary
 
-![fopa_heat_map_network.jpg](../resources/fopa_heat_map_network.jpg)
+![fopa_heat_map_network](../resources/fopa_heat_map_network.jpg)
 
 FOPA model extracts foreground feature vector from scaled foreground object, and extracts background feature map from background image. The foreground feature vector interacts with each location on the background feature map through dynamic kernel to predict the rationality score at this location. Given the foreground of certain scale,  FOPA model can predict the rationality heatmaps for this scale. Given the foregrounds of different scales, FOPA model can predict the rationality heatmaps for different scales. Based on the predicted rationality heatmaps, FOPA model can output the optimal bounding boxes to place the foreground and further output the corresponding composite images. 

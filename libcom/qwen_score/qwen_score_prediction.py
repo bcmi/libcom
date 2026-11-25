@@ -180,17 +180,18 @@ class QwenScoreModel:
     This is the same scoring protocol used during training / evaluation, so the score
     ranges from 0 to 1 and is directly comparable to ``OPAScoreModel`` etc.
 
-    **Test-time augmentation is ON by default** (``enable_tta=True``), because the
-    reported benchmark numbers were obtained with multi-view TTA. Each task uses the
-    view set that won on the validation set:
+    Test-time augmentation is OFF by default (``enable_tta=False``), so scoring uses
+    one forward pass. Enable it with ``enable_tta=True`` to use the multi-view TTA
+    used for the reported benchmark numbers. Each task uses the view set that won
+    on the validation set:
 
     - ``QwenVL-OPA`` / ``QwenVL-FOS``: orig + horizontal flip + 1.1x zoom, **mean**
     - ``QwenVL-Harmony``: orig + 1.1x zoom + 1.2x zoom, **median**
       (flipping rotates the light direction, so it is dropped for the illumination task;
       the median also vetoes the weakest single view, which is the original image)
 
-    TTA costs 3 forward passes. Pass ``enable_tta=False`` for a single forward pass
-    (faster, but the score is systematically lower: e.g. Harmony 0.6951 vs 0.7309 Acc).
+    TTA costs 3 forward passes. Single-view inference is faster, but validation
+    accuracy can be lower: e.g. Harmony 0.6951 vs 0.7309 Acc.
 
     Args:
         device (str | torch.device): gpu id
@@ -205,8 +206,8 @@ class QwenScoreModel:
               adapter: 802816 for all three tasks (OPA / FOS / Harmony), so that the
               three scores share the same input-resolution setting. Override only if you
               know the matching training setting.
-            - ``enable_tta`` (bool): whether to apply multi-view TTA, default True.
-              Set False to fall back to a single forward pass.
+            - ``enable_tta`` (bool): whether to apply multi-view TTA, default False.
+              Set True to enable multi-view inference.
             - ``tta_agg`` (str): override the aggregation of TTA views, ``'mean'`` or
               ``'median'``. Default follows the task (mean for OPA/FOS, median for Harmony).
             - ``device_map`` (str): passed to ``from_pretrained`` when set (e.g. ``'auto'``).
@@ -237,7 +238,7 @@ class QwenScoreModel:
         self.prompt = PROMPTS[task]
         self.max_pixels = int(kwargs.get('max_pixels', default_pixels))
         self.device = check_gpu_device(device)
-        self.enable_tta = bool(kwargs.get('enable_tta', True))
+        self.enable_tta = bool(kwargs.get('enable_tta', False))
         self.tta_config = dict(TTA_CONFIG[model_type])
         tta_agg = kwargs.get('tta_agg')
         if tta_agg is not None:
@@ -288,7 +289,7 @@ class QwenScoreModel:
         return self.encode_images(image, mask)
 
     def encode_images(self, image, mask):
-        '''image / mask 均为 PIL.Image；返回处理器输出与 prompt 长度。'''
+        '''Encode PIL images and return the processor outputs and prompt length.'''
         user_msg = {
             'role': 'user',
             'content': [
@@ -311,7 +312,7 @@ class QwenScoreModel:
 
     @torch.no_grad()
     def score_single(self, image, mask):
-        '''单次前向打分（不涉及 TTA）。'''
+        '''Score one image and mask with a single forward pass, without TTA.'''
         inputs, prompt_len = self.encode_images(image, mask)
         device = next(self.model.parameters()).device
         inputs = {k: v.to(device) for k, v in inputs.items()}
@@ -334,9 +335,11 @@ class QwenScoreModel:
             the composition is more likely to be judged as reasonable by the corresponding task.
 
         Note:
-            ``enable_tta=True``（默认）时会按任务执行多视图推理并聚合，代价是 3 次前向：
-            OPA / FOS 走「原图 + 翻转 + 1.1x 放大」的算术平均，Harmony 走「原图 + 1.1x + 1.2x」
-            的中位数。显式传 ``enable_tta=False`` 可退回单次前向（更快，但分数偏低）。
+            TTA is disabled by default, so scoring uses one forward pass. Set
+            ``enable_tta=True`` to run three views and aggregate their scores.
+            OPA and FOS average the original, horizontally flipped, and 1.1x
+            zoomed views. Harmony takes the median of the original, 1.1x,
+            and 1.2x zoomed views.
 
         """
         image = read_image_pil(composite_image)

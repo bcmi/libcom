@@ -12,6 +12,8 @@ We use Qwen3-VL to evaluate a composite image from different aspects.
 
 ## Brief Method Summary
 
-<img title="" src="../resources/qwen_score_model.jpg" alt="qwen_score_model.jpg" width="615">
+![qwen_score_model](../resources/qwen_score_model.jpg)
 
 Qwen3-VL takes a composite image, a composite mask, and a prompt as input. We add task-specific LoRA adapters and prompts for OPA score, FOS score, and harmony score. Instead of generating a text response, the modified version reads the next-token logits at the final prompt position, keeps only the logits for the tokenizer’s “0” and “1” tokens, and applies softmax to that pair to produce a continous score within [0,1].
+
+Test-time augmentation (TTA) is disabled by default, so each score uses one forward pass. Pass `enable_tta=True` to `QwenScoreModel` to enable the three-view TTA used for the reported benchmarks: OPA and FOS average the original, horizontally flipped, and 1.1x zoomed views; Harmony takes the median of the original, 1.1x, and 1.2x zoomed views.

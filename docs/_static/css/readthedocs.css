@@ -4,3 +4,18 @@
     height: 60px;
     width: 60px;
 }
+
+article.pytorch-article img[alt="qwen_edit_model"] {
+    max-width: 66.6667%;
+}
+
+#pytorch-left-menu li.current > a.reference.internal:link,
+#pytorch-left-menu li.current > a.reference.internal:visited {
+    color: #2980b9;
+}
+
+@media screen and (min-width: 1101px) {
+    #pytorch-left-menu .pytorch-side-scroll {
+        overflow-y: auto;
+    }
+}

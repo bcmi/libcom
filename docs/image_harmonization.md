@@ -36,6 +36,6 @@ PCTNet takes in a downsampled image and outputs spatial-aware color transformati
 
 **Brief Method Summary**
 
-<img src="file:///C:/Users/ustcn/Desktop/libcom-main/libcom-main/resources/LBM_model.jpg" title="" alt="LBM_model.jpg" width="609">
+![LBM_model](../resources/LBM_model.jpg)
 
 LBM learns a direct mapping between source and target latent by matching bridge distributions defined along interpolation paths. It performs more stably than other diffusion-based models which learns a mapping between noise and target latent conditioned on source image.

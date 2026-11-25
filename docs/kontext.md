@@ -9,6 +9,6 @@ Based on FLUX.1 Kontext, we provide the model KontextBlendingHarmonization which
 
 ## Brief Method Summary
 
-![kontext.jpg](../resources/kontext.jpg)
+![kontext](../resources/kontext.jpg)
 
 FLUX.1 Kontext is a unified image generation and editing framework built on the Flux Transformer. It accepts text prompts together with one reference image. Based on FLUX.1 Kontext, we train LoRA adapters and obtain two models for image blending and image harmonization.

@@ -144,10 +144,12 @@ class ReflectionGenerationModel:
 
     def background_blending(self, decoded, composite_image, composite_mask,
                             blur_sigma=8.0, alpha_gain=1.3):
-        """Soft mask 融合：用网络预测的倒影概率掩码做 alpha 混合。
+        """Alpha-blend using the predicted reflection probability mask.
 
-        掩码由第 4 通道 logits 经 sigmoid 得到，保持连续值不做二值化；
-        掩码值趋近 0 的区域基本保留原图，不做前景剔除保护。
+        The mask is obtained by applying sigmoid to the fourth-channel logits
+        and remains continuous, without binarization. Regions where the mask
+        approaches zero largely retain the original image, without foreground
+        exclusion.
         """
         width, height = 512, 512
 

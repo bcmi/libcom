@@ -35,8 +35,8 @@ ObjectStitch is good at adjusting foreground pose/view to be compatible with bac
 
 In "conservative" mode, we feed background image, bounding box mask, and foreground reference into **InsertAnything**.
 
-<img title="" src="../resources/insertanything_model.jpg" alt="insertanything_model.jpg" width="606">
+![insertanything_model](../resources/insertanything_model.jpg)
 
 In "aggressive" mode,  we adopt a two-stage approach named [OSInsert](https://arxiv.org/pdf/2602.19523). In the first stage, we use **ObjectStitch** to generate an intermediate composite image with a foreground object that has a plausible pose, viewpoint, and geometric alignment with the background. We then use the Segment Anything Model (SAM) to extract a high-precision foreground mask from this intermediate result. In the second stage, we utilize **InsertAnything**  to fill the foreground region defined by the SAM-extracted mask with the foreground reference.
 
-![osinsert_model.jpg](..\resources\osinsert_model.jpg)
+![osinsert_model](../resources/osinsert_model.jpg)
