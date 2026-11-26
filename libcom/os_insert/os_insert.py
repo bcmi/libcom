@@ -49,8 +49,8 @@ class OSInsertModel:
     conservative and aggressive. It internally combines multiple sub-models such
     as InsertAnything, ObjectStitch, and SAM.
 
-    Modes
-    -----
+    Modes:
+
     - ``aggressive``:
         ObjectStitch + SAM + InsertAnything pipeline.
         Suitable for more complex and flexible compositions.
@@ -91,38 +91,29 @@ class OSInsertModel:
     Examples:
         >>> import cv2
         >>> from libcom import OSInsertModel
-
-        >>> model = OSInsertModel(
-        >>>     device="cuda:0"
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> model = OSInsertModel(device="cuda:0")
+        >>> test_dir = "../tests/os_insert_source"
+        >>> bg_path = test_dir + "/background/1.jpg"
+        >>> fg_path = test_dir + "/foreground/1.jpg"
+        >>> fg_mask_path = test_dir + "/foreground_mask/1.png"
+        >>> bbox = [1000, 895, 1480, 1355]
+        >>> result_dir = "../tests/results/os_insert/aggressive"
+        >>> result = model(
+        >>>     background_path=bg_path,
+        >>>     foreground_path=fg_path,
+        >>>     foreground_mask_path=fg_mask_path,
+        >>>     bbox=bbox,
+        >>>     result_dir=result_dir,
+        >>>     mode="aggressive",
+        >>>     verbose=True,
         >>> )
-
-        >>> bg = cv2.imread("tests/osinsert/background/Demo_0.png")
-        >>> fg = cv2.imread("tests/osinsert/foreground/Demo_0.png")
-        >>> fg_mask = cv2.imread(
-        >>>     "tests/osinsert/foreground_mask/Demo_0.png",
-        >>>     cv2.IMREAD_GRAYSCALE
-        >>> )
-
-        >>> bbox = (175, 184, 363, 372)
-
-        >>> result = model.infer_images(
-        >>>     background=bg,
-        >>>     foreground=fg,
-        >>>     foreground_mask=fg_mask,
-        >>>     bbox_xyxy=bbox,
-        >>>     mode="conservative",   # or "aggressive"
-        >>>     verbose=False,
-        >>>     seed=123,
-        >>>     strength=1.0,
-        >>>     split_ratio=0.33,
-        >>>     save_path="result_dir/conservative",
-        >>> )
+        >>> grid_img = make_image_grid([cv2.imread(fg_path), cv2.imread(bg_path), cv2.cvtColor(result, cv2.COLOR_RGB2BGR)])
+        >>> cv2.imshow("OSInsert", grid_img)
 
     Expected result:
-        The foreground object is inserted into the background image
-        at the specified bounding box, with realistic blending.
 
-    .. image:: _static/image/os_insert_result.jpg
+    .. image:: _static/image/os_insert_result1.jpg
 
     """
     def __init__(

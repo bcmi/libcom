@@ -6,6 +6,7 @@ import argparse
 import os
 
 import cv2
+from libcom.utils.process_image import resize_image_pil
 import numpy as np
 import torch
 from PIL import Image
@@ -98,18 +99,18 @@ def _get_pipes(
             torch_dtype=dtype,
         )
         pipe.load_lora_weights(str(ia_lora_path))
-        redux = FluxPriorReduxPipeline.from_pretrained(str(flux_redux_path)).to(dtype=dtype)
+        redux = FluxPriorReduxPipeline.from_pretrained(str(flux_redux_path), torch_dtype=dtype)
 
     # Prefer explicit device. If device is None, fall back to diffusers defaults.
     if device is None:
         pipe.enable_model_cpu_offload()
         redux.enable_model_cpu_offload()
-        pipe.enable_vae_slicing()
+        pipe.vae.enable_slicing()
     elif device.type == "cuda":
         gpu_id = int(device.index or 0)
         pipe.enable_model_cpu_offload(gpu_id=gpu_id)
         redux.enable_model_cpu_offload(gpu_id=gpu_id)
-        pipe.enable_vae_slicing()
+        pipe.vae.enable_slicing()
     else:
         # CPU mode: keep everything on CPU.
         pipe.to(device)
@@ -256,12 +257,12 @@ def _run_insertanything_with_pipes(
 
     ref_mask_np = _to_mask_u8(ref_mask)
     tar_mask = _to_mask_u8(mask_image)
-    tar_mask = cv2.resize(tar_mask, (tar_image.shape[1], tar_image.shape[0]))
+    tar_mask = resize_image_pil(tar_mask, (tar_image.shape[1], tar_image.shape[0]))
 
     sam_mask_np = None
     if sam_mask is not None:
         sam_mask_np = _to_mask_u8(sam_mask)
-        sam_mask_np = cv2.resize(sam_mask_np, (tar_image.shape[1], tar_image.shape[0]))
+        sam_mask_np = resize_image_pil(sam_mask_np, (tar_image.shape[1], tar_image.shape[0]))
 
     # Remove the background information of the reference picture
     ref_box_yyxx = get_bbox_from_mask(ref_mask_np)
@@ -299,20 +300,20 @@ def _run_insertanything_with_pipes(
     H1, W1 = tar_image.shape[0], tar_image.shape[1]
 
     tar_mask = pad_to_square(tar_mask, pad_value=0)
-    tar_mask = cv2.resize(tar_mask, size)
+    tar_mask = resize_image_pil(tar_mask, size)
 
     if sam_mask_np is not None:
         sam_mask_np = pad_to_square(sam_mask_np, pad_value=0)
-        sam_mask_np = cv2.resize(sam_mask_np, size)
+        sam_mask_np = resize_image_pil(sam_mask_np, size)
 
     # Extract the features of the reference image
-    masked_ref_image = cv2.resize(masked_ref_image.astype(np.uint8), size).astype(np.uint8)
+    masked_ref_image = resize_image_pil(masked_ref_image.astype(np.uint8), size).astype(np.uint8)
     pipe_prior_output = redux(Image.fromarray(masked_ref_image))
 
     tar_image = pad_to_square(tar_image, pad_value=255)
     H2, W2 = tar_image.shape[0], tar_image.shape[1]
 
-    tar_image = cv2.resize(tar_image, size)
+    tar_image = resize_image_pil(tar_image, size)
     diptych_ref_tar = np.concatenate([masked_ref_image, tar_image], axis=1)
 
     tar_mask = np.stack([tar_mask, tar_mask, tar_mask], -1)

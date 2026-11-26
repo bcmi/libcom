@@ -7,7 +7,7 @@ import shutil
 task_name = 'inharmonious_region_localization'
 
 if __name__ == '__main__':
-    test_set = get_test_list()
+    test_set = get_test_list(task_name)
     result_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', task_name)
     if os.path.exists(result_dir):
         shutil.rmtree(result_dir)
@@ -17,7 +17,6 @@ if __name__ == '__main__':
     for pair in test_set:
         comp_img = pair['composite']
         trans_img = model(comp_img)
-        # visulization results
         img_name  = os.path.basename(comp_img).replace('.png', '.jpg')
         grid_img  = make_image_grid([comp_img, trans_img])
         res_path  = os.path.join(result_dir, img_name)

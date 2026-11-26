@@ -3,6 +3,7 @@ import sys
 import re
 import numpy as np
 import cv2
+from libcom.utils.process_image import resize_image_pil
 import torch
 
 
@@ -133,7 +134,7 @@ def resize_image(img):
     height = (np.ceil(height_orig / scale / 32) * 32).astype(int)
     width = (np.ceil(width_orig / scale / 32) * 32).astype(int)
 
-    img_resized = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
+    img_resized = resize_image_pil(img, (width, height))
 
     img_resized = (
         torch.from_numpy(np.transpose(img_resized, (2, 0, 1))).contiguous().float()
@@ -156,9 +157,7 @@ def resize_depth(depth, width, height):
     """
     depth = torch.squeeze(depth[0, :, :, :]).to("cpu")
 
-    depth_resized = cv2.resize(
-        depth.numpy(), (width, height), interpolation=cv2.INTER_CUBIC
-    )
+    depth_resized = resize_image_pil(depth.numpy(), (width, height))
 
     return depth_resized
 

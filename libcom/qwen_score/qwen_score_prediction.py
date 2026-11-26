@@ -215,18 +215,21 @@ class QwenScoreModel:
 
     Examples:
         >>> from libcom import QwenScoreModel
-        >>> from libcom import get_composite_image
+        >>> from libcom.utils.process_image import make_image_grid
         >>> import cv2
-        >>> net = QwenScoreModel(device=0, model_type='QwenVL-OPA')
-        >>> bg_img, fg_img, fg_mask = 'source/background/17.jpg', 'source/foreground/17.jpg', 'source/foreground_mask/17.png'
-        >>> bbox = [475, 697, 1275, 1401]
-        >>> comp, comp_mask = get_composite_image(fg_img, fg_mask, bg_img, bbox)
+        >>> net = QwenScoreModel(device=0, model_type='QwenVL-FOS', max_pixels=802816)
+        >>> test_dir = '../tests/qwen_score_prediction_source/'
+        >>> comp = test_dir + 'composite/1.jpg'
+        >>> comp_mask = test_dir + 'composite_mask/1.png'
         >>> score = net(comp, comp_mask)
-        >>> print(f'qwen opa score: {score:.4f}')
+        >>> grid_img = make_image_grid([comp, comp_mask],
+        >>>                            text_list=[f'QwenVL-FOS:{score:.2f}', 'composite-mask'])
+        >>> cv2.imshow('Qwen FOS score', grid_img)
 
-        >>> # Harmony adapter with the high-resolution setting used in training
-        >>> net_h = QwenScoreModel(device=0, model_type='QwenVL-Harmony', max_pixels=802816)
-        >>> harmony_score = net_h(comp, comp_mask)
+    Expected result:
+
+    .. image:: _static/image/qwen_score_fos_result1.jpg
+        :scale: 50%
 
     """
     def __init__(self, device=0, model_type='QwenVL-OPA', **kwargs):

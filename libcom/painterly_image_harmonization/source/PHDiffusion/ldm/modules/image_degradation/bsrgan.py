@@ -12,7 +12,9 @@
 
 import numpy as np
 import cv2
+from libcom.utils.process_image import resize_image_pil
 import torch
+from PIL import Image
 
 from functools import partial
 import random
@@ -24,6 +26,12 @@ from scipy.linalg import orth
 import albumentations
 
 import ldm.modules.image_degradation.utils_image as util
+
+
+def _resize_degradation(image, size):
+    # Keep subsequent random augmentations reproducible.
+    random.choice([1, 2, 3])
+    return resize_image_pil(image, size)
 
 
 def modcrop_np(img, sf):
@@ -344,7 +352,7 @@ def add_resize(img, sf=4):
         sf1 = random.uniform(0.5 / sf, 1)
     else:
         sf1 = 1.0
-    img = cv2.resize(img, (int(sf1 * img.shape[1]), int(sf1 * img.shape[0])), interpolation=random.choice([1, 2, 3]))
+    img = _resize_degradation(img, (int(sf1 * img.shape[1]), int(sf1 * img.shape[0])))
     img = np.clip(img, 0.0, 1.0)
 
     return img
@@ -462,8 +470,7 @@ def degradation_bsrgan(img, sf=4, lq_patchsize=72, isp_model=None):
 
     if sf == 4 and random.random() < scale2_prob:  # downsample1
         if np.random.rand() < 0.5:
-            img = cv2.resize(img, (int(1 / 2 * img.shape[1]), int(1 / 2 * img.shape[0])),
-                             interpolation=random.choice([1, 2, 3]))
+            img = _resize_degradation(img, (int(1 / 2 * img.shape[1]), int(1 / 2 * img.shape[0])))
         else:
             img = util.imresize_np(img, 1 / 2, True)
         img = np.clip(img, 0.0, 1.0)
@@ -487,8 +494,7 @@ def degradation_bsrgan(img, sf=4, lq_patchsize=72, isp_model=None):
             # downsample2
             if random.random() < 0.75:
                 sf1 = random.uniform(1, 2 * sf)
-                img = cv2.resize(img, (int(1 / sf1 * img.shape[1]), int(1 / sf1 * img.shape[0])),
-                                 interpolation=random.choice([1, 2, 3]))
+                img = _resize_degradation(img, (int(1 / sf1 * img.shape[1]), int(1 / sf1 * img.shape[0])))
             else:
                 k = fspecial('gaussian', 25, random.uniform(0.1, 0.6 * sf))
                 k_shifted = shift_pixel(k, sf)
@@ -499,7 +505,7 @@ def degradation_bsrgan(img, sf=4, lq_patchsize=72, isp_model=None):
 
         elif i == 3:
             # downsample3
-            img = cv2.resize(img, (int(1 / sf * a), int(1 / sf * b)), interpolation=random.choice([1, 2, 3]))
+            img = _resize_degradation(img, (int(1 / sf * a), int(1 / sf * b)))
             img = np.clip(img, 0.0, 1.0)
 
         elif i == 4:
@@ -551,8 +557,7 @@ def degradation_bsrgan_variant(image, sf=4, isp_model=None):
 
     if sf == 4 and random.random() < scale2_prob:  # downsample1
         if np.random.rand() < 0.5:
-            image = cv2.resize(image, (int(1 / 2 * image.shape[1]), int(1 / 2 * image.shape[0])),
-                               interpolation=random.choice([1, 2, 3]))
+            image = _resize_degradation(image, (int(1 / 2 * image.shape[1]), int(1 / 2 * image.shape[0])))
         else:
             image = util.imresize_np(image, 1 / 2, True)
         image = np.clip(image, 0.0, 1.0)
@@ -576,8 +581,7 @@ def degradation_bsrgan_variant(image, sf=4, isp_model=None):
             # downsample2
             if random.random() < 0.75:
                 sf1 = random.uniform(1, 2 * sf)
-                image = cv2.resize(image, (int(1 / sf1 * image.shape[1]), int(1 / sf1 * image.shape[0])),
-                                   interpolation=random.choice([1, 2, 3]))
+                image = _resize_degradation(image, (int(1 / sf1 * image.shape[1]), int(1 / sf1 * image.shape[0])))
             else:
                 k = fspecial('gaussian', 25, random.uniform(0.1, 0.6 * sf))
                 k_shifted = shift_pixel(k, sf)
@@ -588,7 +592,7 @@ def degradation_bsrgan_variant(image, sf=4, isp_model=None):
 
         elif i == 3:
             # downsample3
-            image = cv2.resize(image, (int(1 / sf * a), int(1 / sf * b)), interpolation=random.choice([1, 2, 3]))
+            image = _resize_degradation(image, (int(1 / sf * a), int(1 / sf * b)))
             image = np.clip(image, 0.0, 1.0)
 
         elif i == 4:
@@ -689,8 +693,7 @@ def degradation_bsrgan_plus(img, sf=4, shuffle_prob=0.5, use_sharp=True, lq_patc
             print('check the shuffle!')
 
     # resize to desired size
-    img = cv2.resize(img, (int(1 / sf * hq.shape[1]), int(1 / sf * hq.shape[0])),
-                     interpolation=random.choice([1, 2, 3]))
+    img = _resize_degradation(img, (int(1 / sf * hq.shape[1]), int(1 / sf * hq.shape[0])))
 
     # add final JPEG compression noise
     img = add_JPEG_noise(img)
@@ -720,10 +723,10 @@ if __name__ == '__main__':
 		print(img_lq.shape)
 		print("bicubic", img_lq_bicubic.shape)
 		print(img_hq.shape)
-		lq_nearest = cv2.resize(util.single2uint(img_lq), (int(sf * img_lq.shape[1]), int(sf * img_lq.shape[0])),
-		                        interpolation=0)
-		lq_bicubic_nearest = cv2.resize(util.single2uint(img_lq_bicubic), (int(sf * img_lq.shape[1]), int(sf * img_lq.shape[0])),
-		                        interpolation=0)
+		lq_nearest = np.array(Image.fromarray(util.single2uint(img_lq)).resize(
+		    (int(sf * img_lq.shape[1]), int(sf * img_lq.shape[0])), Image.NEAREST))
+		lq_bicubic_nearest = np.array(Image.fromarray(util.single2uint(img_lq_bicubic)).resize(
+		    (int(sf * img_lq.shape[1]), int(sf * img_lq.shape[0])), Image.NEAREST))
 		img_concat = np.concatenate([lq_bicubic_nearest, lq_nearest, util.single2uint(img_hq)], axis=1)
 		util.imsave(img_concat, str(i) + '.png')
 

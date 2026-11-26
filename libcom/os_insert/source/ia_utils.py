@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Tuple
 
 import cv2
+from libcom.utils.process_image import resize_image_pil
 import numpy as np
 import math
 
@@ -136,7 +137,7 @@ def crop_back(edited: np.ndarray, old_tar: np.ndarray, hw_vec, box_crop) -> np.n
     y1, y2, x1, x2 = map(int, box_crop)
 
     # Resize prediction back to the padded crop size.
-    pred = cv2.resize(edited, (W2, H2))
+    pred = resize_image_pil(edited, (W2, H2))
     m = 2  # margin pixels
 
     # Case 1: original crop was square, simple margin paste.

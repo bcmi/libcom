@@ -25,6 +25,7 @@ import torch.utils.data as data
 import json
 import time
 import cv2
+from libcom.utils.process_image import resize_image_pil
 cv2.setNumThreads(0)
 import torch
 import torchvision
@@ -225,7 +226,7 @@ def rescale_image_with_bbox(image, bbox=None, long_size=1024):
     else:
         scale = float(long_size) / max(src_width, src_height)
         dst_width, dst_height = int(scale * src_width), int(scale * src_height)
-        dst_img  = image.resize((dst_width, dst_height))
+        dst_img  = image.resize((dst_width, dst_height), Image.BICUBIC)
     if bbox == None:
         return dst_img
     bbox[0] = int(float(bbox[0]) / src_width  * dst_width)
@@ -276,7 +277,7 @@ def reverse_image_tensor(tensor, img_size=(256,256)):
     img_nps = np.uint8(tensor)
     def np2bgr(img, img_size = img_size):
         if img.shape[:2] != img_size:
-            img = cv2.resize(img, img_size)
+            img = resize_image_pil(img, img_size)
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_list = [np2bgr(img) for img in img_nps]
     return img_list
@@ -290,7 +291,7 @@ def reverse_mask_tensor(tensor, img_size=(256,256)):
     img_nps = np.uint8(tensor)
     def np2bgr(img, img_size = img_size):
         if img.shape[:2] != img_size:
-            img = cv2.resize(img, img_size)
+            img = resize_image_pil(img, img_size)
         return cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     img_list = [np2bgr(img) for img in img_nps]
     return img_list
@@ -309,7 +310,7 @@ def reverse_clip_tensor(tensor, img_size=(256,256)):
     img_nps = np.uint8(tensor)
     def np2bgr(img, img_size = img_size):
         if img.shape[:2] != img_size:
-            img = cv2.resize(img, img_size)
+            img = resize_image_pil(img, img_size)
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_list = [np2bgr(img) for img in img_nps]
     return img_list
@@ -437,7 +438,7 @@ class OpenImageDataset(data.Dataset):
             source_img, bbox = rescale_image_with_bbox(source_img, bbox)
             source_np   = np.array(source_img)
             mask = read_mask(mask_path)
-            mask = mask.resize((source_np.shape[1], source_np.shape[0]))
+            mask = mask.resize((source_np.shape[1], source_np.shape[0]), Image.BICUBIC)
             mask = np.array(mask)
             # bbox = mask2bbox(mask)
             fg_img, fg_mask, bbox  = crop_foreground_by_bbox(source_np, mask, bbox)
@@ -502,7 +503,7 @@ class COCOEEDataset(data.Dataset):
             mask_path = os.path.join(self.mask_dir, im_name + '_mask.png')
             assert os.path.exists(mask_path), mask_path
             mask_img = read_mask(mask_path)
-            mask_img = mask_img.resize((src_img.width, src_img.height))
+            mask_img = mask_img.resize((src_img.width, src_img.height), Image.BICUBIC)
             bbox = mask2bbox(np.array(mask_img))
             bbox_tensor = get_bbox_tensor(bbox, src_img.width, src_img.height)
             mask_tensor = self.mask_transform(mask_img) 

@@ -2,15 +2,12 @@ import os
 import cv2
 import shutil
 from common import *
-import cv2
 from libcom import ReflectionGenerationModel
 
 task_name = 'reflection_generation'
 
-
-
 def get_test_list_reflection_generation():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'reflection_generation')
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{task_name}_source')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'composite')):
         pair = {}

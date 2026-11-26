@@ -8,7 +8,7 @@ task_name = 'shadow_generation'
 
 
 def get_test_list_shadow_generation():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'shadow_generation')
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{task_name}_source')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'composite')):
         pair = {}

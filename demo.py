@@ -7,7 +7,7 @@ demo.py — ReflectionGenerationModel 最小运行示例
 
 用法
 ----
-    # 用内置样例（tests/source）跑一张，结果存到 results/reflection_demo.png
+    # 用内置样例（tests/reflection_generation_source）跑一张，结果存到 results/reflection_demo.png
     python demo.py
 
     # 指定自己的输入与输出
@@ -43,10 +43,10 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 def parse_args():
     parser = argparse.ArgumentParser(description='ReflectionGeneration demo')
     parser.add_argument('--composite', type=str,
-                        default=os.path.join(SCRIPT_DIR, 'tests', 'source', 'composite', '1.jpg'),
+                        default=os.path.join(SCRIPT_DIR, 'tests', 'reflection_generation_source', 'composite', '1.png'),
                         help='合成图路径（有物体、无倒影）')
     parser.add_argument('--mask', type=str,
-                        default=os.path.join(SCRIPT_DIR, 'tests', 'source', 'composite_mask', '1.png'),
+                        default=os.path.join(SCRIPT_DIR, 'tests', 'reflection_generation_source', 'composite_mask', '1.png'),
                         help='前景物体掩码路径（物体为白色）')
     parser.add_argument('--output', type=str,
                         default=os.path.join(SCRIPT_DIR, 'results', 'reflection_demo.png'),

@@ -30,32 +30,24 @@ class FOPAHeatMapModel:
         model_type (str): predefined model type
 
     Examples:
-        >>> test_set = get_test_list_fopa_heatmap()
-        >>> result_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', task_name)
-        >>> if os.path.exists(result_dir):
-        >>>     shutil.rmtree(result_dir)
-        >>> os.makedirs(result_dir, exist_ok=True)
-        >>> os.makedirs(os.path.join(result_dir, 'grid'), exist_ok=True)
-        >>> print(f'begin testing {task_name}...')
+        >>> import os
+        >>> import cv2
+        >>> from libcom import FOPAHeatMapModel
+        >>> from libcom.utils.process_image import make_image_grid
+        >>> test_dir = '../tests/fopa_heat_map_source'
+        >>> bg_img = os.path.join(test_dir, 'background', '1674.jpg')
+        >>> fg_img = os.path.join(test_dir, 'foreground', '1674.jpg')
+        >>> fg_mask = os.path.join(test_dir, 'foreground_mask', '1674.jpg')
+        >>> result_dir = '../tests/results/fopa_heat_map'
         >>> net = FOPAHeatMapModel(device=0)
-        >>> for pair in test_set[:1]:
-        >>>     fg_img, fg_mask, bg_img = pair['foreground'], pair['foreground_mask'], pair['background']
-        >>>     bboxes, heatmaps = net(fg_img, fg_mask, bg_img, cache_dir=os.path.join(result_dir, 'cache'), heatmap_dir=os.path.join(result_dir, 'heatmap'))
-        >>>     img_name  = os.path.basename(bg_img).replace('.png', '.jpg')
-        >>>     grid_img  = make_image_grid([bg_img, fg_img, heatmaps[0]])
-        >>>     res_path  = os.path.join(result_dir, 'grid', img_name)
-        >>>     cv2.imwrite(res_path, grid_img)
-        >>>     print('save result to ', res_path)
-        >>> print(f'end testing {task_name}!') 
+        >>> bboxes, heatmaps = net(fg_img, fg_mask, bg_img, cache_dir=os.path.join(result_dir, 'cache'), heatmap_dir=os.path.join(result_dir, 'heatmap'))
+        >>> grid_img = make_image_grid([bg_img, fg_img, heatmaps[0]])
+        >>> cv2.imshow('FOPA heatmap', grid_img)
 
     Expected result:
 
-    .. image:: _static/image/fopa_heatmap_FOPA_result1.png
-        :scale: 72 %
+    .. image:: _static/image/fopa_heatmap_FOPA_result1.jpg
 
-    .. image:: _static/image/fopa_heatmap_FOPA_result3.png
-        :scale: 52 %
-        
     """
     def __init__(self, device=0, model_type='fopa', **kwargs):
         

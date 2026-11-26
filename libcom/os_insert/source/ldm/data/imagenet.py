@@ -281,7 +281,8 @@ class ImageNetSR(Dataset):
         3.  degrades resized crop with degradation_fn
 
         :param size: resizing to size after cropping
-        :param degradation: degradation_fn, e.g. cv_bicubic or bsrgan_light
+        :param degradation: degradation_fn, e.g. cv_bicubic or bsrgan_light.
+          Pillow choices use bicubic, except pil_nearest.
         :param downscale_f: Low Resolution Downsample factor
         :param min_crop_f: determines crop size s,
           where s = c * min_img_side_len with c sampled from interval (min_crop_f, max_crop_f)
@@ -317,11 +318,11 @@ class ImageNetSR(Dataset):
             "cv_area": cv2.INTER_AREA,
             "cv_lanczos": cv2.INTER_LANCZOS4,
             "pil_nearest": PIL.Image.NEAREST,
-            "pil_bilinear": PIL.Image.BILINEAR,
+            "pil_bilinear": PIL.Image.BICUBIC,
             "pil_bicubic": PIL.Image.BICUBIC,
-            "pil_box": PIL.Image.BOX,
-            "pil_hamming": PIL.Image.HAMMING,
-            "pil_lanczos": PIL.Image.LANCZOS,
+            "pil_box": PIL.Image.BICUBIC,
+            "pil_hamming": PIL.Image.BICUBIC,
+            "pil_lanczos": PIL.Image.BICUBIC,
             }[degradation]
 
             self.pil_interpolation = degradation.startswith("pil_")

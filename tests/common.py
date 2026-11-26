@@ -14,8 +14,8 @@ def load_bbox_from_txt(txt_path):
             bbox.append([x1, y1, x2, y2])
     return bbox[0] if len(bbox) == 1 else bbox
 
-def get_test_list():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'source')
+def get_test_list(task_name):
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{task_name}_source')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'background')):
         pair = {}
@@ -33,8 +33,8 @@ def get_test_list():
         samples.append(pair)
     return samples
 
-def get_test_list_painterly_harmonization():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'painterly_harmonization_source')
+def get_test_list_painterly_harmonization(task_name):
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{task_name}_source')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'composite')):
         pair = {}
@@ -45,8 +45,8 @@ def get_test_list_painterly_harmonization():
         samples.append(pair)
     return samples
 
-def get_test_list_harmony_prediction():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'harmony_score_prediction')
+def get_test_list_harmony_prediction(task_name):
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{task_name}_source')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'composite')):
         pair = {}
@@ -57,8 +57,8 @@ def get_test_list_harmony_prediction():
         samples.append(pair)
     return samples
 
-def get_test_list_fopa_heatmap():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fopa_heat_map')
+def get_test_list_fopa_heatmap(task_name):
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{task_name}_source')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'background')):
         pair = {}
@@ -69,8 +69,8 @@ def get_test_list_fopa_heatmap():
         samples.append(pair)
     return samples
 
-def get_controlcom_test_list():
-    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'controllable_composition')
+def get_controlcom_test_list(task_name):
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{task_name}_source')
     samples  = []
     for img_name in os.listdir(os.path.join(data_dir, 'background')):
         pair = {}
@@ -145,7 +145,7 @@ def make_image_grid(img_list, text_list=None, resolution=(512,512), cols=None, b
         row_img = []
         for j in range(cols):
             img = read_image_opencv(img_list[index])
-            img = cv2.resize(img, resolution)
+            img = resize_image_pil(img, resolution)
             if img.ndim == 2:
                 img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             if text_list and len(text_list[index]) > 0:
@@ -176,7 +176,7 @@ def make_image_grid_mure(img_list, text_list=None, resolution=(512,512), cols=No
         row_img = []
         for j in range(cols):
             img = read_image_opencv(img_list[index])
-            img = cv2.resize(img, resolution)
+            img = resize_image_pil(img, resolution)
             if img.ndim == 2:
                 img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             if text_list and len(text_list[index]) > 0:

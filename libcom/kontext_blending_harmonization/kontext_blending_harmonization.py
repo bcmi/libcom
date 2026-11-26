@@ -25,12 +25,10 @@ class KontextBlendingHarmonizationModel:
         >>> from libcom import KontextBlendingHarmonizationModel
         >>> from libcom.utils.process_image import make_image_grid, draw_bbox_on_image
         >>> import cv2
-
         >>> net = KontextBlendingHarmonizationModel(device=0, model_type="Kontext_blend")
         >>> img_names = ["000000049931.png", "000000460450.png", "6c5601278dcb5e6d_m09728_f5cd2891_17.png"]
         >>> bboxes = [[168, 137, 488, 413], [134, 158, 399, 511], [130, 91, 392, 271]]
-        >>> test_dir  = 'tests/controllable_composition/'
-
+        >>> test_dir  = '../tests/flux_kontext_source/'
         >>> for i in range(len(img_names)):
         >>>     bg_img  = test_dir + 'background/' + img_names[i]
         >>>     fg_img  = test_dir + 'foreground/' + img_names[i]
@@ -39,14 +37,14 @@ class KontextBlendingHarmonizationModel:
         >>>     comp    = net(bg_img, fg_img, bbox, mask)
         >>>     bg_img  = draw_bbox_on_image(bg_img, bbox)
         >>>     grid_img = make_image_grid([bg_img, fg_img, comp[0]])
-        >>>     cv2.imwrite('../docs/_static/image/kontext_result{}.jpg'.format(i+1), grid_img)
+        >>>     cv2.imshow('Kontext', grid_img)
+
 
     Expected result:
 
     .. image:: _static/image/kontext_result1.jpg
-        :scale: 21 %
+ 
     .. image:: _static/image/kontext_result2.jpg
-        :scale: 21 %
  
     """
 
@@ -90,7 +88,7 @@ class KontextBlendingHarmonizationModel:
 
         if fg_mask_path is not None:
             fg_mask = Image.open(fg_mask_path).convert('L')  # 灰度
-            fg_mask = fg_mask.resize((fg_img.width, fg_img.height))
+            fg_mask = fg_mask.resize((fg_img.width, fg_img.height), Image.BICUBIC)
             fg_img_np   = np.array(fg_img)
             fg_mask_np  = np.array(fg_mask)
             # mask>127认为是物体，其他是背景 -> 背景改成白色

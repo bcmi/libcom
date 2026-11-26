@@ -735,7 +735,8 @@ class FrozenCLIPImageEmbedder(AbstractEncoder):
         all_hidden = outputs.hidden_states
         last_hidden = outputs.last_hidden_state  # b,257,1024
         global_emb = last_hidden
-        gz = self.transformer.vision_model.post_layernorm(global_emb)
+        vision_model = getattr(self.transformer, 'vision_model', self.transformer)
+        gz = vision_model.post_layernorm(global_emb)
         gz = self.mapper(gz)
         z = self.final_ln(gz)  # b,257,1024
         z_local = z[:, 1:, :]

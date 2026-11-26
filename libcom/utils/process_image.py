@@ -3,6 +3,32 @@ import cv2
 from PIL import Image
 import numpy as np
 
+def resize_image_pil(image, size=None, *, fx=None, fy=None):
+    """Resize with Pillow bicubic, preserving dtype; floats use 32-bit precision."""
+    if size is None:
+        if fx is None or fy is None:
+            raise ValueError("Both fx and fy are required when size is omitted")
+        size = (round(image.shape[1] * fx), round(image.shape[0] * fy))
+
+    def resize_plane(plane):
+        if plane.dtype == np.uint16:
+            plane = plane.astype(np.int32)
+        resized = np.asarray(Image.fromarray(plane).resize(size, Image.BICUBIC))
+        if np.issubdtype(image.dtype, np.integer):
+            limits = np.iinfo(image.dtype)
+            resized = np.clip(resized, limits.min, limits.max)
+        return resized.astype(image.dtype)
+
+    if image.ndim == 2:
+        return resize_plane(image)
+    if image.ndim != 3:
+        raise ValueError("Expected an HxW or HxWxC image")
+    if image.shape[2] == 1:
+        return resize_plane(image[:, :, 0])
+    if image.dtype == np.uint8 and image.shape[2] in (3, 4):
+        return np.array(Image.fromarray(image).resize(size, Image.BICUBIC))
+    return np.stack([resize_plane(image[:, :, i]) for i in range(image.shape[2])], axis=2)
+
 def opencv_to_pil(input):
     return Image.fromarray(cv2.cvtColor(input, cv2.COLOR_BGR2RGB))
 

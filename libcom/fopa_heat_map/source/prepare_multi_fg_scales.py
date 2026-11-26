@@ -51,8 +51,8 @@ def prepare_multi_fg_scales(cache_dir,fg_path,mask_path,bg_path,fg_scale_num):
         left   = int((bg_img.width - new_width) / 2)
         right  = left + new_width
         
-        fg_img_ = np.asarray(fg_tocp.resize((new_width, new_height)))
-        mask_   = np.asarray(mask_tocp.resize((new_width, new_height)))
+        fg_img_ = np.asarray(fg_tocp.resize((new_width, new_height), Image.BICUBIC))
+        mask_   = np.asarray(mask_tocp.resize((new_width, new_height), Image.BICUBIC))
         fg_img  = np.zeros((bg_img.height, bg_img.width, 3), dtype=np.uint8) 
         mask    = np.zeros((bg_img.height, bg_img.width, 3), dtype=np.uint8) 
         fg_img[top:bottom, left:right, :] = fg_img_

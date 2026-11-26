@@ -1,6 +1,8 @@
 from enum import Enum, unique
 
 import cv2
+from libcom.utils.process_image import resize_image_pil
+import numpy as np
 import torch
 from basicsr.utils import img2tensor
 from libcom.painterly_image_harmonization.source.ldm.util import resize_numpy_image
@@ -216,8 +218,12 @@ def get_cond_color(opt, cond_image, cond_inp_type='image', cond_model=None):
     color = resize_numpy_image(color, max_resolution=opt.max_resolution, resize_short_edge=opt.resize_short_edge)
     opt.H, opt.W = color.shape[:2]
     if cond_inp_type == 'image':
-        color = cv2.resize(color, (opt.W//64, opt.H//64), interpolation=cv2.INTER_CUBIC)
-        color = cv2.resize(color, (opt.W, opt.H), interpolation=cv2.INTER_NEAREST)
+        color = resize_image_pil(color, (opt.W//64, opt.H//64))
+        color = np.stack([
+            np.array(Image.fromarray(color[:, :, i]).resize((opt.W, opt.H), Image.NEAREST),
+                     dtype=color.dtype)
+            for i in range(color.shape[2])
+        ], axis=2)
     color = img2tensor(color).unsqueeze(0) / 255.
     color = color.to(opt.device)
     return color

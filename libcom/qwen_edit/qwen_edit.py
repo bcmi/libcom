@@ -120,7 +120,7 @@ def _bucket(image):
         raise ValueError(f"Image too small for training bucket: {image.size}")
     scale = max(target_width / width, target_height / height)
     resized_width, resized_height = round(width * scale), round(height * scale)
-    resized = image.resize((resized_width, resized_height), Image.Resampling.BILINEAR)
+    resized = image.resize((resized_width, resized_height), Image.Resampling.BICUBIC)
     left = round((resized_width - target_width) / 2)
     top = round((resized_height - target_height) / 2)
     return resized.crop((left, top, left + target_width, top + target_height)), (scale, left, top)
@@ -152,7 +152,7 @@ def _background_with_box(image, bbox):
     if not (0 <= x1 < x2 <= width and 0 <= y1 < y2 <= height):
         raise ValueError(f"bbox is outside the background image: {bbox}")
     target_size = _background_target_size(width, height)
-    normalized = image.resize(target_size, Image.Resampling.LANCZOS)
+    normalized = image.resize(target_size, Image.Resampling.BICUBIC)
     x1 = math.floor(x1 * target_size[0] / width)
     x2 = math.ceil(x2 * target_size[0] / width)
     y1 = math.floor(y1 * target_size[1] / height)
@@ -206,8 +206,8 @@ def _white_foreground(image, mask):
     scale = 1024 / max(crop.size)
     size = (min(1024, max(1, round(crop.width * scale))),
             min(1024, max(1, round(crop.height * scale))))
-    resized = crop.resize(size, Image.Resampling.LANCZOS)
-    resized_mask = crop_mask.resize(size, Image.Resampling.LANCZOS)
+    resized = crop.resize(size, Image.Resampling.BICUBIC)
+    resized_mask = crop_mask.resize(size, Image.Resampling.BICUBIC)
     white_object = Image.composite(resized, Image.new("RGB", size, "white"), resized_mask)
     canvas = Image.new("RGB", (1024, 1024), "white")
     canvas.paste(white_object, ((1024 - size[0]) // 2, (1024 - size[1]) // 2))
@@ -215,7 +215,57 @@ def _white_foreground(image, mask):
 
 
 class QwenEditModel:
-    """Qwen-Image-2.1 mode-specific LoRA with the libcom composition call signature."""
+    """
+    Qwen-Image-2.1 based object insertion with mode-specific LoRA adapters.
+
+    The model inserts a foreground object into a specified background region and
+    can generate matching shadows and reflections. Use a clean background: the
+    model does not remove objects already present in the bounding box.
+
+    Args:
+        device (int | str): CUDA device index or device string, such as 0 or
+            ``"cuda:0"``. Default: 0.
+        model_type (str): ``"photorealistic"`` or ``"artistic"``. Default:
+            ``"photorealistic"``.
+        kwargs: Optional model settings:
+
+            - ``model_path`` (str | Path): Local base model path. Defaults to
+              ``LIBCOM_QWEN21_MODEL_PATH``, or the Hugging Face model
+              ``Qwen/Qwen-Image-2.1`` when unset.
+            - ``lora_path`` (str | Path): LoRA checkpoint for the selected mode.
+            - ``lora_paths`` (mapping): Maps model types to LoRA checkpoints.
+              Cannot be used together with ``lora_path``. Without either option,
+              the mode-specific ``LIBCOM_QWEN21_<MODE>_LORA_PATH`` environment
+              variable or the default downloaded checkpoint is used.
+            - ``lora_scale`` (float): LoRA scale. Default: 1.0.
+            - ``local_files_only`` (bool): Whether to use only local base model
+              files. Defaults to True for a local path and False otherwise.
+            - ``cpu_offload`` (bool): Offload model components to CPU when not
+              in use. Default: False.
+
+    Examples:
+        >>> import cv2
+        >>> from libcom import QwenEditModel
+        >>> from libcom.utils.process_image import draw_bbox_on_image, make_image_grid
+        >>> net = QwenEditModel(device=0, model_type="photorealistic")
+        >>> sample = "../tests/qwen_edit_source/photorealistic/1/"
+        >>> background = sample + "background.png"
+        >>> foreground = sample + "foreground.png"
+        >>> mask = sample + "foreground_mask.png"
+        >>> bbox = [153, 563, 749, 870]
+        >>> result = net(background, foreground, bbox, foreground_mask=mask, seed=2511)
+        >>> background_with_box = draw_bbox_on_image(background, bbox, color=(0, 0, 255))
+        >>> grid_img = make_image_grid([background_with_box, foreground, result[0]])
+        >>> cv2.imshow("Qwen Edit", grid_img)
+
+
+    Expected result:
+
+    The grid shows the background with the red bounding box, the foreground,
+    and the generated composite from left to right. Generated details may vary.
+
+    .. image:: _static/image/qwen_edit_result1.png
+    """
 
     def __init__(self, device=0, model_type="photorealistic", **kwargs):
         if model_type not in PROMPTS:
@@ -265,9 +315,29 @@ class QwenEditModel:
     def __call__(self, background_image, foreground_image, bbox,
                  foreground_mask=None, prompt=None, num_samples=1,
                  sample_steps=20, guidance_scale=1.0, seed=2511):
-        """Return N×H×W×3 uint8 BGR images for insertion into a clean background.
+        """
+        Insert the foreground object into the background.
 
-        This model does not remove an object already present in the bbox.
+        Args:
+            background_image (str | Path | PIL.Image | numpy.ndarray): Clean
+                background image. NumPy images must be uint8 in BGR order.
+            foreground_image (str | Path | PIL.Image | numpy.ndarray): Foreground
+                image, with NumPy images in uint8 BGR order.
+            bbox (list | tuple): In-bounds background coordinates
+                ``[x1, y1, x2, y2]``.
+            foreground_mask (str | Path | PIL.Image | numpy.ndarray | None):
+                Mask identifying the foreground object. If omitted, the
+                foreground must already be a 1024x1024 image on white.
+            prompt (str | None): Override the mode-specific prompt.
+            num_samples (int): Number of images to generate. Default: 1.
+            sample_steps (int): Number of inference steps; only 20 is supported.
+            guidance_scale (float): Guidance scale; only 1.0 is supported.
+            seed (int): Initial random seed; successive samples use seed + index.
+
+        Returns:
+            numpy.ndarray: Generated uint8 BGR images of shape ``(N, H, W, 3)``.
+            The height and width depend on background preprocessing and may
+            differ from the input dimensions.
         """
         background, foreground = self.inputs_preprocess(
             background_image, foreground_image, bbox, foreground_mask

@@ -14,7 +14,6 @@ try:
     XFORMERS_IS_AVAILBLE = True
 except:
     XFORMERS_IS_AVAILBLE = False
-    print("No module 'xformers'. Proceeding without it.")
 
 
 def get_timestep_embedding(timesteps, embedding_dim):

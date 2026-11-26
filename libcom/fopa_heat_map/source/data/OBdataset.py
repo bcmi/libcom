@@ -269,8 +269,8 @@ def make_composite_PIL(fg_img, mask_img, bg_img, pos, return_mask=False):
     bottom = min(y + h, bg_h)
     left = max(x, 0)
     right = min(x + w, bg_w)
-    fg_img_ = fg_img.resize((w,h))
-    mask_img_ = mask_img.resize((w,h))
+    fg_img_ = fg_img.resize((w,h), Image.BICUBIC)
+    mask_img_ = mask_img.resize((w,h), Image.BICUBIC)
     
     fg_img_ = np.array(fg_img_)
     mask_img_ = np.array(mask_img_, dtype=np.float64)/255

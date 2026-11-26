@@ -46,22 +46,22 @@ class ImageHarmonizationModel:
         >>> from PIL import Image
         >>> #Use PCTNet
         >>> PCTNet = ImageHarmonizationModel(device=0, model_type='PCTNet')
-        >>> comp_img1  = '../tests/source/composite/comp1_PCTNet.jpg'
-        >>> comp_mask1 = '../tests/source/composite_mask/mask1_PCTNet.png'
+        >>> comp_img1  = '../tests/image_harmonization_source/composite/1.jpg'
+        >>> comp_mask1 = '../tests/image_harmonization_source/composite_mask/1.png'
         >>> PCT_result1 = PCTNet(comp_img1, comp_mask1)
-        >>> cv2.imwrite('../docs/_static/image/image_harmonization_PCT_result1.jpg', np.concatenate([cv2.imread(comp_img1), cv2.imread(comp_mask1), PCT_result1],axis=1))
-        
+        >>> cv2.imshow('PCTNet', np.concatenate([cv2.imread(comp_img1), cv2.imread(comp_mask1), PCT_result1],axis=1))
         >>> #Use LBM
         >>> LBM = ImageHarmonizationModel(device=0, model_type='LBM')
-        >>> comp_img  = '../tests/source/composite/1.jpg'
-        >>> comp_mask = '../tests/source/composite_mask/1.png'
+        >>> comp_img  = '../tests/image_harmonization_source/composite/1.jpg'
+        >>> comp_mask = '../tests/image_harmonization_source/composite_mask/1.png'
         >>> LBM_result = LBM(comp_img, comp_mask, steps=4)
-        >>> cv2.imwrite('../docs/_static/image/image_harmonization_LBM_result.jpg', np.concatenate([cv2.imread(comp_img), cv2.imread(comp_mask), LBM_result],axis=1))
+        >>> cv2.imshow('LBM', np.concatenate([cv2.imread(comp_img), cv2.imread(comp_mask), LBM_result],axis=1))
+
 
     Expected result:
 
     .. image:: _static/image/image_harmonization_PCT_result1.jpg
-    .. image:: _static/image/image_harmonization_LBM_result.jpg
+    .. image:: _static/image/image_harmonization_LBM_result1.jpg
 
     """
     def __init__(self, device=0, model_type='PCTNet', **kwargs):

@@ -160,13 +160,33 @@ class FrozenCLIPImageEmbedder(AbstractEncoder):
         for param in self.final_ln.parameters():
             param.requires_grad = True
 
+    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
+                              missing_keys, unexpected_keys, error_msgs):
+        if not hasattr(self.transformer, "vision_model"):
+            old_prefix = prefix + "transformer.vision_model."
+            new_prefix = prefix + "transformer."
+            current_keys = self.transformer.state_dict()
+            for key in list(state_dict):
+                if key.startswith(old_prefix):
+                    suffix = key[len(old_prefix):]
+                    new_key = new_prefix + suffix
+                    if suffix in current_keys and new_key not in state_dict:
+                        state_dict[new_key] = state_dict.pop(key)
+                    elif suffix == "embeddings.position_ids" and suffix not in current_keys:
+                        state_dict.pop(key)
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict,
+            missing_keys, unexpected_keys, error_msgs
+        )
+
     def forward(self, image):
         outputs = self.transformer(pixel_values=image,
                                    output_hidden_states=True)
         all_hidden  = outputs.hidden_states
         last_hidden = outputs.last_hidden_state # b,257,1024
         global_emb  = last_hidden
-        gz = self.transformer.vision_model.post_layernorm(global_emb)
+        vision_model = getattr(self.transformer, 'vision_model', self.transformer)
+        gz = vision_model.post_layernorm(global_emb)
         gz = self.mapper(gz) 
         z = self.final_ln(gz) # b,257,1024
         # get the outputs from shallow layer

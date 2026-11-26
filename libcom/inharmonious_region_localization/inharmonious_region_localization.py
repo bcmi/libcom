@@ -23,18 +23,18 @@ class InharmoniousLocalizationModel:
     Examples:
         >>> from libcom import InharmoniousLocalizationModel
         >>> import cv2
+        >>> import numpy as np
+        >>> from PIL import Image
         >>> net = InharmoniousLocalizationModel(device=0)
-        >>> comp_img1  = '../tests/source/composite/comp1_MadisNet.png'
+        >>> comp_img1  = '../tests/inharmonious_region_localization_source/composite/1.jpg'
         >>> inharmonious_localization1 = net(comp_img1)
-        >>> comp_img2  = '../tests/source/composite/comp2_MadisNet.png'
-        >>> inharmonious_localization2 = net(comp_img2)
-        >>> cv2.imwrite('../docs/_static/image/inharmonious_localization_result1.jpg', np.concatenate([cv2.resize(cv2.imread(comp_img1),(256,256)), inharmonious_localization1],axis=1))
-        >>> cv2.imwrite('../docs/_static/image/inharmonious_localization_result2.jpg', np.concatenate([cv2.resize(cv2.imread(comp_img2),(256,256)), inharmonious_localization2],axis=1))
+        >>> cv2.imshow('Inharmonious localization', np.concatenate([np.array(Image.fromarray(cv2.imread(comp_img1)).resize((256, 256), Image.BICUBIC)), inharmonious_localization1], axis=1))
 
 
     Expected result:
 
-    .. image:: _static/image/inharmonious_localization_result3_4.jpg
+    .. image:: _static/image/inharmonious_localization_result1.jpg
+       :scale: 50 %
 
     """
     def __init__(self, device=0, model_type='IHDRNet', **kwargs):

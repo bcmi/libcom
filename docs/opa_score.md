@@ -1,4 +1,4 @@
-# Object Placement Assessment (OPA) Score Prediction
+# OPA Score Prediction
 
 OPA score measures whether a composite image is plausible in terms of the foreground object placement, which is predicted by the following method:
 

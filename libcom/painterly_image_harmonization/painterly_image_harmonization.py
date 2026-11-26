@@ -39,8 +39,8 @@ class PainterlyHarmonizationModel:
         >>> import torch
         >>> task_name = 'painterly_image_harmonization'
         >>> MODEL_TYPE = 'PHDNet' # choose from 'PHDNet', 'PHDiffusion'
-        >>> comp_img = '../tests/painterly_harmonization_source/composite/3.png'
-        >>> comp_mask = '../tests/painterly_harmonization_source/composite_mask/3.png'
+        >>> comp_img = '../tests/painterly_image_harmonization_source/composite/1.png'
+        >>> comp_mask = '../tests/painterly_image_harmonization_source/composite_mask/1.png'
         >>> net = PainterlyHarmonizationModel(device=0, model_type=MODEL_TYPE)
         >>> output_img = net(comp_img, comp_mask)
         >>> grid_img = make_image_grid([comp_img, comp_mask, output_img])
@@ -48,8 +48,7 @@ class PainterlyHarmonizationModel:
 
     Expected result:
 
-    .. image:: _static/image/painterly_image_harmonization_result2.jpg
-    .. image:: _static/image/painterly_image_harmonization_result3.jpg
+    .. image:: _static/image/painterly_image_harmonization_result1.jpg
         
     """
     def __init__(self, device=0, model_type='PHDNet', **kwargs):
@@ -170,7 +169,7 @@ class PainterlyHarmonizationModel:
         if self.model_type == 'PHDNet':
             return self.PHDNet_inference(composite_image, composite_mask)
         if random_seed != None:
-            seed_everything(random_seed)
+            seed_everything(random_seed, verbose=False)
         comp, mask = self.inputs_preprocess(composite_image, composite_mask)
         self.scheduler.set_timesteps(sample_steps, device=self.device)
         init_timestep = min(int(sample_steps * strength), sample_steps)

@@ -47,7 +47,7 @@ def evaluate(
     closest_ar_bg = min(ASPECT_RATIOS, key=lambda x: abs(float(x) - ar_bg))
     source_dimensions = ASPECT_RATIOS[closest_ar_bg]
 
-    source_image = source_image.resize(source_dimensions)
+    source_image = source_image.resize(source_dimensions, PIL.Image.BICUBIC)
 
     img_pasted_tensor = ToTensor()(source_image).unsqueeze(0) * 2 - 1
     batch = {
@@ -65,6 +65,6 @@ def evaluate(
 
     output_image = (output_image[0].float().cpu() + 1) / 2
     output_image = ToPILImage()(output_image)
-    output_image.resize((ori_h_bg, ori_w_bg))
+    output_image.resize((ori_h_bg, ori_w_bg), PIL.Image.BICUBIC)
 
     return output_image

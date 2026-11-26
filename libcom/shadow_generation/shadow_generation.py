@@ -22,7 +22,7 @@ from .source.PostProcessModel import PostProcess
 from .source.cldm.model import load_state_dict
 from .source.attention_processor import IPAttnProcessor, AttnProcessor
 
-seed_everything(42)
+seed_everything(42, verbose=False)
 
 def is_torch2_available():
     return hasattr(F, "scaled_dot_product_attention")
@@ -424,23 +424,23 @@ class ShadowGenerationModel:
         >>> from libcom.utils.process_image import make_image_grid
         >>> import cv2
         >>> net = ShadowGenerationModel()
-        >>> comp_image1 = "../tests/shadow_generation/composite/1.png"
-        >>> comp_mask1 = "../tests/shadow_generation/composite_mask/1.png"
+        >>> comp_image1 = "../tests/shadow_generation_source/composite/1.png"
+        >>> comp_mask1 = "../tests/shadow_generation_source/composite_mask/1.png"
         >>> preds = net(comp_image1, comp_mask1, number=5)
         >>> grid_img  = make_image_grid([comp_image1, comp_mask1] + preds)
-        >>> cv2.imwrite('../docs/_static/image/shadow_generation_result1.jpg', grid_img)
-        >>> comp_image2 = "../tests/shadow_generation/composite/2.png"
-        >>> comp_mask2 = "../tests/shadow_generation/composite_mask/2.png"
-        >>> preds = net(comp_image2, comp_mask2, number=5)
+        >>> cv2.imshow('Shadow generation', grid_img)
+        >>> comp_image2 = "../tests/shadow_generation_source/composite/2.png"
+        >>> comp_mask2 = "../tests/shadow_generation_source/composite_mask/2.png"
+        >>> preds = net(comp_image2, comp_mask2, number=1)
         >>> grid_img  = make_image_grid([comp_image2, comp_mask2] + preds)
-        >>> cv2.imwrite('../docs/_static/image/shadow_generation_result2.jpg', grid_img)
+        >>> cv2.imshow('Shadow generation', grid_img)
+
 
     Expected result:
 
     .. image:: _static/image/shadow_generation_result1.jpg
-        :scale: 21 %
+
     .. image:: _static/image/shadow_generation_result2.jpg
-        :scale: 21 %
 
     """
     def __init__(self, device=0):

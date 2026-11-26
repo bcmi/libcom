@@ -27,7 +27,7 @@ class HarmonyScoreModel:
         >>> from libcom.utils.process_image import make_image_grid
         >>> import cv2
         >>> net = HarmonyScoreModel(device=0, model_type='BargainNet')
-        >>> test_dir   = '../tests/harmony_score_prediction/'
+        >>> test_dir   = '../tests/harmony_score_prediction_source/'
         >>> img_names  = ['vaulted-cellar-247391_inharm.jpg', 'ameland-5651866_harm.jpg']
         >>> vis_list,scores = [], []
         >>> for img_name in img_names:
@@ -37,12 +37,11 @@ class HarmonyScoreModel:
         >>>     vis_list += [comp_img, comp_mask]
         >>>     scores.append(score)
         >>> grid_img  = make_image_grid(vis_list, text_list=[f'harmony_score:{scores[0]:.2f}', 'composite-mask', f'harmony_score:{scores[1]:.2f}', 'composite-mask'])
-        >>> cv2.imwrite('../docs/_static/image/harmonyscore_result1.jpg', grid_img)
+        >>> cv2.imshow('Harmony score', grid_img)
  
     Expected result:
 
     .. image:: _static/image/harmonyscore_result1.jpg
-        :scale: 38 %
 
     """
     def __init__(self, device=0, model_type='BargainNet', **kwargs):

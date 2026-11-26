@@ -2,6 +2,7 @@ import torch
 # from clip2 import build_model
 # import clip
 import cv2
+from libcom.utils.process_image import resize_image_pil
 import numpy as np
 from sklearn.cluster import KMeans
 from PIL import Image
@@ -64,7 +65,7 @@ def crop_and_resize_shadow(shadow_img, shadow_mask, target_size=224):
     scale = target_size / max(w, h)
     new_w, new_h = int(w * scale), int(h * scale)
 
-    shadow_resized = cv2.resize(shadow_area, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+    shadow_resized = resize_image_pil(shadow_area, (new_w, new_h))
 
     background = np.zeros((target_size, target_size, 3), dtype=np.uint8)
 

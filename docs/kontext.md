@@ -1,4 +1,4 @@
-# KontextBlendingHarmonization
+# FLUX-Kontext Composition
 
 Based on FLUX.1 Kontext, we provide the model KontextBlendingHarmonization which supports two functions: image harmonization and image blending. Image harmonization adjusts the foreground illumination in a composite image to be consistent with the background. Image blending seamlessly combines a foreground object with a background so that the composite appears natural and visually coherent.
 

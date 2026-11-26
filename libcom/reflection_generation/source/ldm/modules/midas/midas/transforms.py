@@ -1,6 +1,19 @@
 import numpy as np
 import cv2
+from libcom.utils.process_image import resize_image_pil
 import math
+from PIL import Image
+
+
+def _resize_nearest(array, size):
+    if array.dtype == np.float64:
+        # Pillow's float image mode is 32-bit; resize indices to retain precision.
+        rows = np.arange(array.shape[0], dtype=np.int32)[:, None]
+        cols = np.arange(array.shape[1], dtype=np.int32)[None, :]
+        rows = np.array(Image.fromarray(rows).resize((1, size[1]), Image.NEAREST)).ravel()
+        cols = np.array(Image.fromarray(cols).resize((size[0], 1), Image.NEAREST)).ravel()
+        return array[rows[:, None], cols]
+    return np.array(Image.fromarray(array).resize(size, Image.NEAREST), dtype=array.dtype)
 
 
 def apply_min_size(sample, size, image_interpolation_method=cv2.INTER_AREA):
@@ -9,6 +22,7 @@ def apply_min_size(sample, size, image_interpolation_method=cv2.INTER_AREA):
     Args:
         sample (dict): sample
         size (tuple): image size
+        image_interpolation_method: Retained for compatibility; images use Pillow bicubic.
 
     Returns:
         tuple: new size
@@ -28,18 +42,10 @@ def apply_min_size(sample, size, image_interpolation_method=cv2.INTER_AREA):
     shape[1] = math.ceil(scale * shape[1])
 
     # resize
-    sample["image"] = cv2.resize(
-        sample["image"], tuple(shape[::-1]), interpolation=image_interpolation_method
-    )
+    sample["image"] = resize_image_pil(sample["image"], tuple(shape[::-1]))
 
-    sample["disparity"] = cv2.resize(
-        sample["disparity"], tuple(shape[::-1]), interpolation=cv2.INTER_NEAREST
-    )
-    sample["mask"] = cv2.resize(
-        sample["mask"].astype(np.float32),
-        tuple(shape[::-1]),
-        interpolation=cv2.INTER_NEAREST,
-    )
+    sample["disparity"] = _resize_nearest(sample["disparity"], tuple(shape[::-1]))
+    sample["mask"] = _resize_nearest(sample["mask"].astype(np.float32), tuple(shape[::-1]))
     sample["mask"] = sample["mask"].astype(bool)
 
     return tuple(shape)
@@ -81,6 +87,7 @@ class Resize(object):
                 "upper_bound": Output will be at max as large as the given size. (Output size might be smaller than given size.)
                 "minimal": Scale as least as possible.  (Output size might be smaller than given size.)
                 Defaults to "lower_bound".
+            image_interpolation_method: Retained for compatibility; images use Pillow bicubic.
         """
         self.__width = width
         self.__height = height
@@ -89,7 +96,6 @@ class Resize(object):
         self.__keep_aspect_ratio = keep_aspect_ratio
         self.__multiple_of = ensure_multiple_of
         self.__resize_method = resize_method
-        self.__image_interpolation_method = image_interpolation_method
 
     def constrain_to_multiple_of(self, x, min_val=0, max_val=None):
         y = (np.round(x / self.__multiple_of) * self.__multiple_of).astype(int)
@@ -165,30 +171,16 @@ class Resize(object):
         )
 
         # resize sample
-        sample["image"] = cv2.resize(
-            sample["image"],
-            (width, height),
-            interpolation=self.__image_interpolation_method,
-        )
+        sample["image"] = resize_image_pil(sample["image"], (width, height))
 
         if self.__resize_target:
             if "disparity" in sample:
-                sample["disparity"] = cv2.resize(
-                    sample["disparity"],
-                    (width, height),
-                    interpolation=cv2.INTER_NEAREST,
-                )
+                sample["disparity"] = _resize_nearest(sample["disparity"], (width, height))
 
             if "depth" in sample:
-                sample["depth"] = cv2.resize(
-                    sample["depth"], (width, height), interpolation=cv2.INTER_NEAREST
-                )
+                sample["depth"] = _resize_nearest(sample["depth"], (width, height))
 
-            sample["mask"] = cv2.resize(
-                sample["mask"].astype(np.float32),
-                (width, height),
-                interpolation=cv2.INTER_NEAREST,
-            )
+            sample["mask"] = _resize_nearest(sample["mask"].astype(np.float32), (width, height))
             sample["mask"] = sample["mask"].astype(bool)
 
         return sample

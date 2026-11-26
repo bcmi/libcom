@@ -7,7 +7,7 @@ import shutil
 task_name = 'generate_composite'
 
 if __name__ == '__main__':
-    test_set = get_test_list()
+    test_set = get_test_list(task_name)
     result_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', task_name)
     if os.path.exists(result_dir):
         shutil.rmtree(result_dir)
@@ -21,7 +21,6 @@ if __name__ == '__main__':
             comp_img, comp_mask = get_composite_image(fg_img, fg_mask, bg_img, bbox, option)
             img_list.append(comp_img)
             img_list.append(comp_mask)
-        # visulization results
         img_name  = os.path.basename(fg_img).replace('.png', '.jpg')
         grid_img  = make_image_grid(img_list, cols=4)
         res_path  = os.path.join(result_dir, img_name)

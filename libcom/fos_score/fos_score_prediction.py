@@ -33,11 +33,11 @@ class FOSScoreModel:
         >>> import torch
         >>> task_name = 'fos_score_prediction'
         >>> MODEL_TYPE = 'FOS_D'
-        >>> background = '../tests/source/background/f80eda2459853824_m09g1w_b2413ec8_11.png'
-        >>> fg_bbox    = [175, 82, 309, 310] # x1,y1,x2,y2
-        >>> foreground = '../tests/source/foreground/f80eda2459853824_m09g1w_b2413ec8_11.png'
-        >>> foreground_mask = '../tests/source/foreground_mask/f80eda2459853824_m09g1w_b2413ec8_11.png'
-        >>> composite_image = '../tests/source/composite/f80eda2459853824_m09g1w_b2413ec8_11.png'
+        >>> background = '../tests/fos_score_prediction_source/background/1.jpg'
+        >>> fg_bbox    = [1000, 895, 1480, 1355] # x1,y1,x2,y2
+        >>> foreground = '../tests/fos_score_prediction_source/foreground/1.jpg'
+        >>> foreground_mask = '../tests/fos_score_prediction_source/foreground_mask/1.png'
+        >>> composite_image = '../tests/fos_score_prediction_source/composite/1.jpg'
         >>> net = FOSScoreModel(device=0, model_type=MODEL_TYPE)
         >>> score = net(background, foreground, fg_bbox, foreground_mask=foreground_mask)
         >>> grid_img  = make_image_grid([background, foreground, composite_image], text_list=[f'fos_score:{score:.2f}'])
@@ -45,11 +45,7 @@ class FOSScoreModel:
 
     Expected result:
 
-    .. image:: _static/image/fos_score_result3.jpg
-        :scale: 50 %
-    .. image:: _static/image/fos_score_result2.jpg
-        :scale: 50 %
-
+    .. image:: _static/image/fos_score_result1.jpg
             
     """
     def __init__(self, device=0, model_type='FOS_D', **kwargs):

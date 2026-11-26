@@ -7,6 +7,8 @@ from torchvision import transforms
 
 
 class LSUNBase(Dataset):
+    """Load LSUN images; legacy interpolation choices all use Pillow bicubic."""
+
     def __init__(self,
                  txt_file,
                  data_root,
@@ -26,10 +28,10 @@ class LSUNBase(Dataset):
         }
 
         self.size = size
-        self.interpolation = {"linear": PIL.Image.LINEAR,
-                              "bilinear": PIL.Image.BILINEAR,
+        self.interpolation = {"linear": PIL.Image.BICUBIC,
+                              "bilinear": PIL.Image.BICUBIC,
                               "bicubic": PIL.Image.BICUBIC,
-                              "lanczos": PIL.Image.LANCZOS,
+                              "lanczos": PIL.Image.BICUBIC,
                               }[interpolation]
         self.flip = transforms.RandomHorizontalFlip(p=flip_p)
 

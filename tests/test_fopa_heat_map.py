@@ -7,8 +7,7 @@ import shutil
 task_name = 'fopa_heat_map'
 
 if __name__ == '__main__':
-    # collect pairwise test samples
-    test_set = get_test_list_fopa_heatmap()
+    test_set = get_test_list_fopa_heatmap(task_name)
     result_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', task_name)
     if os.path.exists(result_dir):
         shutil.rmtree(result_dir)

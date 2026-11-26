@@ -37,23 +37,15 @@ class ReflectionGenerationModel:
         >>> from libcom.utils.process_image import make_image_grid
         >>> import cv2
         >>> net = ReflectionGenerationModel(device=2, model_type='ReflectionGeneration')
-        >>> comp_image1 = "../tests/reflection_generation/composite/1.png"
-        >>> comp_mask1 = "../tests/reflection_generation/composite_mask/1.png"
-        >>> preds = net(comp_image1, comp_mask1, number=5)
+        >>> comp_image1 = "../tests/reflection_generation_source/composite/1.png"
+        >>> comp_mask1 = "../tests/reflection_generation_source/composite_mask/1.png"
+        >>> preds = net(comp_image1, comp_mask1, number=1)
         >>> grid_img  = make_image_grid([comp_image1, comp_mask1] + preds)
-        >>> cv2.imwrite('../docs/_static/image/reflection_generation_result1.jpg', grid_img)
-        >>> comp_image2 = "../tests/reflection_generation/composite/2.png"
-        >>> comp_mask2 = "../tests/reflection_generation/composite_mask/2.png"
-        >>> preds = net(comp_image2, comp_mask2, number=5)
-        >>> grid_img  = make_image_grid([comp_image2, comp_mask2] + preds)
-        >>> cv2.imwrite('../docs/_static/image/reflection_generation_result2.jpg', grid_img)
+        >>> cv2.imshow('Reflection generation', grid_img)
 
     Expected result:
 
-    .. image:: _static/image/reflection_generation1.jpg
-        :scale: 21 %
-    .. image:: _static/image/reflection_generation2.jpg
-        :scale: 21 %
+    .. image:: _static/image/reflection_generation_result1.jpg
 
         
     """
@@ -241,7 +233,7 @@ class ReflectionGenerationModel:
             generated_images (list): A list of images with generated foreground reflections. Each image is in ndarray form with a shape of 512x512x3
 
         """
-        seed_everything(seed)
+        seed_everything(seed, verbose=False)
         inputs = self.inputs_preprocess(composite_image, composite_mask)
         preds = []
         for _ in range(number):

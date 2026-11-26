@@ -3,12 +3,11 @@ from libcom import HarmonyScoreModel
 import os
 import cv2
 import shutil
-import torch
 
 task_name = 'harmony_score_prediction'
 
 if __name__ == '__main__':
-    test_set = get_test_list_harmony_prediction()
+    test_set = get_test_list_harmony_prediction(task_name)
     result_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', task_name)
     if os.path.exists(result_dir):
         shutil.rmtree(result_dir)

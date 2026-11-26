@@ -159,7 +159,7 @@ def generate_image_batch(
 
     fg_img = Image.open(fg_path).convert("RGB")
     fg_mask = Image.open(fg_mask_path).convert("RGB")
-    fg_mask = fg_mask.resize((fg_img.width, fg_img.height))
+    fg_mask = fg_mask.resize((fg_img.width, fg_img.height), Image.BICUBIC)
 
     black = np.zeros_like(np.asarray(fg_mask))
     fg_mask_np = np.asarray(fg_mask)
@@ -230,7 +230,7 @@ def generate_image_batch_from_images(
 
     if fg_mask_np.shape[0] != fg_img.height or fg_mask_np.shape[1] != fg_img.width:
         fg_mask_pil = Image.fromarray(fg_mask_np)
-        fg_mask_pil = fg_mask_pil.resize((fg_img.width, fg_img.height))
+        fg_mask_pil = fg_mask_pil.resize((fg_img.width, fg_img.height), Image.BICUBIC)
         fg_mask_np = np.asarray(fg_mask_pil).astype(np.uint8)
 
     black = np.zeros((fg_img.height, fg_img.width, 3), dtype=np.uint8)

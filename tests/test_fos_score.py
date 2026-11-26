@@ -3,13 +3,12 @@ from libcom import FOSScoreModel
 import os
 import cv2
 import shutil
-import torch
 
 task_name = 'fos_score_prediction'
 MODEL_TYPE = 'FOS_D' # choose from 'FOS_D', 'FOS_E'
 
 if __name__ == '__main__':
-    test_set = get_test_list()
+    test_set = get_test_list(task_name)
     result_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', task_name, MODEL_TYPE)
     if os.path.exists(result_dir):
         shutil.rmtree(result_dir)

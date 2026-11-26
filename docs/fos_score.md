@@ -1,4 +1,4 @@
-# Foreground Object Search (FOS) Score
+# FOS Score Prediction
 
 FOS score measures the compatibility between foreground and background in terms of geometry and semantics, which is computed by using the following method. FOS score is useful for foreground object search, that is, retrieving compatible foregrounds from a foreground library for a given background with bounding box. 
 

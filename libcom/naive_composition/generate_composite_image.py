@@ -24,9 +24,9 @@ def get_composite_image(foreground_image, foreground_mask, background_image, bbo
         >>> from libcom import get_composite_image
         >>> from libcom.utils.process_image import make_image_grid, draw_bbox_on_image
         >>> import cv2
-        >>> test_dir = 'source/'
-        >>> img_list = ['1.jpg', '8.jpg']
-        >>> bbox_list = [[1000, 895, 1480, 1355], [1170, 944, 2331, 3069]] 
+        >>> test_dir = '../tests/generate_composite_source/'
+        >>> img_list = ['1.jpg']
+        >>> bbox_list = [[1000, 895, 1480, 1355]]
         >>> for i,img_name in enumerate(img_list):
         >>>     bg_img  = test_dir + 'background/' + img_name
         >>>     bbox    = bbox_list[i] # x1,y1,x2,y2
@@ -39,16 +39,13 @@ def get_composite_image(foreground_image, foreground_mask, background_image, bbo
         >>>     vis_list = [bg_img, fg_img, comp_img1, comp_mask1, comp_img2, comp_mask2, comp_img3, comp_mask3]
         >>>     # visualization results
         >>>     grid_img  = make_image_grid(vis_list, cols=4)
-        >>>     cv2.imwrite(f'../docs/_static/image/generatecomposite_result{i+1}.jpg', grid_img)
+        >>>     cv2.imshow('Composite image', grid_img)
+
     
     Expected result:
 
     .. image:: _static/image/generatecomposite_result1.jpg
-        :scale: 38 %
-        
-    .. image:: _static/image/generatecomposite_result2.jpg
-        :scale: 38 %
-            
+
     """
     choices = ['none', 'gaussian', 'poisson']
     assert option in choices, f'{option} must be one of {choices}'
@@ -111,7 +108,8 @@ def poisson_composite_image(bg_img, fg_img, fg_mask, bbox, clone_method=cv2.NORM
     fg_region, fg_mask = crop_and_resize_foreground(fg_img, fg_mask, bbox)
     x1, y1, x2, y2 = bbox
     center    = (x1+x2)//2, (y1+y2)//2
-    comp_img  = cv2.seamlessClone(fg_region, bg_img, fg_mask[:,:,np.newaxis], center, clone_method)
+    clone_mask = fg_mask.copy()
+    comp_img   = cv2.seamlessClone(fg_region, bg_img, clone_mask, center, clone_method)
     comp_mask = np.zeros((bg_img.shape[0], bg_img.shape[1]), dtype=np.uint8) 
     comp_mask[y1:y2, x1:x2] = fg_mask
     return comp_img, comp_mask

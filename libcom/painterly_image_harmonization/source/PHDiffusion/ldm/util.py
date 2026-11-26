@@ -2,6 +2,7 @@ import importlib
 import math
 
 import cv2
+from libcom.utils.process_image import resize_image_pil
 import torch
 import numpy as np
 
@@ -180,7 +181,7 @@ def resize_numpy_image(image, max_resolution=512 * 512, resize_short_edge=None):
         k = k**0.5
     h = int(np.round(h * k / 64)) * 64
     w = int(np.round(w * k / 64)) * 64
-    image = cv2.resize(image, (w, h), interpolation=cv2.INTER_LANCZOS4)
+    image = resize_image_pil(image, (w, h))
     return image
 
 
